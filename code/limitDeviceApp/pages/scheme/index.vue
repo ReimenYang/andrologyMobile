@@ -89,7 +89,10 @@
             :info="item"
             @click="toReady(item)"
           >
-            <view slot="footer">
+            <view
+              slot="footer"
+              v-if="item.todayState === 'Y'"
+            >
               <view class="today">
                 <view class="after">
                   √<br>今日
