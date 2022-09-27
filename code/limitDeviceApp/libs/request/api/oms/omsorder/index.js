@@ -48,7 +48,7 @@ const apis = {
     method: 'GET',
     url: 'omsorder/orderReport',
     group: 'oms',
-    dataType: 'form'
+    dataType: 'keyValue'
   }
 }
 

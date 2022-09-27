@@ -3,8 +3,21 @@ import initUni from './uni'
 import page from './page'
 import verify from './verify'
 import { Interpreter } from 'eval5'
+import { framework } from '@/projectConfig.js'
 
-let data = {}
+let data = async () => {
+  if (framework === 'uni') {
+    let obj = await initUni()
+    for (let key in obj) {
+      data[key] = obj[key]
+    }
+    console.log(data.networkType)
+  }
+}
+if (framework === 'uni') {
+  data.systemInfo = uni.getSystemInfoSync()
+  data.processEnv = process.env
+}
 const s = 1000 // 秒
 const m = s * 60 // 分
 const h = m * 60 // 时
@@ -203,7 +216,5 @@ data.listFormat = ({
 }
 data.page = page
 data.verify = verify
-
-if (typeof uni !== 'undefined') initUni()
 
 export default data

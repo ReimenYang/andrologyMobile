@@ -33,13 +33,13 @@ const apis = {
     method: 'POST',
     url: 'weixin/qwcodeQuery',
     group: 'core',
-    dataType: 'form'
+    dataType: 'keyValue'
   },
   getSdkConfig: {
     method: 'GET',
     url: 'weixin/getSdkConfig',
     group: 'core',
-    dataType: 'form'
+    dataType: 'keyValue'
   }
 }
 

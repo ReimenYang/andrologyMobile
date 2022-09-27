@@ -25,19 +25,22 @@ import init from './init'
 // }
 Vue.config.productionTip = false
 
-Vue.prototype.toast = (title, duration, icon) => uni.showToast({ title, duration, icon: icon || 'none' })
+Vue.prototype.toast = (title, duration = 2000, icon = 'none') => uni.showToast({ title, duration, icon })
 Vue.prototype.libs = libs
 Vue.prototype.globalData = libs.configProject.globalData
 Vue.prototype.echarts = echarts
 
-uni.report('设备信息', uni.getSystemInfoSync())
 
 Vue.mixin({
   async created () {
     // 跳过初始化
     // libs.configProject.globalData.appReady = true
     // 开始初始化
-    if (libs.configProject.globalData.appReady !== true) await init(this)
+    if (libs.configProject.globalData.appReady !== true) {
+      await libs.data()
+      await init(this)
+      uni.report('设备信息', libs.data.systemInfo)
+    }
   },
   async mounted () {
     // #ifdef H5
@@ -54,7 +57,7 @@ Vue.mixin({
         !this.globalData.dataBase ||// 对象未健全
         !getCurrentPages().length ||// 页面未准备好
         !this.globalData.dataBase.debugSetting.page.includes(getCurrentPages().slice(-1)[0].$route.fullPath) ||// 非指定页面
-        !this.globalData.dataBase.debugSetting.user.includes(this.globalData.userInfo.openid)// 非指定用户
+        !this.globalData.dataBase.debugSetting.user.includes(this.globalData.userInfo.wxOpenid)// 非指定用户
       )
     }
   }

@@ -9,7 +9,7 @@ let wx = require('weixin-js-sdk')
 wechat.getOAuth = async (url, hostPath) => {
   if (data.getStorage('getOAuth') === 'Y') return
   else data.setStorage('getOAuth', 'Y')
-  let hostOAuth = config.apiServers[config.mode === 'produce' ? 'produce' : 'test']
+  let hostOAuth = config.apiServers[(config.mode === 'produce' || config.mode === 'pre') ? config.mode : 'test']
   location.href = hostOAuth + request.api.core.wxmpoauth.authorize.url
     + '?returnUrl=' + encodeURIComponent(hostOAuth + request.api.core.wxmpoauth.userInfo.url
       + '?rurl=' + encodeURIComponent(url || (hostPath || config.urlPage) + data.page.pageRoute().hashPath))// 后端重定向
@@ -18,7 +18,7 @@ wechat.getOAuth = async (url, hostPath) => {
 wechat.setHeaders = async (_openId = 'openId', _unionId = 'unionId', header = {}) => {
   let page = data.page.pageRoute()
   let openid = page.hashParams[_openId] || page.pageParams[_openId] || data.getStorage(_openId) || ''
-  let unionid = page.hashParams[_unionId] || page.pageParams[_unionId] || data.getStorage(_unionId) || ''
+  let unionid = page.hashParams[_unionId] || page.pageParams[_unionId] || data.getStorage(_unionId) || '1'
   let headers = { openid, unionid, ...header }
   config.globalData.headers = headers
 }

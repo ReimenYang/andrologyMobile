@@ -16,8 +16,13 @@
         <!-- 数字控件 -->
         <xnw-number
           v-if="item.number"
-          v-bind="item.number"
+          :min="item.number.min"
+          :max="item.number.max"
+          :step="item.number.step"
+          :typeDisabled="item.number.typeDisabled"
+          :style="item.number.style"
           :value="item.number.value"
+          :disabled="item.number.disabled"
           @change="(val)=>onchange(val,item,{},'number')"
         />
         <!-- 文本域控件 -->
@@ -108,12 +113,12 @@
           {{ item.link.label }}
         </view>
         <!-- 文本 -->
-        <!-- <view
+        <view
           class="text"
           v-else
         >
-          {{ item.text }}
-        </view> -->
+          {{ item.textContent }}
+        </view>
       </view>
     </view>
     <!-- #endif -->

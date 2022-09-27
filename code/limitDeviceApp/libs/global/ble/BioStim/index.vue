@@ -7,21 +7,29 @@
     <view>
       蓝牙功能:
       <switch
-        :checked="isTurnOnBluetoothSwitch"
-        @change="turnOnBluetoothSwitch"
-        :disabled="isTurnOnBluetoothSwitch"
+        :checked="bleReady"
+        @change="turnOnBluetooth"
+        :disabled="bleReady"
+      />
+    </view>
+    <view>
+      使用新协议（连接状态下不能改）:
+      <switch
+        :checked="isNewDevice==='Y'"
+        @change="protocolChange"
+        :disabled="connected"
       />
     </view>
     <view>
       <button
-        @click="search"
+        @click="bleSearch"
         type="primary"
       >
         搜索设备
       </button>
     </view>
     <view
-      v-for="item in bleModules.equipmentList"
+      v-for="item in BioStimBleModule.deviceList"
       :key="item.name"
     >
       <view @click="selectDevice(item)">
@@ -34,12 +42,12 @@
       </view>
     </view>
     <button
-      @click="addDevice"
+      @click="connectDevice"
       type="primary"
     >
-      确认链接
+      确认连接
     </button>
-    <view v-if="devicesReady">
+    <view v-if="paired">
       <scroll-view
         class="uni-scroll_box"
         scrollY
@@ -68,7 +76,7 @@
       <view>
         治疗时间：
         <xnw-number
-          :disabled="!workoutProject.initcommand"
+          :disabled="!workoutProject.initcommand||!workoutProject.initCommand"
           :min="1"
           :value="workTime/60"
           @change="setWorkTime"
@@ -76,7 +84,7 @@
         分钟
       </view>
       <button
-        @click="sendProject"
+        @click="sendInit"
         type="primary"
       >
         发送方案
@@ -86,7 +94,7 @@
           v-for="item in control"
           :key="item.name"
           :type="item.style"
-          @click="item.fun"
+          @click="item.fun()"
         >
           {{ item.name }}
         </button>
@@ -98,147 +106,56 @@
 
 <script>
 import workoutData from './workoutData.js'
-// import { BleModule } from './BleModule.js'
-// import { EventBus } from './EventBus.js'
+// mixinBLE只为当前demo使用，具体项目需要另外定义
+import mixinBLE from './mixinBLE.js'
 export default {
+  mixins: [mixinBLE],
   data () {
     return {
       workoutList: workoutData.data,
       workoutProject: {},
-      isTurnOnBluetoothSwitch: false, // 是否已打开蓝牙开关
+      bleReady: false, // 是否已打开蓝牙开关
       isAddDeviceSuccess: false, // 是否添加设备成功
-      bleModules: new this.libs.global.ble.BleModule(),
+      BioStimBleModule: this.libs.global.ble.BioStimBleModule,
       control: [],
-      devicesSelected: null,
-      devicesReady: false,
       planReady: false,
-      whiteList: ['muscstim', 'biostim'],
-      blackList: [],
-      eventBusCallBack: () => console.log('eventBusCallBack'),
       workTime: 60
     }
   },
-  created () {
-    //  #ifdef APP-PLUS
+  async created () {
     this.control = [
-      { name: '左电流+', fun: this.bleModules.bleModule.addLeftMa },
-      { name: '左电流-', fun: this.bleModules.bleModule.subLeftMa },
-      { name: '右电流+', fun: this.bleModules.bleModule.addRightMa },
-      { name: '右电流-', fun: this.bleModules.bleModule.subRightMa },
-      { name: '开始治疗', fun: this.bleModules.bleModule.startTreatment, style: 'primary' },
-      { name: '暂停治疗', fun: this.bleModules.bleModule.pauseTreatment },
-      { name: '退出治疗', fun: this.bleModules.bleModule.exitProject },
-      { name: '断开蓝牙设备', fun: this.bleModules.bleModule.closeBLEConnection }
+      { name: '左电流+', fun: this.leftPlus },
+      { name: '左电流-', fun: this.leftMinus },
+      { name: '右电流+', fun: this.rightPlus },
+      { name: '右电流-', fun: this.rightMinus },
+      { name: '开始治疗', fun: this.startTreatment, style: 'primary' },
+      { name: '暂停治疗', fun: this.pauseTreatment },
+      { name: '退出治疗', fun: this.endTreatment },
+      { name: '断开蓝牙设备', fun: this.closeBLEConnection }
     ]
-    let EventBus = this.libs.global.ble.EventBus
-    this.eventBusCallBack = res => {
-      switch (res.msgCode) {
-        case EventBus.ADD_DEVICE_SUCCESS:
-          break
-        case EventBus.DELETE_DEVICE_SUCCESS:
-          break
-        case EventBus.UPDATE_DEVICE_SUCCESS:
-          break
-      }
-      console.log(res.msgCode)
-    }
-    EventBus.register(this.eventBusCallBack)
-
-    // 设备过滤逻辑,需要注意发动的时机
-    this.setDeviceFilter()
-
-    // 判断客户端蓝牙状态
-    this.bleModules.bleModule.isTurnOnBluetoothSwitch(
-      // 如果已经打开就开始搜索蓝牙设备
-      () => {
-        this.isTurnOnBluetoothSwitch = true
-        this.search()
-      },
-      // 未打开则监听客户端蓝牙状态
-      this.turnOnBluetoothSwitch
-    )
-    // #endif
   },
-
-  // onUnload () {
-  //   EventBus.unregister(this.eventBusCallBack)
-  // },
   onBackPress () {
-    if (!this.isAddDeviceSuccess) this.bleModules.disConnect()
+    if (!this.isAddDeviceSuccess) this.closeBLEConnection()
     return true
   },
   methods: {
-    /**
-     * 设备过滤逻辑：
-     * 1.必须先配置好白名单(whiteList)和黑名单(blackList)再调用
-     * 2.传入需要判断的字段名，默认值是name
-     * 3.只显示符合白名单判断逻辑，且不在黑名单逻辑内的设备
-     * 4.必须在启用搜索设备前调用
-     *
-     * 白名单判断逻辑：1.大小写不敏感；2.模糊匹配
-     * 黑名单判断逻辑：1.大小写敏感；2.精准匹配
-     */
-    setDeviceFilter (key = 'name') {
-      return this.bleModules.setDeviceFilter((newDevice) => {
-        console.log(newDevice[key])
-        if (
-          this.whiteList.find(item => String(newDevice[key]).toLowerCase().match(String(item).toLowerCase()))
-          &&
-          !this.blackList.includes(newDevice[key])
-        )
-          return newDevice
-      })
+    turnOnBluetooth () {
+      if (this.bleReady) return
+      // 因为调用BioStimBleModule.turnOnBluetoothSwitch出现问题
+      // 临时使用bleStateChange监听方式处理
+      this.turnOnBluetoothSwitch()
     },
-    turnOnBluetoothSwitch () {
-      if (this.isTurnOnBluetoothSwitch) return
-      this.bleModules.bleModule.turnOnBluetoothSwitch()
-      this.bleModules.bleModule.onBluetoothAdapterStateChange(() => {
-        // 监听到客户端蓝牙开启就改变状态
-        this.isTurnOnBluetoothSwitch = true
-        // 开始搜索蓝牙设备
-        this.search()
-        // 监听动作设置为空
-        this.bleModules.bleModule.onBluetoothAdapterStateChange(null)
-      })
-    },
-    search () {
-      return this.bleModules.search()
-    },
-    selectDevice (item) {
-      if (item.isCheck) return
-      // 这里必须用$set
-      this.bleModules.equipmentList.forEach(obj => { this.$set(obj, 'isCheck', obj.deviceId === item.deviceId) })
-      this.devicesSelected = item
-    },
-    addDevice () {
-      if (!this.bleModules.equipment) return uni.showToast({
-        title: '请先选择连接设备',
-        icon: 'none',
-      })
-      this.bleModules.selectEquipment(this.devicesSelected, () => this.devicesReady = true, () => this.devicesReady = false)
-      // 连续使用有时机问题，待优化
-      // this.bleModules.bleModule.getBLEConnectStatus(res => {
-      //   console.log('连接状态码:', res.statuscode)
-      //   if (res.statuscode === '0000') {// 如果是连接状态
-      //     EventBus.post(new EventBus(EventBus.BLE_DEVICE_CONNECTED)) // 发送蓝牙连接成功通知
-      //   }
-      //   this.devicesReady = res.statuscode === '0000'
-      //   EventBus.post(new EventBus(EventBus.ADD_DEVICE_SUCCESS)) // 发送成功添加设备通知
-      // })
+    protocolChange (e) {
+      this.isNewDevice = this.globalData.isNewDevice = e.detail.value ? 'Y' : 'N'
     },
     selectProject (item) {// 选择计划
-      this.workoutProject = JSON.parse(JSON.stringify(item))
-      this.bleModules.selectProject(this.workoutProject)
-      this.workTime = this.workoutProject.duration
+      this.globalData.workout = item
+      console.log('workoutDetail程序明细', this.globalData.workout)
+      this.workTime = item.duration
     },
-    setWorkTime (time) {
-      if (!this.workoutProject.initcommand) return
-      this.workTime = time * 60
-      return this.bleModules.setTreatTime(this.workTime)
-    },
-    sendProject () {
+    sendInit () {
       this.planReady = true
-      return this.bleModules.sendProject()
+      return this.sendInitCmd()
     },
   }
 }

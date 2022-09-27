@@ -1,23 +1,27 @@
 import project from '../projectConfig.js'
-const { mode, projectName, webDeveloper } = project // dev开发环境、test测试环境、produce正式环境、demo演示环境
+const { mode, projectName, webDeveloper, framework } = project // dev开发环境、test测试环境、produce正式环境、demo演示环境、pre预发布环境
 let globalData = {}
 
 // 接口访问路径1
 const setting = {
   apiServers: {
-    dev: 'https://testbl.xinuowang.com', // dev开发环境 http://10.10.20.36:8085
+    // dev: 'http://10.10.20.67:9999', // 邦森局域网
+    // dev: 'http://219.135.144.91:6799', // 邦森外网映射
+    dev: 'https://testbl.xinuowang.com:9998', // dev测试环境
     test: 'https://testbl.xinuowang.com', // test测试环境
     demo: 'https://sapi.xinuowang.com', // 'http://10.10.20.46:9999', // demo演示环境
+    pre: 'https://prepublish.xinuowang.com', // 预发布环境
     produce: 'https://sapi.xinuowang.com', // produce正式环境
-    limitDeviceApp: 'http://consume.sspendi.com' // 消费电子
+    limitDeviceApp: 'http://consume.sspendi.com' // 易循环
   },
   // 页面访问路径
   host: {
     dev: 'http://' + webDeveloper, // dev开发环境
     test: 'https://testbl.xinuowang.com', // test测试环境
     demo: 'https://sapi.xinuowang.com', // 'http://10.10.20.46', // demo演示环境
+    pre: 'https://prepublish.xinuowang.com', // 预发布环境
     produce: 'https://sapi.xinuowang.com', // produce正式环境
-    limitDeviceApp: 'http://' + webDeveloper // 消费电子
+    limitDeviceApp: 'http://' + webDeveloper // 易循环
   },
 
   // 页面访问端口
@@ -30,7 +34,7 @@ const setting = {
       wyjkWap: '8803', // 网约家康官网移动端
       enterMiniApp: '8804', // 会议报名小程序
       registerMiniApp: '8805', // 会议报到小程序
-      wyjk2AppDoctor: '8806', // 网约家康2.0医生端
+      // wyjk2AppDoctor: '8806', // 网约家康2.0医生端
       class: '8807', // 家康学院
       xnwWap: '8810', // 玺诺王官网移动端
       xnwWeb: '8811', // 玺诺王官网电脑端
@@ -40,14 +44,19 @@ const setting = {
       centerApplication: '8822', // 中心申报
       statisticDoctor: '8823', // 科研进度管理
       admin: '8830', // 后台管理系统
+      wyjk2AppDoctor: '8840', // 网约家康2.0医生端
+      deviceApp: '8841', // 网约家康2.0-设备端
       managePc: '8850', // 业务管理平台PC端
       manageMobile: '8851', // 业务管理平台手机端
+      limitDeviceApp: '8860', // 易循环
+      limitDeviceAdmin: '8861', // 消费电子管理后台
+      consume: '8862', // 优E康
       uniApp: '8001', // uniApp模板
       demo: '8000', // vue3模板
-      limitDeviceApp: '8840'// 消费电子
     },
     test: {},
     demo: {},
+    pre: {},
     produce: {},
     limitDeviceApp: {}
   },
@@ -74,7 +83,9 @@ const setting = {
     manageMobile: 'manageMobile', // 业务管理平台手机端
     uniApp: 'uniApp', // uniApp模板
     demo: 'demo', // vue3模板
-    limitDeviceApp: 'limitDeviceApp'// 消费电子
+    limitDeviceApp: 'limitDeviceApp', // 易循环
+    limitDeviceAdmin: 'limitDeviceAdmin', // 消费电子管理后台
+    consume: 'consume', // 优E康
   },
   apiGroup: { // ssyypt=衫山运营平台;ssdt=衫山大唐
     cms: '/wyjk-cms/v1/api/', // 项目考试，发放 项目证书 ， 家康学院  AI  培训证书  综合健康问卷数据  ， 售卖单个课程
@@ -93,7 +104,8 @@ const setting = {
     adminSms: '/wyjk-sms/', // 会议管理, 营销管理
     adminSsyypt: '/wyjk-ssdt-bleapi/', // ble后台管理, 治疗计划日志,设备管理,病症管理,工作室设备数据统计, 设备租用统计
     manageApi: '/manageApi/', // 业务管理平台
-    limitDeviceApp: '/api/', // 消费电子
+    limitDeviceApp: '/api/', // 多通道消费电子
+    wyjkDevice: '/wyjkDevice/', // 单通道消费电子：consume（痛经）
   }
 }
 
@@ -111,7 +123,7 @@ setting.buildPath = buildPath
 const config = {
   ...setting,
   ...project,
-  systemInfo: uni.getSystemInfoSync(),
+  systemInfo: framework === 'uni' && uni.getSystemInfoSync(),
   process,
   env: process.env,
   layout: '默认框架',

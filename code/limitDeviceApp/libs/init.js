@@ -2,7 +2,6 @@
 import libs from '@/libs'
 
 let init = async (app) => {
-  console.log('运行模式：', libs.configProject.env.VUE_APP_PLATFORM)
   let { projectType, globalData, env } = libs.configProject
   let X = { ...libs, globalData }
   switch (env.VUE_APP_PLATFORM) {
@@ -25,6 +24,7 @@ let init = async (app) => {
       // #endif
       break
   }
+  console.log('运行模式：', libs.configProject.env.VUE_APP_PLATFORM)
 }
 
 export default init

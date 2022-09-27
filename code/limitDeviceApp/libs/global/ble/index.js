@@ -1,7 +1,5 @@
 import BaseBleModule from './BaseBleModule'
-import BleModule from './BioStim/BleModule.js'
+import BioStimBleModule from './BioStim/BioStimBleModule.js'
 import EventBus from './BioStim/EventBus.js'
 
-let ble = { BaseBleModule, BleModule, EventBus }
-
-export default ble
+export default { BaseBleModule, BioStimBleModule, EventBus }

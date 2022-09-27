@@ -1,34 +1,53 @@
 <template>
-  <view
-    class="uni-numbox"
-    :class="{ 'small': size==='small'}"
-  >
+  <view class="uni-numbox">
     <view
-      :class="{'uni-numbox--disabled': inputValue <= min || disabled}"
-      class="uni-numbox__minus"
       @click="_calcValue('minus')"
+      class="uni-numbox__minus uni-cursor-point"
     >
-      -
+      <text
+        class="uni-numbox--text"
+        :class="{ 'uni-numbox--disabled': inputValue <= min || disabled }"
+      >
+        -
+      </text>
     </view>
     <input
-      :disabled="true"
-      v-model="inputValue"
+      :disabled="disabled||typeDisabled"
+      @focus="_onFocus"
+      @blur="_onBlur"
       class="uni-numbox__value"
       type="number"
-      @blur="_onBlur"
+      v-model="inputValue"
     >
     <view
-      :class="{'uni-numbox--disabled': inputValue >= max || disabled || plusLock}"
-      class="uni-numbox__plus"
       @click="_calcValue('plus')"
+      class="uni-numbox__plus uni-cursor-point"
     >
-      +
+      <text
+        class="uni-numbox--text"
+        :class="{ 'uni-numbox--disabled': inputValue >= max || disabled }"
+      >
+        +
+      </text>
     </view>
   </view>
 </template>
 <script>
+/**
+ * NumberBox 数字输入框
+ * @description 带加减按钮的数字输入框
+ * @tutorial https://ext.dcloud.net.cn/plugin?id=31
+ * @property {Number} value 输入框当前值
+ * @property {Number} min 最小值
+ * @property {Number} max 最大值
+ * @property {Number} step 每次点击改变的间隔大小
+ * @property {Boolean} disabled = [true|false] 是否为禁用状态
+ * @property {Boolean} typeDisabled = [true|false] 输入是否为禁用状态
+ * @event {Function} change 输入框值改变时触发的事件，参数为输入框当前的 value
+ */
+
 export default {
-  name: 'XnwNumber',
+  name: 'UniNumberBox',
   props: {
     value: {
       type: [Number, String],
@@ -39,7 +58,7 @@ export default {
       default: 0
     },
     max: {
-      type: [Number, String],
+      type: Number,
       default: 100
     },
     step: {
@@ -50,13 +69,9 @@ export default {
       type: Boolean,
       default: false
     },
-    plusLock: {
+    typeDisabled: {
       type: Boolean,
       default: false
-    },
-    size: {
-      type: String,
-      default: 'big'
     }
   },
   data () {
@@ -71,6 +86,7 @@ export default {
     inputValue (newVal, oldVal) {
       if (+newVal !== +oldVal) {
         this.$emit('change', newVal)
+        this.$emit('input', newVal)
       }
     }
   },
@@ -87,14 +103,22 @@ export default {
       let step = this.step * scale
       if (type === 'minus') {
         value -= step
+        if (value < (this.min * scale)) {
+          return
+        }
+        if (value > (this.max * scale)) {
+          value = this.max * scale
+        }
       } else if (type === 'plus') {
-        if (this.plusLock) return
         value += step
+        if (value > (this.max * scale)) {
+          return
+        }
+        if (value < (this.min * scale)) {
+          value = this.min * scale
+        }
       }
-      if (value < this.min || value > this.max) {
-        return
-      }
-      this.inputValue = value / scale
+      this.inputValue = (value / scale).toFixed(String(scale).length)
     },
     _getDecimalScale () {
       let scale = 1
@@ -105,9 +129,10 @@ export default {
       return scale
     },
     _onBlur (event) {
+      this.$emit('blur', event)
       let value = event.detail.value
       if (!value) {
-        this.inputValue = 0
+        // this.inputValue = 0;
         return
       }
       value = +value
@@ -117,90 +142,99 @@ export default {
         value = this.min
       }
       this.inputValue = value
+    },
+    _onFocus (event) {
+      this.$emit('focus', event)
     }
   }
 }
 </script>
-<style lang="scss">
+<style lang="scss" scoped>
+$box-height: 35px;
+/* #ifdef APP-NVUE */
+$box-line-height: 35px;
+/* #endif */
+$box-line-height: 26px;
+$box-width: 35px;
+
 .uni-numbox {
-  display: inline-flex;
+  /* #ifndef APP-NVUE */
+  display: flex;
+  /* #endif */
   flex-direction: row;
-  justify-content: flex-start;
-  height: 70rpx;
-  position: relative;
-
-  &:after {
-    content: "";
-    position: absolute;
-    transform-origin: center;
-    box-sizing: border-box;
-    pointer-events: none;
-    top: -50%;
-    left: -50%;
-    right: -50%;
-    bottom: -50%;
-    border: 1px solid #c8c7cc;
-    border-radius: 12rpx;
-    transform: scale(0.5);
-  }
-
-  &__minus,
-  &__plus {
-    margin: 0;
-    background-color: #f8f8f8;
-    width: 70rpx;
-    font-size: 40rpx;
-    height: 100%;
-    line-height: 70rpx;
-    text-align: center;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    color: #333;
-    position: relative;
-  }
-
-  &__value {
-    position: relative;
-    background-color: #fff;
-    width: 80rpx;
-    height: 100%;
-    text-align: center;
-    padding: 0;
-
-    &:after {
-      content: "";
-      position: absolute;
-      transform-origin: center;
-      box-sizing: border-box;
-      pointer-events: none;
-      top: -50%;
-      left: -50%;
-      right: -50%;
-      bottom: -50%;
-      border-style: solid;
-      border-color: #c8c7cc;
-      border-left-width: 1px;
-      border-right-width: 1px;
-      border-top-width: 0;
-      border-bottom-width: 0;
-      transform: scale(0.5);
-    }
-  }
-
-  &--disabled {
-    color: #c0c0c0;
-  }
+  height: $box-height;
+  line-height: $box-height;
+  width: 120px;
 }
-.uni-numbox.small {
-  height: 50rpx;
 
-  .uni-numbox__minus,
-  .uni-numbox__plus,
-  .uni-numbox__value {
-    width: 50rpx !important;
-    font-size: 30rpx !important;
-    line-height: 50rpx !important;
-  }
+.uni-cursor-point {
+  /* #ifdef H5 */
+  cursor: pointer;
+  /* #endif */
+}
+
+.uni-numbox__value {
+  background-color: $uni-bg-color;
+  width: 40px;
+  height: $box-height;
+  text-align: center;
+  font-size: $uni-font-size-lg;
+  border-width: 1rpx;
+  border-style: solid;
+  border-color: $uni-border-color;
+  border-left-width: 0;
+  border-right-width: 0;
+}
+
+.uni-numbox__minus {
+  /* #ifndef APP-NVUE */
+  display: flex;
+  /* #endif */
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  width: $box-width;
+  height: $box-height;
+  // line-height: $box-line-height;
+  // text-align: center;
+  font-size: 20px;
+  color: $uni-text-color;
+  background-color: $uni-bg-color-grey;
+  border-width: 1rpx;
+  border-style: solid;
+  border-color: $uni-border-color;
+  border-top-left-radius: $uni-border-radius-base;
+  border-bottom-left-radius: $uni-border-radius-base;
+  border-right-width: 0;
+}
+
+.uni-numbox__plus {
+  /* #ifndef APP-NVUE */
+  display: flex;
+  /* #endif */
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  width: $box-width;
+  height: $box-height;
+  border-width: 1rpx;
+  border-style: solid;
+  border-color: $uni-border-color;
+  border-top-right-radius: $uni-border-radius-base;
+  border-bottom-right-radius: $uni-border-radius-base;
+  background-color: $uni-bg-color-grey;
+  border-left-width: 0;
+}
+
+.uni-numbox--text {
+  font-size: 20px;
+  color: $uni-text-color;
+}
+
+.uni-numbox--disabled {
+  color: $uni-text-color-disable;
+  /* #ifdef H5 */
+  cursor: not-allowed;
+  /* #endif */
 }
 </style>

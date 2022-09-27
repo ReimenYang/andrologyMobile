@@ -3,7 +3,7 @@ const apis = {
     method: 'GET',
     url: 'umsmedicalcases/getUnitStatisticsPage',
     group: 'adminUms',
-    dataType: 'json'
+    dataType: 'keyValue'
   },
   getProjectEntryRecord: {
     method: 'GET',

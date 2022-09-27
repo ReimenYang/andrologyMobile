@@ -15,6 +15,10 @@ const apis = {
   userInfo: {
     method: 'GET',
     url: '/wyjk-core/v2/api/wxmpoauth/userInfo',
+  },
+  editById: {
+    method: 'POST',
+    url: '/wyjk-core/coreUnit/editById',
   }
 }
 

@@ -45,19 +45,25 @@ const apis = {
     method: 'GET',
     url: 'direcipe/countTreatmentPrescriptions',
     group: 'adminSsyypt',
-    dataType: 'formData'
+    dataType: 'keyValue'
   },
   countTreatments: {
     method: 'GET',
     url: 'direcipe/countTreatments',
     group: 'adminSsyypt',
-    dataType: 'formData'
+    dataType: 'keyValue'
   },
   patientRecords: {
     method: 'GET',
     url: 'direcipe/patientRecords',
     group: 'adminSsyypt',
     dataType: 'formData'
+  },
+  patientRecordsExportData: {
+    method: 'POST',
+    url: 'direcipe/patientRecordsExportData',
+    group: 'adminSsyypt',
+    dataType: 'json'
   },
   treatmentStatistics: {
     method: 'GET',

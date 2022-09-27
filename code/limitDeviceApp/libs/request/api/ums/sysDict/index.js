@@ -34,8 +34,16 @@ const apis = {
   // 问卷
   questionnaire: {
     paperType: { ...def, url: _path + 'questionnaire/paperType' },
-    baseInfoStep: { ...def, url: _path + 'questionnaire/baseInfoStep' }
-  }
+    baseInfoStep: { ...def, url: _path + 'questionnaire/baseInfoStep' },
+    painPhaseStatus: { ...def, url: _path + 'questionnaire/painPhaseStatus' }
+  },
+  // App版本信息
+  updateAppConfig: {
+    ble: { ...def, url: _path + 'updateAppConfig/ble' },
+    consume: { ...def, url: _path + 'updateAppConfig/consume' }// 优E康
+  },
+  // 字典获取
+  getSysDict: data => ({ ...def, url: 'sys-dict/temporaryItemsByType/' + data }),
 }
 
 export default apis

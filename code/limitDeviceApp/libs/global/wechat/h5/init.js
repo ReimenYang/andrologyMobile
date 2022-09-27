@@ -9,12 +9,12 @@ async function init (app) {
     globalData.enterRoute = app.$route
 
     let wyjkh5BaseUrl = buildPath(mode, 'wyjkh5')
-    // 因为微信认证的原因，只要不是正式环境，都调用测试环境的家康项目
-    if (urlPage !== buildPath('produce', 'wyjkh5')) wyjkh5BaseUrl = buildPath('test', 'wyjkh5')
+    // 因为微信认证的原因，只要不是正式环境、预发布环境，都调用测试环境的家康项目
+    if (mode !== 'produce' && mode !== 'pre') wyjkh5BaseUrl = buildPath('test', 'wyjkh5')
     globalData.wyjkh5BaseUrl = wyjkh5BaseUrl
 
     // 获取家康授权并写入内存
-    libs.global.wechat.h5.setHeaders('minPro_openid', 'minPro_unionid')
+    await libs.global.wechat.h5.setHeaders('minPro_openid', 'minPro_unionid')
     let headers = globalData.headers
 
     // 家康授权openid, unionid不齐全
@@ -35,7 +35,7 @@ async function init (app) {
 
     // 检查注册
     let isSign = await libs.global.user.checkLogin()
-    if (!isSign && globalData.userInfo.openid) libs.data.page.navigateTo(wyjkh5BaseUrl + '/#/pages/mine/replenish?openId=' + globalData.userInfo.openid + '&from=' + encodeURIComponent(location.href))
+    if (!isSign) libs.data.page.redirectTo(wyjkh5BaseUrl + '/#/pages/mine/replenish?openId=' + globalData.userInfo.wxOpenid + '&from=' + encodeURIComponent(location.href))
 
     // 获取基础数据
     if (mode !== 'produce') {

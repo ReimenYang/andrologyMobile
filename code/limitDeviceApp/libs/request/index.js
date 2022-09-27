@@ -1,109 +1,104 @@
 import axios from 'axios'
-import api from './api'
+import _api from './api'
 import configProject from '@/libs/config.js'
 import utils from '@/libs/utils'
-// 校验请求 ，类似拦截请求报错
-const validateStatus = status => {
-  // console.log(status)
-  return status >= 200 && status < 300 // default
+
+configProject.globalData.axios = axios
+let toast
+
+function toastBox (errMsg, obj, dataRes) {
+  console.error(errMsg)
+  console.log(obj)
+  console.log(dataRes)
+  toast(errMsg)
 }
 
-async function request (api, params, config = {}) {
-  configProject.globalData.axios = axios
+// 校验请求 ，类似拦截请求报错
+const validateStatus = status => 200 <= status && status < 300
+
+async function request (api, params = {}, config = {}) {
+  let headers = configProject.globalData.headers || {}
+  let header = JSON.parse(JSON.stringify(headers))
+  if (headers && !config.important) config = { headers, ...config }
   api = JSON.parse(JSON.stringify(api))
-  let data = {}
+
+  // limitDeviceAdmin项目特有逻辑
+  if (configProject.mode === 'limitDeviceApp') params = { pageSize: 20, token: headers && headers.token, ...params }
+  let apiName = api.url.split('/').slice(-1).join()
+  let _host = configProject.urlApi
+  // if(this.libs.data.getStorage('proxy')) _host = this.libs.data.getStorage('proxy')
+  let _group = api.group ? configProject.apiGroup[api.group] : ''
+  let _keyValue = utils.object.paramsToKeyValue(params)
+  let url = _host + _group + api.url // + '?' + encodeURI(_keyValue)
+  if (api.url.startsWith('http')) url = api.url
+  // if (url.length > 1024) {
+  //   console.error('路径长度超过1024，重组路径')
+  //   url = _host + _group + api.url
+  // }
+  // api.url = url
+
+  let data = params
+  // let _formData = params
   switch (api.dataType) {
     case 'formData':
-      {
-        let _formData = new FormData()
-        Object.keys(params).forEach(key => {
-          _formData.append(key, params[key])
-        })
-        data = _formData
-      }
+      // #ifndef APP-PLUS
+      // _formData = new FormData()
+      // Object.keys(params).forEach(key => _formData.append(key, params[key]))
+      // #endif
+      // data = _formData
+      header['Content-Type'] = 'application/x-www-form-urlencoded'
       break
     case 'form':
     case 'json':
-      data = params
+      // data = params
       break
     case 'keyValue':
     case undefined:
       api.dataType = 'keyValue'
-      data = utils.object.paramsToKeyValue(params)
+      // data = _keyValue
       break
   }
-  if (api.method === 'GET') data = utils.object.paramsToKeyValue(params)
 
-  if (api.group) api.url = configProject.apiGroup[api.group] + api.url
-  if (api.url.indexOf('http://') !== 0 && api.url.indexOf('https://') !== 0)
-    api.url = configProject.urlApi + api.url
-
-  if (api.dataType === 'keyValue') api.url += '?' + data
-  //   const response = await axios({ ...api, data, validateStatus, ...config });
-  if (configProject.globalData.headers && !config.important) config = { headers: configProject.globalData.headers, ...config }
-
-  // #ifdef APP-PLUS || MP-WEIXIN
-  return new Promise((resolve, reject) => {
-    uni.request({ // 发送请求
-      ...api, data, ...config,
-      header: configProject.globalData.headers,
-      success: (res) => { // 数据获取成功
-        // console.log('成功', res, validateStatus(res.statusCode))
-        if (configProject.projectName === 'limitDeviceApp') {
-          // limitDeviceApp项目特有逻辑
-          if (validateStatus(res.statusCode)) {// 网络层拦截错误
-            let _data = {}
-            try {
-              _data = JSON.parse(res.data)
-            } catch (e) {
-              _data = res.data
-            }
-            if (utils.object.isObject(_data) && _data.code === 200) return resolve(_data)
-            if (utils.object.isObject(_data) && _data.errorMessage) return uni.showToast({ title: _data.errorMessage, icon: 'none', duration: 2000 })
-            reject(_data)
-
-          } else {
-            let err = ''
-            try {
-              err = JSON.stringify(JSON.parse(res.data).errors)
-            } catch (e) {
-              err = res.data
-            }
-            uni.showToast({ title: err, icon: 'none', duration: 2000 })
-            reject(err)
-          }
-          return
-        }
-        try {
-          resolve(JSON.parse(res.data))
-        } catch (e) {
-          resolve(res.data)
-        }
-      },
-      fail: (err) => { // 失败操作
-        uni.showToast({ title: String(err), icon: 'none', duration: 2000 })
-        reject(err)
-      }
-    })
-  })
-  // #endif
-
-  // #ifndef APP-PLUS || MP-WEIXIN
-  // eslint-disable-next-line no-unreachable
-  const response = await axios({ ...api, data, ...config })
-  // 拦截请求报错
-  // .catch(function(error) {
-  //   if (error.response) console.log(error.response.status);
-  // });
-  // 请求正常，后端返回状态不正常
-  if (response.data.code && response.data.code !== 0) uni.showToast({ title: String(response.data.msg), icon: 'none', duration: 2000 })
-  switch (response.status) {
-    case 200:
-      return response.data
-
-    default:
-      return response
+  let errRes, dataRes, respondseError
+  if (configProject.framework === 'uni') {
+    console.log('uni请求')
+    if (api.dataType === 'keyValue') url += '?' + encodeURI(_keyValue)
+    toast = title => uni.showToast({ title, icon: 'none', duration: 2000 })
+    let [_errRes, _dataRes] = await uni.request({ ...api, url, data, ...config, header, sslVerify: false })
+    errRes = _errRes
+    dataRes = _dataRes
+    if (errRes) respondseError = errRes.errMsg
   }
-  // #endif
+
+  if (configProject.framework !== 'uni') {
+    console.log('axios请求')
+    toast = this.$alert || window.X.app.$alert
+    dataRes = await axios({ ...api, url, data, params, ...config })
+      // 拦截请求报错
+      .catch(error => errRes = respondseError = error)
+  }
+
+  dataRes = dataRes || {}
+  let _data = {}
+  try {
+    _data = JSON.parse(dataRes.data)
+  } catch (e) {
+    _data = dataRes.data
+  }
+
+  let statusCode = dataRes.statusCode || dataRes.status
+  let errorMessage = dataRes.errorMessage || ''
+  // 一般失败请求处理
+  if (errRes) return toastBox(apiName + '请求无效' + respondseError, { ...api, data, ...config }, dataRes)
+  // 有些网络层拦截错误在返回的数据里面
+  if (!validateStatus(statusCode)) return toastBox(apiName + '请求失败，' + statusCode + errorMessage, { ...api, url, data, ...config }, dataRes)
+
+  // 判断业务返回的错误
+  if ((_data.code && (_data.code !== 0 && _data.code !== 200)) || (_data.statuscode && _data.statuscode !== '0000')) {
+    toastBox('业务提示：' + (_data.msg || _data.statusmsg || _data.errorMessage), apiName + (_data.code || _data.statuscode), { ...api, data, ...config }, dataRes)
+  }
+  // console.log(_data)
+  return _data
 }
-export default { request, api, configProject }
+
+export default { request, api: _api, configProject }

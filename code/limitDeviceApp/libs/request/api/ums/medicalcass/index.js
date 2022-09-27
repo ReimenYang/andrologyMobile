@@ -21,7 +21,7 @@ const apis = {
     method: 'POST',
     url: 'medicalcass/saveUserJoinUnit',
     group: 'ums',
-    dataType: 'formData'
+    dataType: 'keyValue'
   },
   sendPatientElectrodes: {
     method: 'POST',
@@ -43,11 +43,22 @@ const apis = {
   },
   sendWxInformedConsent: {
     method: 'POST',
-      url: 'medicalcass/sendWxInformedConsent',
-      group: 'ums',
-      dataType: 'formData'
+    url: 'medicalcass/sendWxInformedConsent',
+    group: 'ums',
+    dataType: 'keyValue'
   },
-
+  manualJoinGroup: {
+    method: 'POST',
+    url: 'medicalcass/manualJoinGroup',
+    group: 'ums',
+    dataType: 'json'
+  },
+  batchManualJoinGroup: {
+    method: 'POST',
+    url: 'medicalcass/batchManualJoinGroup',
+    group: 'ums',
+    dataType: 'json'
+  }
 }
 
 export default apis

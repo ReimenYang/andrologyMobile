@@ -8,6 +8,7 @@ import wxtemp from './wxtemp'
 import wxmpoauth from './wxmpoauth'
 import coreUnit from './coreUnit'
 import coreunitdoctor from './coreunitdoctor'
+import userJoinSubjectApi from './userJoinSubjectApi'
 
 export default {
   activiys,
@@ -19,5 +20,6 @@ export default {
   wxtemp,
   wxmpoauth,
   coreUnit,
-  coreunitdoctor
+  coreunitdoctor,
+  userJoinSubjectApi
 }
