@@ -116,7 +116,7 @@ export default {
         mask: true
       })
 
-      let recordId = this.libs.data.random(6)// 代替请求recordId
+      let recordId = this.libs.data.random(7)// 代替请求recordId
       await this.setRecord(recordId)
       setTimeout(async () => {// 设备写入recordId需要时间
         await this.startTreatment()
@@ -130,6 +130,7 @@ export default {
           workout: this.globalData.workout,
           time: 0, // 已治疗时间
           recordId,
+          deviceName: this.device.name,
           terminalInfo: { deviceName: this.device.name },
           startTime: new Date().valueOf(),
           startDateTime: this.libs.data.dateNow(),
@@ -139,7 +140,7 @@ export default {
 
         let _data = (await this.libs.request(this.libs.api.limitDeviceApp.treatment.startTreatment, params)).data
         this.globalData.workoutRecord = { ..._data, ...params }
-        this.libs.data.setStorage('workoutRecord' + recordId, this.globalData.workoutRecord)
+        // this.libs.data.setStorage('workoutRecord' + recordId, this.globalData.workoutRecord)
         uni.hideLoading()
         uni.reLaunch({ url: '/pages/bluetooth/running' })
       }, 1000)

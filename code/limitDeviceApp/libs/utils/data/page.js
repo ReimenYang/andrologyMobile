@@ -11,6 +11,7 @@ page.pageRoute = () => {
     hashPath: '',
     hashParams: {}
   }
+  // #ifndef APP
   let page = getCurrentPages().length ? getCurrentPages()[0].$route : config.globalData.enterRoute
 
   pageRoute.fullRoute = page.fullPath
@@ -20,6 +21,7 @@ page.pageRoute = () => {
     pageRoute.hashPath = location.hash
     pageRoute.hashParams = object.keyValueToParams(location.search.substr(1))
   }
+  // #endif
   return pageRoute
 }
 // 重定向

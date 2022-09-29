@@ -3,7 +3,7 @@
     class="wrap indexBg"
     :style="{'--indexBg': `url(${globalData.config.indexBg})`,'--theme-color':globalData.config.theme}"
   >
-    <p-header title="早泄康复" />
+    <p-header :title="globalData.config.appName" />
     <p-wrap
       :hasHeader="true"
       :hasFooter="true"
@@ -61,18 +61,13 @@
         class="unPaired"
         v-if="!paired"
         @click="toConnect('navigateTo')"
+        :style="setBg()"
       >
-        <view v-if="!this.device.name">
-          请先打开设备<br>并蓝牙连接
-        </view>
         <view
-          v-if="this.device.name"
+          v-if="device.name"
           class="deviceName"
         >
-          设备号：{{ this.device.name }}
-        </view>
-        <view v-if="this.device.name">
-          请打开设备的开关<br>然后点击连接
+          设备号：{{ device.name }}
         </view>
       </view>
       <view
@@ -223,6 +218,10 @@ export default {
       console.log('workoutDetail程序明细', this.globalData.workout)
       // 此时可能处于匹配状态
       uni.navigateTo({ url: '/pages/bluetooth/setTime' })
+    },
+    setBg () {
+      if (this.device.name) return 'background-image: url("/static/neverLink.png")'
+      return 'background-image: url("/static/unLink.png")'
     }
   }
 }
@@ -310,13 +309,14 @@ export default {
     align-items: center;
     justify-content: center;
     border-radius: 50%;
-    background: #fff;
+    background: no-repeat center/cover;
     font-size: var(--font-h3);
     text-align: center;
     line-height: 1.5;
     .deviceName {
-      margin-bottom: 30rpx;
-      font-size: var(--font-h4);
+      margin-top: 100%;
+      padding-top: 100rpx;
+      color: var(--theme-color);
     }
   }
   .workoutList {

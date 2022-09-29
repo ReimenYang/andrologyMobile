@@ -41,7 +41,7 @@ export default class EventBus {
   static CONNECTING = 'connecting'// 连接中
   static CONNECTED = 'connected'// 连接成功
   static CONNECT_FAIL = 'connectFail'// 连接失败
-  static CONNECT_BREAK = 'connectBreak'// 被动断开连接
+  static CONNECT_BREAK = 'connectBreak'// 设备断开连接
   static CONNECT_CLOSE = 'connectClose'// 主动断开连接
   /**
    * 配对设备（paired）：手机是否与设备配对上，执行完获取设备信息指令，并按一定的业务规则进行判断，符合联机条件，处于pbt状态
@@ -119,8 +119,8 @@ export default class EventBus {
       state: false
     },
     connectBreak: {
-      log: '被动断开连接',
-      toast: '被动断开连接',
+      log: '设备断开连接',
+      toast: '设备断开连接',
       stateName: 'bleOnline',
       state: false
     },

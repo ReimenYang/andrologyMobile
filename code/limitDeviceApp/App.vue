@@ -10,7 +10,7 @@ export default {
         theme: '#7A56EC'
       },
       PE: { // 早泄
-        appName: '早泄治疗',
+        appName: '易循环',
         theme: '#127087'
       }
     }

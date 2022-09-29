@@ -4,8 +4,10 @@ module.exports = {
   port: 8862, // 本地运行的端口
   framework: 'uni', // 使用前端框架:vue||uni
   appid: '__UNI__0940A4C',
-  apiKey: '2cbeb0083ca06ce71e0c8aa700f8da9b', // 在开发者中心开通服务并获取apiKey
-  apiSecret: '2523bede5154496dd21c9a9f68b2362c', // 在开发者中心开通服务并获取apiSecret
+  // apiKey: '2cbeb0083ca06ce71e0c8aa700f8da9b', // 在开发者中心开通服务并获取apiKey
+  // apiSecret: '2523bede5154496dd21c9a9f68b2362c', // 在开发者中心开通服务并获取apiSecret
+  apiKey: 'e72a85e683138b13b23129f065768f49', // 在开发者中心开通服务并获取apiKey
+  apiSecret: '61e88a6b012b160a927a064c9fb7ef52', // 在开发者中心开通服务并获取apiSecret
   projectType: {
     wechat: false,
     browser: false,

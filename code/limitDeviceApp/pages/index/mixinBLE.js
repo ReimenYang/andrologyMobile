@@ -34,7 +34,7 @@ export default {
     // 避免重复激活服务
     if (!this.globalData.bleReady) {
       // 注册蓝牙改变全局监听事件,全局基础服务，千万不能重复注册
-      if (!this.globalData.bleStateChange) this.bleStateChangeRegister()
+      if (!this.globalData.bleStateChange) this.bleStateChangeRegister(this)
       if (this.globalData.workout) this.workTime = this.globalData.workout.duration
       this.setEventBus()
       await this.bleInit()
@@ -43,26 +43,32 @@ export default {
   },
   methods: {
     // 注册蓝牙改变全局监听事件
-    async bleStateChangeRegister () {
+    async bleStateChangeRegister (_this) {
       console.log('注册蓝牙改变全局监听事件')
       // let _this = this
       this.globalData.bleStateChange = {
-        // discoveringFalse: { console () { console.log('关闭发现') } },
-        // discoveringTrue: { console () { console.log('开启发现') } },
+        discoveringFalse: { console () { console.log('关闭发现') } },
+        discoveringTrue: { console () { console.log('开启发现') } },
         availableFalse: {
-          // console () {
-          //   console.log('关闭蓝牙')
-          // },
+          console () {
+            console.log('关闭蓝牙')
+            _this.reLaunchIndex()
+            // uni.showModal({
+            //   title: '蓝牙已关闭，请开启后重新打开app',
+            //   showCancel: false,
+            //   success: res => res.confirm && this.libs.data.exit()
+            // })
+          },
           closeBluetoothAdapter () {
-            // console.log('蓝牙不可链接')
+            console.log('蓝牙不可链接')
             // 蓝牙已经关闭，次数执行closeBluetoothAdapter一定报错(10001)
             // this.BioStimBleModule.closeBluetoothAdapter()
           }
         },
         availableTrue: {
-          // console () {
-          //   console.log('开启蓝牙')
-          // },
+          console () {
+            console.log('开启蓝牙')
+          },
           async openBluetoothAdapter (res) {
             console.log('蓝牙空闲，可连接', res)
             // if (_this.globalData.bleReady) await _this.BioStimBleModule.closeBluetoothAdapter()
@@ -137,7 +143,9 @@ export default {
       return getCurrentPages()[getCurrentPages().length - 1].route
     },
     reLaunchIndex (from) {
-      let noAction = ['pages/index/contact', 'pages/scheme/record', 'pages/scheme/index', 'pages/bluetooth/connect', 'pages/bluetooth/running'].includes(this.getPageUrl())
+      // let noAction = ['pages/index/contact', 'pages/scheme/record', 'pages/scheme/index', 'pages/bluetooth/connect', 'pages/bluetooth/running'].includes(this.getPageUrl())
+      // 22020928 需求from罗 运行过程中手动 关闭蓝牙，返回首页
+      let noAction = ['pages/index/contact', 'pages/scheme/record', 'pages/scheme/index', 'pages/bluetooth/connect'].includes(this.getPageUrl())
       if (noAction) return
       let back = ['pages/index/contact', 'pages/scheme/index'].includes(this.getPageUrl())
       if (back) return uni.navigateBack()
@@ -244,12 +252,24 @@ export default {
       console.log('获取r指令', data, _page, recordId, totalTime, time, isStop)
       clearInterval(this.globalData.loopRecord)
       if (!recordId) return// 设备没有记录
-      let _record = this.libs.data.getStorage('workoutRecord' + recordId)
+      // let _record = this.libs.data.getStorage('workoutRecord' + recordId)
+
+      let _record = (await this.libs.request(this.libs.api.limitDeviceApp.treatment.getRecordByRecordId, { recordId, deviceName: this.device.name })).data
       console.log('治疗记录', 'workoutRecord' + recordId, _record)
       if (!_record) return// app没有记录
       _record.isStop = isStop
       _record.duration = totalTime
       _record.time = time
+      _record.deviceName = this.device.name
+      let workout = this.globalData.workoutList.find(item => item.workoutId === _record.workoutId)
+      let { workoutId, workoutName, workoutDescription, portNum = 2, initCommand = '0,0,0' } = workout
+      let [, , phaseNumber] = initCommand.split(',')
+      _record.workout = workout
+      _record.workoutName = workoutName
+      _record.portNum = portNum
+      _record.workoutId = workoutId
+      _record.workoutDescription = workoutDescription
+      _record.phaseNumber = phaseNumber
       this.globalData.workoutRecord = _record
       // 未结束
       if (isStop === '0') {
@@ -277,19 +297,18 @@ export default {
       // if (isStop === '1') {
       // 这个地方有歧义，未结束的会显示设置的治疗时长，已结束的会显示实际治疗时长
       _record.duration = _record.specificDuration = time
-      _record.recordId = _record.id
+      // _record.recordId = _record.id
       _record.endDateTime = this.libs.data.dateNow(_record.startTime + parseFloat(time) * 1000)
       console.log('已结束', isStop, !isStop, '结束时间：', _record.endDateTime, '治疗时长：', time)
       console.log('治疗结束，更新治疗记录', _record)
 
       // 前端处理今日已治疗的数据，减少后台请求
-      let _finishObj = this.workoutList.find(item => item.workoutId === _record.workoutId)
-      _finishObj.todayState = 'Y'
-      _finishObj.title = _finishObj.workoutName + '（今天已治疗）'
+      _record.workout.todayState = 'Y'
+      // _finishObj.title = _finishObj.workoutName + '（今天已治疗）'
 
       let _res = await this.libs.request(this.libs.api.limitDeviceApp.treatment.endTreatment, _record)
       if (_res) this.clearRecord()
-      this.libs.data.removeStorage(recordId)
+      // this.libs.data.removeStorage(recordId)
       delete this.globalData.workoutRecord
       // let whithPage = ['pages/scheme/index', 'pages/bluetooth/setCurrent']
       // let whithPage = ['pages/scheme/index']
