@@ -60,15 +60,15 @@ MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDXmihNG2sviXVLaTzuWQ5WEYU6ZUV177quq1veOlVW
   console.log('当前用户：', userInfo.realname, userInfo)
 }
 
-let univerifyStyle = { // 一键登录设置
-  force: true, // 自定义强制登录参数，不登录则退出程序，默认值： false
-  fullScreen: true, // 是否全屏显示，默认值： false
-  icon: { path: '/static/logo.png' },
-  closeIcon: { path: '/static/transparent.png' }, // 自定义关闭按钮，仅支持本地图片。 HBuilderX3.3.7+版本支持
-  otherLoginButton: {
-    visible: false, // 是否显示其他登录按钮，默认值：true
-  }
-}
+// let univerifyStyle = { // 一键登录设置
+//   force: true, // 自定义强制登录参数，不登录则退出程序，默认值： false
+//   fullScreen: true, // 是否全屏显示，默认值： false
+//   icon: { path: '/static/logo.png' },
+//   closeIcon: { path: '/static/transparent.png' }, // 自定义关闭按钮，仅支持本地图片。 HBuilderX3.3.7+版本支持
+//   otherLoginButton: {
+//     visible: false, // 是否显示其他登录按钮，默认值：true
+//   }
+// }
 App.mpType = 'app'
 const app = new Vue({ ...App })
 !(async function initReady (n = 0) {
@@ -82,7 +82,7 @@ const app = new Vue({ ...App })
     // phone = 15914214657 //邦森
     // Hbuilder X 3.4.7的一键登录(uni.login)出现坑爹情况 TypeError: Cannot read property 'route' of null
     // 旧版本能正常通过
-    phone = await libs.global.uniLogin.auto(univerifyStyle)
+    // phone = await libs.global.uniLogin.auto(univerifyStyle)
     libs.data.setStorage('phone', phone)
   }
 

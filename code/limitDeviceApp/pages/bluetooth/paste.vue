@@ -14,7 +14,7 @@
       <!-- <p-steps :active="1" /> -->
       <view class="item">
         <view class="itemTitle">
-          请按示意图贴片
+          {{ imageList[index].channelName }}通道如图接电极片
         </view>
         <image
           :src="imageList[index].url"
@@ -42,11 +42,15 @@ export default {
     }
   },
   onShow () {
-    let channel = this.globalData.pasteChannel
-    this.imageList = this.globalData.workout.imageList
-      .filter(item => item.channel === channel)
-      .map(item => item.imageUrl)
-      .join().split(',').map(url => ({ url }))
+    this.globalData.workout.channelList.forEach(item => {
+      item.imageUrl.split(',').forEach(url => {
+        this.imageList.push({
+          channel: item.channel,
+          channelName: ['A', 'B', 'C', 'D'][item.channel - 1],
+          url
+        })
+      })
+    })
   },
   onBackPress () {
     this.endTreatment()
@@ -59,7 +63,8 @@ export default {
       uni.redirectTo({ url: '/pages/bluetooth/setCurrent' })
     },
     prevStep () {
-      if (1 < this.index) return this.index--
+      if (0 < this.index) return this.index--
+      this.reLaunchIndex('paste')
     }
   }
 }

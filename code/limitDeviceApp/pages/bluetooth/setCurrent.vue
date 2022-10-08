@@ -12,35 +12,42 @@
       :hasFooter="true"
     >
       <!-- <p-steps :active="2" /> -->
-      <view class="itemBox">
-        <view class="itemTitle">
-          {{ `电极口${pasteChannel*2-1}：请设置刺激强度` }}
-        </view>
-        <xnw-number
-          v-model="firstPhase.settingCHL"
-          :min="0"
-          :max="900"
-          :step="step"
-          @change="n => currentChange(n,'settingCHL')"
-          :typeDisabled="true"
-        />
-      </view>
-      <view
-        class="itemBox"
-        v-if="portNum===2"
+      <block
+        v-for="item in currentList"
+        :key="item.id"
       >
-        <view class="itemTitle">
-          {{ `电极口${(pasteChannel)*2}：请设置刺激强度` }}
+        <view class="itemBox">
+          <view class="itemTitle">
+            {{ `${item.channelName}1：请设置刺激强度` }}
+          </view>
+          <xnw-number
+            v-model="item.settingCHL"
+            :min="0"
+            :max="900"
+            :step="step"
+            @minus="n => currentChange(n,'settingCHL','minus',item)"
+            @plus="n => currentChange(n,'settingCHL','plus',item)"
+            :typeDisabled="true"
+          />
         </view>
-        <xnw-number
-          v-model="firstPhase.settingCHR"
-          :min="0"
-          :max="900"
-          :step="step"
-          @change="n => currentChange(n,'settingCHR')"
-          :typeDisabled="true"
-        />
-      </view>
+        <view
+          class="itemBox"
+          v-if="item.splices===2"
+        >
+          <view class="itemTitle">
+            {{ `${item.channelName}2：请设置刺激强度` }}
+          </view>
+          <xnw-number
+            v-model="item.settingCHR"
+            :min="0"
+            :max="900"
+            :step="step"
+            @minus="n => currentChange(n,'settingCHR','minus',item)"
+            @plus="n => currentChange(n,'settingCHR','plus',item)"
+            :typeDisabled="true"
+          />
+        </view>
+      </block>
     </p-wrap>
     <xnw-footer
       textConfirm="下一步"
@@ -55,13 +62,9 @@ export default {
   mixins: [mixinBLE],
   data () {
     return {
-      phaseList: [{ left: 0, right: 0, phaseSeqNo: 1 }],
-      portNum: 2,
+      currentList: [{ settingCHL: 0, settingCHR: 0, channel: 1, splices: 2 }],
       step: 5,
-      index: 1,
-      firstPhase: { settingCHL: 0, settingCHR: 0 },
-      showModal: false,
-      pasteChannel: this.globalData.pasteChannel
+      showModal: false
     }
   },
   async onLoad () {
@@ -70,12 +73,16 @@ export default {
       mask: true
     })
     this.globalData.handleLongRecived = this.handleLongRecived
-    this.portNum = this.globalData.workout.portNum || this.globalData.workout.channelList.find(item => item.channel === this.pasteChannel).splices
     // 获取硬件的最后一个治疗程序的状态
     // this.getRecord()
   },
   onShow () {
-    this.firstPhase = { settingCHL: 0, settingCHR: 0 }
+    this.currentList = this.globalData.workout.channelList.map(item => ({
+      id: item.id,
+      channel: item.channel,
+      channelName: ['A', 'B', 'C', 'D'][item.channel - 1],
+      settingCHL: 0, settingCHR: 0, splices: item.splices
+    }))
   },
   onBackPress () {
     this.endTreatment()
@@ -83,33 +90,41 @@ export default {
     delete this.globalData.deviceState
   },
   methods: {
-    currentChange (n, side) {
-      let channel = this.pasteChannel
+    currentChange (n, side, type, item) {
+      let channel = item.channel
       let deviceState = this.globalData.deviceState[channel]
       let value = deviceState[side]
-      console.log(channel, n, value)
-      if (n - value < 0) side === 'settingCHL' ? this.leftMinus(channel) : this.rightMinus(channel)
-      if (value - n < 0) side === 'settingCHL' ? this.leftPlus(channel) : this.rightPlus(channel)
+      console.log(type, channel, side, n, value)
+      if (n - value === 0) return
+      if (type === 'minus') side === 'settingCHL' ? this.leftMinus(channel) : this.rightMinus(channel)
+      if (type === 'plus') side === 'settingCHL' ? this.leftPlus(channel) : this.rightPlus(channel)
       // 修改设备指定通道强度，防止界面跳动，如果s指令返回值不一样，还是会跳动
       deviceState[side] = n
     },
     async handleLongRecived (data) {
-      let channel = data.channel
+      let channel = data.channel - 0
+      let _deviceState = this.globalData.deviceState[channel]
+      if (_deviceState) uni.hideLoading() // 通道数据健全
 
-      if (this.globalData.deviceState['1']) uni.hideLoading() // 通道数据健全
-
-      if (this.pasteChannel - channel !== 0) return
-      let { settingCHL, settingCHR } = this.globalData.deviceState[channel]
-      this.firstPhase = { settingCHL, settingCHR }
+      let { settingCHL, settingCHR } = _deviceState
+      let target = this.currentList.find(item => item.channel === channel)
+      if (Number(target.settingCHL) !== Number(settingCHL)) {
+        console.log('settingCHL', channel, settingCHL, typeof settingCHL, target.settingCHL, typeof target.settingCHL)
+        target.settingCHL = settingCHL
+      }
+      if (Number(target.settingCHR) !== Number(settingCHR)) {
+        console.log('settingCHR', channel, settingCHR)
+        target.settingCHR = settingCHR
+      }
     },
     async nextStep () {
       if (!this.globalData.paired) return this.toast('请先配对并初始化设备')
-      let { settingCHL, settingCHR } = this.globalData.deviceState[this.pasteChannel]
-      let currentReady = Number(settingCHL) !== 0 && !(this.portNum === 2 && Number(settingCHR) === 0)
-      if (!currentReady) return this.toast('刺激强度不能设置为0')
+      let currentReady = this.currentList.map(item => {
+        let { settingCHL, settingCHR } = this.globalData.deviceState[item.channel]
+        return Number(settingCHL) !== 0 && (item.splices !== 2 || Number(settingCHR) !== 0)
+      })
 
-      this.globalData.pasteChannel += 1
-      if (this.globalData.pasteChannel <= this.globalData.maxChannel) return uni.redirectTo({ url: '/pages/bluetooth/paste' })
+      if (currentReady.includes(false)) return this.toast('刺激强度不能设置为0')
 
       uni.showLoading({
         title: '准备开始',
@@ -140,7 +155,6 @@ export default {
 
         let _data = (await this.libs.request(this.libs.api.limitDeviceApp.treatment.startTreatment, params)).data
         this.globalData.workoutRecord = { ..._data, ...params }
-        // this.libs.data.setStorage('workoutRecord' + recordId, this.globalData.workoutRecord)
         uni.hideLoading()
         uni.reLaunch({ url: '/pages/bluetooth/running' })
       }, 1000)
@@ -171,8 +185,8 @@ export default {
   }
 
   .uni-numbox {
-    zoom: 2;
-    margin: 75rpx auto;
+    zoom: 1.5;
+    margin: 30rpx auto;
   }
 
   .btn {

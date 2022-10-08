@@ -55,8 +55,6 @@ export default {
       uni.hideLoading()
       // 这里应该在EventBus响应的回调做个别处理？？
       this.globalData.workout.duration = this.workTime
-      this.globalData.pasteChannel = 1
-      this.globalData.maxChannel = Math.max.apply(null, this.globalData.workout.channelList.map(item => item.channel))
       uni.redirectTo({ url: '/pages/bluetooth/paste' })
     }
   }

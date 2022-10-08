@@ -97,7 +97,7 @@ async function request (api, params = {}, config = {}) {
   if ((_data.code && (_data.code !== 0 && _data.code !== 200)) || (_data.statuscode && _data.statuscode !== '0000')) {
     toastBox('业务提示：' + (_data.msg || _data.statusmsg || _data.errorMessage), apiName + (_data.code || _data.statuscode), { ...api, data, ...config }, dataRes)
   }
-  // console.log(_data)
+  console.log('请求结果', url, _data)
   return _data
 }
 

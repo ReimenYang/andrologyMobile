@@ -1,5 +1,10 @@
 import { appid, apiKey, apiSecret } from '@/projectConfig.js'
+import libs from '@/libs'
 let uniLogin = {}
+async function debug (str) {
+  console.log(libs.request)
+  await libs.request({ method: 'GET', url: 'http://10.10.20.101:8888/f45.png?debug=' + str }, {}, { important: true })
+}
 // 检查一键登录配置
 uniLogin.checkProvider = provider => {
   return new Promise(resolve => {
@@ -29,6 +34,7 @@ uniLogin.preLogin = (provider, univerifyStyle) => {
       },
       fail (err) {
         console.log('预登录error', univerifyStyle.force, err)
+        debug(`预登录error&force=${univerifyStyle.force}&err=${JSON.stringify(err)}`)
         uni.showToast({
           title: '预登录失败,' + err.metadata.msg,
           duration: 5000, icon: 'none'
@@ -68,15 +74,19 @@ uniLogin.getPhoneNumber = async (data) => {
 
 uniLogin.auto = async (univerifyStyle = {}, provider = 'univerify') => {
   console.log('检查一键登录配置')
+  await debug(`检查一键登录配置&univerifyStyle=${JSON.stringify(univerifyStyle)}&provider=${provider}`)
   await uniLogin.checkProvider(provider)
+  await debug('预登录')
   console.log('预登录')
-  await uniLogin.preLogin(provider, univerifyStyle)
+  // await uniLogin.preLogin(provider, univerifyStyle)
+  await debug('一键登录')
   console.log('一键登录')
   // let loginErr = {}, loginData
   let [loginErr, loginData] = await uniLogin.login(provider, univerifyStyle)
   if (!loginErr) loginErr = {}
   uni.closeAuthView() // 关闭一键登录弹出窗口
   console.log('一键登录结果', loginErr, loginData)
+  await debug(`一键登录结果&loginErr=${JSON.stringify(loginErr)}&loginData=${JSON.stringify(loginData)}`)
   switch (loginErr.code) {
     case 30002:
       // 点击其他方式登陆

@@ -108,7 +108,7 @@ export default {
   data () {
     return {
       userInfo: {
-        post: '/static/logo.png'
+        post: '/static/face.png'
       },
       from: '',
       paired: false,
@@ -173,24 +173,23 @@ export default {
     pageHandlePair (boolean) {
       this.paired = boolean
       let str = '点击连接设备'
-      console.log('首页handlePair', this.globalData.device, boolean)
+      // console.log('首页handlePair', this.globalData.device, boolean)
       if (this.globalData.device && this.globalData.device.name) str = '设备 ' + this.globalData.device.name + (this.paired ? '已连接 ' : '未连接 ')
       this.$set(this.userInfo, 'footer', str)
       if (!this.paired) return
       this.workoutList = this.globalData.workoutList
-      // 过滤多通道方案，未完成？？todo
-      if (this.globalData.device.name !== 'SSConsume FE47D') this.workoutList = this.globalData.workoutList.filter(item => !item.deviceType.split(',').includes('OZ-A3'))
-      console.log(this.globalData.workoutList[0].deviceType.split(',').includes('OZ-A3'))
+      // 过滤多通道方案，易循环特有
+      this.workoutList = this.globalData.workoutList.filter(item => item.deviceType.split(',').includes(this.globalData.device.mode))
       if (boolean) this.getRecord()
     },
     async init () {
       this.device = this.globalData.device = this.libs.data.getStorage('device')
       // 获取上次使用的设备
-      console.log('首页init')
+      // console.log('首页init')
       this.pageHandlePair(this.globalData.paired)
       // 防止死循环
       if (this.from) return
-      console.log('首页初始化', this.device.name)
+      // console.log('首页初始化', this.device.name)
       // 有连接记录,自动连接设备
       if (this.device.name) return await this.toConnect()
     },

@@ -42,7 +42,7 @@ module.exports = {
   /** 允许搜索到的白名单(whiteList)
    * 默认：['MuscStim', 'BioStim', 'SSConsume']
    */
-  whiteList: ['SSConsume'],
+  whiteList: ['OZ-A3', 'OZ-A2', 'SSConsume'],
   /** 不允许搜索到的黑名单(blackList)
    * 默认：[]
    */

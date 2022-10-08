@@ -252,9 +252,8 @@ export default {
       console.log('获取r指令', data, _page, recordId, totalTime, time, isStop)
       clearInterval(this.globalData.loopRecord)
       if (!recordId) return// 设备没有记录
-      // let _record = this.libs.data.getStorage('workoutRecord' + recordId)
 
-      let _record = (await this.libs.request(this.libs.api.limitDeviceApp.treatment.getRecordByRecordId, { recordId, deviceName: this.device.name })).data
+      let _record = (await this.libs.request(this.libs.api.limitDeviceApp.treatment.getRecordByRecordId, { recordId, deviceName: this.globalData.device.name })).data
       console.log('治疗记录', 'workoutRecord' + recordId, _record)
       if (!_record) return// app没有记录
       _record.isStop = isStop
@@ -411,6 +410,7 @@ export default {
       // 这里必须用$set
       this.BioStimBleModule.deviceList.forEach(obj => { this.$set(obj, 'isCheck', obj.deviceId === item.deviceId) })
       // 保存设备信息，方便其他地方调用
+      item.mode = item.name.split(' ')[0]
       this.globalData.device = this.device = item
       console.log('选择设备', this.globalData.device)
       this.libs.data.setStorage('device', this.globalData.device)
@@ -461,7 +461,11 @@ export default {
     },
     // 发送初始命令
     async sendInitCmd () {
-      this.globalData.workout.channelList.sort((a, b) => a.channel - b.channel).forEach(options => {
+      let channelList = this.globalData.workout.channelList
+      channelList.sort((a, b) => a.channel - b.channel)
+
+      for (let i = 0; i < channelList.length; i++) {
+        let options = channelList[i]
         // let phaseList = this.globalData.workout.workoutphaselist || this.globalData.workout.phaseList || this.globalData.workout.workoutPhaseList[0]
         // let options = { ...this.globalData.workout, ...phaseList }
         let MCommand = options.initCommand = options.initcommand || options.initCommand
@@ -488,8 +492,8 @@ export default {
           }
         }
         console.log('发送初始命令', options, this.workTime)
-        return this.BioStimBleModule.sendInitCmd(options, this.workTime)
-      })
+        await this.BioStimBleModule.sendInitCmd(options, this.workTime)
+      }
     },
     // 设置强度
     setCurrent (name, channel, value) {

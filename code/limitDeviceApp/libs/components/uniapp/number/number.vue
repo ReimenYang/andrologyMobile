@@ -119,6 +119,7 @@ export default {
         }
       }
       this.inputValue = (value / scale).toFixed(String(scale).length)
+      this.$emit(type, this.inputValue)
     },
     _getDecimalScale () {
       let scale = 1

@@ -106,8 +106,6 @@ export default {
     clearInterval(this.globalData.loopRecord)
     delete this.globalData.handleLongRecived
     delete this.globalData.handleRecord
-    delete this.globalData.pasteChannel
-    delete this.globalData.maxChannel
     delete this.globalData.deviceState
   },
   methods: {
@@ -169,12 +167,13 @@ export default {
         }
       }
 
-      // console.log('从s指令获取强度信息，设置调电按钮')
       this.recivedCurrent(channel)
 
       this.remain = remainingTime - 0
       this.countdown()
 
+      // 断开蓝牙再进会出现卡死
+      // console.log('从s指令获取信息', channel, this.config.data)
       let isDone = !!this.config.data.find(item => item.channel === channel)
       if (!isDone) await this.initCurrent()
       // this.longRecivedReady = isDone
@@ -207,7 +206,7 @@ export default {
           this.config.data.push({
             channel,
             key,
-            title: '电极口' + (channel * 2 - 1),
+            title: '电极口' + (channel * 2 - (i ? 0 : 1)),
             setClass: '',
             style: '',
             number: {
