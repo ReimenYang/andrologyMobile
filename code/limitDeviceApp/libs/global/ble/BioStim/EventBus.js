@@ -52,6 +52,7 @@ export default class EventBus {
   static PAIRED = 'paired'// 设备配对成功
 
   static SET_INIT = 'setInit'// 初始命令发送成功
+  static COMMAND_FAIL = 'commandFail'// 指令发送失败
 
   static LONG_RECIVED = 'longRecived'// 手机与设备之间的连接断开长连接心跳包
   static SET_CURRENT = 'setCurrent'// 设置电流强度
@@ -160,6 +161,9 @@ export default class EventBus {
       log: '初始命令发送成功',
       stateName: 'devicesReady',
       state: true
+    },
+    commandFail: {
+      log: '指令发送失败'
     },
     longRecived: {
       log: '心跳包'

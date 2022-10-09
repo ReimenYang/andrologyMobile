@@ -181,6 +181,9 @@ export default {
           case this.EventBus.GET_RECORD: // 获取治疗记录
             this.globalData.record = data
             break
+          case this.EventBus.COMMAND_FAIL: // 指令发送失败
+            this.toast(data)
+            break
         }
         // 2.处理状态
         await this.stateManage({ ...logMsg, toast }, msgCode, data)
@@ -188,6 +191,7 @@ export default {
         switch (msgCode) {
           case this.EventBus.BLE_UNREADY: // 框架未完成初始化
             setTimeout(this.libs.data.exit, 2000)
+            // this.BioStimBleModule.turnOnBluetooth()
             break
           case this.EventBus.BLE_ONLINE: // 手机蓝牙已打开
           case this.EventBus.BLE_OFFLINE: // 手机蓝牙未打开

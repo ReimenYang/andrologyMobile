@@ -2,7 +2,7 @@ import Vue from 'vue'
 import App from './App'
 import checkReady from '@/libs/uniInit'
 import libs from '@/libs'
-import jsencrypt from '@/js_sdk/jsencrypt-Rsa/jsencrypt/jsencrypt.vue'
+// import jsencrypt from '@/js_sdk/jsencrypt-Rsa/jsencrypt/jsencrypt.vue'
 let { projectName, vision, updateTime, globalData, deviceTypeId, subName, isNewDevice, whiteList, blackList } = libs.configProject
 let BioStimBleModule = libs.global.ble.BioStimBleModule
 if (whiteList.length) BioStimBleModule.whiteList = whiteList
@@ -25,10 +25,10 @@ console.log('控制writeBLECharacteristicValue时间间隔', BioStimBleModule.wr
 
 async function login (phone) {
   // 之前ssl生成的公钥，复制的时候要小心不要有空格
-  const publiukey = `-----BEGIN PUBLIC KEY-----
-MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDXmihNG2sviXVLaTzuWQ5WEYU6ZUV177quq1veOlVW12gsbEoEgJzRtbwr3bqoTM1C9n18nA1VdCs451ZUPTpJFclj01sethwg4nBsyqYzKN/ELRi3DWpkH35v2Pno+W8O0vXNeHKUFXOxsVdeXzq8zSo4Iy3fH3fwTGFyl/kPSwIDAQAB
------END PUBLIC KEY-----`.trim()
-  let encryptedPhone = jsencrypt.setEncrypt(publiukey, phone)  // 对内容进行加密
+  //   const publiukey = `-----BEGIN PUBLIC KEY-----
+  // MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDXmihNG2sviXVLaTzuWQ5WEYU6ZUV177quq1veOlVW12gsbEoEgJzRtbwr3bqoTM1C9n18nA1VdCs451ZUPTpJFclj01sethwg4nBsyqYzKN/ELRi3DWpkH35v2Pno+W8O0vXNeHKUFXOxsVdeXzq8zSo4Iy3fH3fwTGFyl/kPSwIDAQAB
+  // -----END PUBLIC KEY-----`.trim()
+  // let encryptedPhone = jsencrypt.setEncrypt(publiukey, phone)  // 对内容进行加密
 
   let accessToken = ''
   let appid = {
@@ -45,7 +45,7 @@ MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDXmihNG2sviXVLaTzuWQ5WEYU6ZUV177quq1veOlVW
     phone
   }
   // 请求用户信息
-  console.log('请求用户信息', phone, encryptedPhone)
+  // console.log('请求用户信息', phone, encryptedPhone)
   // 优E康
   // let { data } = await libs.request(libs.api.wyjkDevice.user.oneClickLoginNormalPhone, { phone })
   // accessToken=data.userLogin.accessToken
@@ -56,19 +56,19 @@ MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDXmihNG2sviXVLaTzuWQ5WEYU6ZUV177quq1veOlVW
   data.realname = data.userName
   let userInfo = globalData.userInfo = data
 
-  console.log('请求用户信息', data)
+  // console.log('请求用户信息', data)
   console.log('当前用户：', userInfo.realname, userInfo)
 }
 
-// let univerifyStyle = { // 一键登录设置
-//   force: true, // 自定义强制登录参数，不登录则退出程序，默认值： false
-//   fullScreen: true, // 是否全屏显示，默认值： false
-//   icon: { path: '/static/logo.png' },
-//   closeIcon: { path: '/static/transparent.png' }, // 自定义关闭按钮，仅支持本地图片。 HBuilderX3.3.7+版本支持
-//   otherLoginButton: {
-//     visible: false, // 是否显示其他登录按钮，默认值：true
-//   }
-// }
+let univerifyStyle = { // 一键登录设置
+  force: true, // 自定义强制登录参数，不登录则退出程序，默认值： false
+  fullScreen: true, // 是否全屏显示，默认值： false
+  icon: { path: '/static/logo.png' },
+  closeIcon: { path: '/static/transparent.png' }, // 自定义关闭按钮，仅支持本地图片。 HBuilderX3.3.7+版本支持
+  otherLoginButton: {
+    visible: false, // 是否显示其他登录按钮，默认值：true
+  }
+}
 App.mpType = 'app'
 const app = new Vue({ ...App })
 !(async function initReady (n = 0) {
@@ -82,7 +82,7 @@ const app = new Vue({ ...App })
     // phone = 15914214657 //邦森
     // Hbuilder X 3.4.7的一键登录(uni.login)出现坑爹情况 TypeError: Cannot read property 'route' of null
     // 旧版本能正常通过
-    // phone = await libs.global.uniLogin.auto(univerifyStyle)
+    phone = await libs.global.uniLogin.auto(univerifyStyle)
     libs.data.setStorage('phone', phone)
   }
 

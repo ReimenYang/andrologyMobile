@@ -206,7 +206,7 @@ export default {
           this.config.data.push({
             channel,
             key,
-            title: '电极口' + (channel * 2 - (i ? 0 : 1)),
+            title: ['A', 'B', 'C', 'D'][channel - 1] + (i ? 1 : 2),
             setClass: '',
             style: '',
             number: {

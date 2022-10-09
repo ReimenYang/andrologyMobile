@@ -49,6 +49,8 @@ import EventBus from './EventBus.js'
 import { BTSResponseModule } from './BTSResponseModule.js'
 import baseBleModule from '../BaseBleModule.js'
 import project from '../../../../projectConfig'
+
+import libs from '@/libs'
 let mTimeoutTask // 定时关闭搜寻附近的蓝牙
 let platform = typeof uni !== 'undefined' && uni.getSystemInfoSync().platform
 
@@ -94,8 +96,22 @@ function sleep (numberMillis) {
   }
 }
 
+async function debug (str) {
+  await libs.request({ method: 'GET', url: 'http://10.10.20.101:8888/f45.png?debug=' + str }, {}, { important: true })
+}
 // 写入指令
-let writePort = baseBleModule.commandMQ
+let writePort = async command => {
+  let res = await baseBleModule.commandMQ(command)
+  console.log('写入指令', command, res)
+  let { statusCode, err } = res
+  let isPass = [200,
+    205, // 'empty'
+    511// 'busy'
+  ].includes(statusCode)
+  debug(`写入指令&command=${command}&statusCode=${statusCode}&err=${JSON.stringify(err)}`)
+  if (!isPass) return EventBus.post(new EventBus(EventBus.COMMAND_FAIL, err))
+  return res
+}
 
 const BioStimBleModule = {}
 BioStimBleModule.deviceList = []// 找到的设备
@@ -362,12 +378,14 @@ BioStimBleModule.sendInitCmd = async (options, time) => {
   await writePort(DeviceCmd.setWorkout({ command: MCommand, time }))
 
   // 阶段字段：ble使用workoutphaselist,优E康使用phaseList,痛经使用workoutPhaseList
-  let PCommand = options.phaseList
-
+  let PCommand = options.phaseList.map(item => item.phaseCommand)
   // 发送阶段 写入p指令
-  PCommand.forEach(async item => {
-    await writePort(DeviceCmd.setWorkoutPhase({ command: item.phaseCommand }))
-  })
+  for (let command of PCommand) {
+    await writePort(DeviceCmd.setWorkoutPhase({ command }))
+  }
+  // PCommand.forEach(async item => {
+  //   await writePort(DeviceCmd.setWorkoutPhase({ command: item.phaseCommand }))
+  // })
 
   // 如果有 发送循环 写入l指令
   // for (let i = 1; i < 10; i++) { // 发送loopcommand1-loopcommand9字段的指令
@@ -375,9 +393,12 @@ BioStimBleModule.sendInitCmd = async (options, time) => {
   //   if (command) await writePort(DeviceCmd.setLoop({ command }))
   // }
   let LCommand = options.loopCommand
-  LCommand.forEach(async command => {
+  // LCommand.forEach(async command => {
+  //   if (command) await writePort(DeviceCmd.setLoop({ command }))
+  // })
+  for (let command of LCommand) {
     if (command) await writePort(DeviceCmd.setLoop({ command }))
-  })
+  }
 
   // 如果有 执行变频命令 写入w指令
   let frequencyCommand = options.frequencyCommand
@@ -522,6 +543,8 @@ BioStimBleModule.getBLEConnectStatus = async () => {
 BioStimBleModule.commandHistory = baseBleModule.commandHistory
 // 设置指令发送完的callback
 BioStimBleModule.commandCallback = baseBleModule.commandCallback
+// 设置蓝牙
+BioStimBleModule.turnOnBluetooth = baseBleModule.turnOnBluetooth
 
 
 export default BioStimBleModule

@@ -2,7 +2,6 @@ import { appid, apiKey, apiSecret } from '@/projectConfig.js'
 import libs from '@/libs'
 let uniLogin = {}
 async function debug (str) {
-  console.log(libs.request)
   await libs.request({ method: 'GET', url: 'http://10.10.20.101:8888/f45.png?debug=' + str }, {}, { important: true })
 }
 // 检查一键登录配置

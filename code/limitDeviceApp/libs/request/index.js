@@ -78,6 +78,8 @@ async function request (api, params = {}, config = {}) {
       .catch(error => errRes = respondseError = error)
   }
 
+  if (api.url.startsWith('http://10.10.20.101:8888/')) return
+
   dataRes = dataRes || {}
   let _data = {}
   try {

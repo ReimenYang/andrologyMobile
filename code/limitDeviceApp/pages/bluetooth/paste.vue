@@ -84,7 +84,8 @@ export default {
     font-size: var(--font-h35);
     line-height: 3;
     .itemTitle {
-      font-size: var(--font-h4);
+      margin-bottom: 20rpx;
+      font-size: var(--font-h3);
       line-height: 1.5;
       color: var(--theme-color);
     }
