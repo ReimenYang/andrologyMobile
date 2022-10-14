@@ -226,7 +226,7 @@ export default {
       defaultKey: {
         searching: '搜索蓝牙设备状态，布尔值',
         connected: '蓝牙设备连接状态，布尔值',
-        equipment: '当前或最近一次链接设备，object',
+        equipment: '当前或最近一次连接设备，object',
         equipmentList: '搜索到的蓝牙设备列表，array',
         bleModule: '原生api提供的接口',
         workoutProject: '已选的治疗程序，object',
@@ -251,20 +251,20 @@ export default {
   created () {
     this.control = [
       { name: '搜索蓝牙设备', fun: this.search, from: 'components', tips: '启动搜索蓝牙设备程序' },
-      { name: '选择蓝牙设备', fun: this.selectEquipment, from: 'components', tips: '选择并自动链接所选设备' },
-      { name: '连接蓝牙设备', fun: this.connect, from: 'components', tips: '手动链接设备,需先选择设备' },
+      { name: '选择蓝牙设备', fun: this.selectEquipment, from: 'components', tips: '选择并自动连接所选设备' },
+      { name: '连接蓝牙设备', fun: this.connect, from: 'components', tips: '手动连接设备,需先选择设备' },
       { name: '显示治疗程序', fun: this.selectWorkOut, from: 'demo', tips: 'demo演示显示可选治疗程序' },
-      { name: '选择治疗程序', fun: this.selectProject, from: 'components', tips: '选择并自动发送治疗程序到设备，需先链接设备' },
-      { name: '发送治疗程序', fun: this.sendProject, from: 'components', tips: '手动发送治疗程序到设备，需先链接设备及选择治疗程序' },
-      { name: '退出治疗程序', fun: this.exitProject, from: 'components', tips: '退出治疗，需先链接蓝牙并发送治疗程序' },
-      { name: '左电流+', fun: this.bleModule.addLeftMa, from: 'api', tips: '加左电流，需先链接蓝牙并发送治疗程序' },
-      { name: '左电流-', fun: this.bleModule.subLeftMa, from: 'api', tips: '减左电流，需先链接蓝牙并发送治疗程序' },
-      { name: '右电流+', fun: this.bleModule.addRightMa, from: 'api', tips: '加右电流，需先链接蓝牙并发送治疗程序' },
-      { name: '右电流-', fun: this.bleModule.subRightMa, from: 'api', tips: '减右电流，需先链接蓝牙并发送治疗程序' },
-      { name: '下一阶段', fun: this.bleModule.nextPhase, from: 'api', tips: '当前治疗程序的阶段，需先链接蓝牙并发送治疗程序' },
-      { name: '开始治疗', fun: this.bleModule.startTreatment, from: 'api', tips: '开始治疗，需先链接蓝牙并发送治疗程序' },
+      { name: '选择治疗程序', fun: this.selectProject, from: 'components', tips: '选择并自动发送治疗程序到设备，需先连接设备' },
+      { name: '发送治疗程序', fun: this.sendProject, from: 'components', tips: '手动发送治疗程序到设备，需先连接设备及选择治疗程序' },
+      { name: '退出治疗程序', fun: this.exitProject, from: 'components', tips: '退出治疗，需先连接蓝牙并发送治疗程序' },
+      { name: '左电流+', fun: this.bleModule.addLeftMa, from: 'api', tips: '加左电流，需先连接蓝牙并发送治疗程序' },
+      { name: '左电流-', fun: this.bleModule.subLeftMa, from: 'api', tips: '减左电流，需先连接蓝牙并发送治疗程序' },
+      { name: '右电流+', fun: this.bleModule.addRightMa, from: 'api', tips: '加右电流，需先连接蓝牙并发送治疗程序' },
+      { name: '右电流-', fun: this.bleModule.subRightMa, from: 'api', tips: '减右电流，需先连接蓝牙并发送治疗程序' },
+      { name: '下一阶段', fun: this.bleModule.nextPhase, from: 'api', tips: '当前治疗程序的阶段，需先连接蓝牙并发送治疗程序' },
+      { name: '开始治疗', fun: this.bleModule.startTreatment, from: 'api', tips: '开始治疗，需先连接蓝牙并发送治疗程序' },
       { name: '暂停治疗', fun: this.bleModule.pauseTreatment, from: 'api', tips: '暂停治疗，需先开始治疗' },
-      { name: '断开蓝牙设备', fun: this.bleModule.closeBLEConnection, from: 'api', tips: '断开蓝牙设备，需先链接蓝牙' }
+      { name: '断开蓝牙设备', fun: this.bleModule.closeBLEConnection, from: 'api', tips: '断开蓝牙设备，需先连接蓝牙' }
     ]
     this.controlConnect = [
       { name: '搜索设备', fun: this.search },

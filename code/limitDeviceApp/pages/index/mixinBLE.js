@@ -11,7 +11,6 @@ export default {
     return {
       BioStimBleModule: this.libs.global.ble.BioStimBleModule,
       EventBus: this.libs.global.ble.EventBus,
-      eventBusCallBack: () => console.log('eventBusCallBack'),
       device: this.libs.data.getStorage('device'),
       workTime: 60, // 单位：秒
       bleReady, // 蓝牙api是否完成初始化，对应openBluetoothAdapter
@@ -24,21 +23,41 @@ export default {
       fallTimeInterval: 5 * 1000, // 跌落判断间隔
       showFall: false, // 跌落提示框
       setCurrentTimeInterval: 2 * 1000, // 调电判断间隔
+      bleState: {}
     }
   },
   async onShow () {
-    this.paired = this.globalData.paired
-    this.device = this.libs.data.getStorage('device')
-    // },
-    // async onLoad () {
-    // 避免重复激活服务
-    if (!this.globalData.bleReady) {
-      // 注册蓝牙改变全局监听事件,全局基础服务，千万不能重复注册
-      if (!this.globalData.bleStateChange) this.bleStateChangeRegister(this)
-      if (this.globalData.workout) this.workTime = this.globalData.workout.duration
-      this.setEventBus()
-      await this.bleInit()
+    // this.paired = this.bleState.paired
+    this.device = this.globalData.device = this.libs.data.getStorage('device')
+    console.log('this.BioStimBleModule.bleState', this.BioStimBleModule.bleState)
+    let { eventBusReady, bleOnline, bleReady } = this.bleState = this.BioStimBleModule.bleState
+    // 注册蓝牙改变全局监听事件,全局基础服务，千万不能重复注册
+    if (!eventBusReady) {
+      this.EventBus.register(this.eventBusCallBack)
+      this.bleStateChangeRegister(this)
+      this.bleState.eventBusReady = true
     }
+    console.log(eventBusReady, this.bleState.eventBusReady, this.BioStimBleModule.bleState.eventBusReady)
+
+    if (!bleOnline) {
+      return uni.showModal({
+        content: '客户端蓝牙未打开',
+        showCancel: true,
+        cancelText: '退出',
+        success: res => {
+          if (res.confirm) {
+            this.BioStimBleModule.bluetoothOn()
+          } else if (res.cancel) {
+            this.libs.data.exit()
+          }
+        }
+      })
+    }
+
+    // 避免重复激活服务
+    if (!bleReady) await this.bleInit()
+
+    if (this.globalData.workout) this.workTime = this.globalData.workout.duration
     this.pageInit()
   },
   methods: {
@@ -52,7 +71,6 @@ export default {
         availableFalse: {
           console () {
             console.log('关闭蓝牙')
-            _this.reLaunchIndex()
             // uni.showModal({
             //   title: '蓝牙已关闭，请开启后重新打开app',
             //   showCancel: false,
@@ -60,7 +78,8 @@ export default {
             // })
           },
           closeBluetoothAdapter () {
-            console.log('蓝牙不可链接')
+            console.log('蓝牙不可连接')
+            _this.reLaunchIndex()
             // 蓝牙已经关闭，次数执行closeBluetoothAdapter一定报错(10001)
             // this.BioStimBleModule.closeBluetoothAdapter()
           }
@@ -76,7 +95,7 @@ export default {
           }
         }
       }
-      this.BioStimBleModule.onBluetoothAdapterStateChange()
+      // this.BioStimBleModule.onBluetoothAdapterStateChange(true)
     },
     // 执行蓝牙改变事件
     async bleStateChangeAction (res) {
@@ -93,7 +112,7 @@ export default {
       // 操作当前状态
       this.$set(this, stateName, state)
       this.globalData[stateName] = state
-      this.paired = this.globalData.paired
+      // this.paired = this.globalData.paired
 
       if (stateName !== 'searching' && !state) {
         // 状态顺序，搜索状态与其他状态的关系需要注意
@@ -104,10 +123,10 @@ export default {
         stateList.slice(stateList.indexOf(stateName) + 1).forEach(_state => {
           this.$set(this, _state, false)
           this.globalData[_state] = false
-          if (_state === 'paired') this.handlePair(this.globalData.paired)
+          // if (_state === 'paired') this.handlePair(this.bleState.paired)
         })
       }
-      if (stateName === 'paired') this.handlePair(this.globalData.paired)
+      // if (stateName === 'paired') this.handlePair(this.bleState.paired)
       if (toast) this.toast(toast, time, icon)
       console.log(
         '触发来源', msgCode,
@@ -117,7 +136,8 @@ export default {
         'searching', this.globalData.searching,
         'connected', this.globalData.connected,
         'paired', this.globalData.paired,
-        'devicesReady', this.globalData.devicesReady
+        'devicesReady', this.globalData.devicesReady,
+        this.BioStimBleModule.bleState
       )
     },
     async bleInit () {
@@ -127,14 +147,14 @@ export default {
    * 在用户蓝牙开关未开启或者手机不支持蓝牙功能的情况下，调用 uni.openBluetoothAdapter 会返回错误（errCode=10001），表示手机蓝牙功能不可用。
    * 此时APP蓝牙模块已经初始化完成，可通过 uni.onBluetoothAdapterStateChange 监听手机蓝牙状态的改变，也可以调用蓝牙模块的所有API。
    * 工作顺序：
-   * 参数设置——打开蓝牙模块——检查手机蓝牙开关状态——搜索设备——链接设备——配对设备——给设备发送工作指令
-   * 链接设备：指执行了createBLEConnection，并成功开启了数据交互监听
+   * 参数设置——打开蓝牙模块——检查手机蓝牙开关状态——搜索设备——连接设备——配对设备——给设备发送工作指令
+   * 连接设备：指执行了createBLEConnection，并成功开启了数据交互监听
    * 配对设备：执行完获取设备信息指令，并按一定的业务规则进行判断，符合联机条件
    */
       await this.BioStimBleModule.openBluetoothAdapter()
 
       // 检查蓝牙是否可连接
-      if (this.globalData.bleReady) await this.BioStimBleModule.getBLEConnectStatus()
+      // if (this.globalData.bleReady) await this.BioStimBleModule.getBLEConnectStatus()
     },
     async pageInit () {
       if (this.globalData.pageInit) return this.globalData.pageInit()
@@ -152,93 +172,93 @@ export default {
       if (this.getPageUrl() !== 'pages/scheme/index') uni.reLaunch({ url: '/pages/scheme/index?from=' + from })
     },
     // 设置回调事件
-    setEventBus () {
-      this.eventBusCallBack = async res => {
-        let { msgCode, data = {} } = res
-        let logMsg = this.EventBus.logMsg[msgCode]
-        let toast = logMsg.toast
-        // 1.将本次事件处理完成
-        switch (msgCode) {
-          case this.EventBus.BLE_UNREADY: // 框架未完成初始化
-            if (data.statusCode === 500 && data.err.errCode === 10001) {
-              toast += ',请检查手机蓝牙是否打开'
-              toast += data.err.errCode
-            }
-            break
-          case this.EventBus.CONNECT_FAIL: // 设备链接失败
-          case this.EventBus.CONNECT_BREAK: // 被动断开链接
-          case this.EventBus.PAIR_FAIL: // 设备配对失败
-          case this.EventBus.PAIR_BREAK: // 设备配对断开
-            if (data.statusCode === 501) {
-              if (data.err.errCode === 10012 || data.err.errCode === 10013) toast += ',请检查设备是否开机'
-              toast += data.err.errCode
-            }
-            break
-          case this.EventBus.GET_SERIALNO: // 设备序列号数据，蓝牙连接成功后只回调一次
-            this.globalData.deviceInfo = data
-            // console.log('设备序列号数据，蓝牙连接成功后只回调一次', this.globalData.deviceInfo)
-            break
-          case this.EventBus.GET_RECORD: // 获取治疗记录
-            this.globalData.record = data
-            break
-          case this.EventBus.COMMAND_FAIL: // 指令发送失败
-            this.toast(data)
-            break
-        }
-        // 2.处理状态
-        await this.stateManage({ ...logMsg, toast }, msgCode, data)
-        // 3.执行后续相关动作
-        switch (msgCode) {
-          case this.EventBus.BLE_UNREADY: // 框架未完成初始化
-            setTimeout(this.libs.data.exit, 2000)
-            // this.BioStimBleModule.turnOnBluetooth()
-            break
-          case this.EventBus.BLE_ONLINE: // 手机蓝牙已打开
-          case this.EventBus.BLE_OFFLINE: // 手机蓝牙未打开
-            await this.bleStateChangeAction(data)
-            break
-          case this.EventBus.CONNECT_FAIL: // 设备链接失败
-          case this.EventBus.CONNECT_BREAK: // 被动断开链接
-          case this.EventBus.PAIR_FAIL: // 设备配对失败
-          case this.EventBus.PAIR_BREAK: // 设备配对断开
-            clearInterval(this.globalData.loopRecord)// 避免r指令堆积
-            if (data.statusCode === 504) {
-              toast += ',启用订阅失败,请退出并在5秒后重启APP'
-              toast += data.err.errCode
-              uni.showModal({
-                title: toast,
-                showCancel: false,
-                success: res => res.confirm && this.libs.data.exit()
-              })
-              return
-            }
-            // if (logMsg.stateName === 'paired') await this.closeBLEConnection()
-            this.reLaunchIndex('connect_close', data)
-            break
-          case this.EventBus.GET_SERIALNO: // 设备序列号数据，蓝牙连接成功后只回调一次
-            // case this.EventBus.CONNECTED: // 链接成功
-            // 使用GET_SERIALNO的逻辑会更严谨，但由于有时候收不到反馈，只能用CONNECTED代替
-            console.log('设备序列号数据，蓝牙连接成功后只回调一次', this.globalData.isNewDevice)
-            if (this.globalData.isNewDevice === 'N') await this.createPaired()
-            // 如果是优E康，检查治疗记录
-            if (this.globalData.isNewDevice === 'Y') await this.getRecord()
-            break
-          // case this.EventBus.PAIRED: // 设备配对成功
-          //   this.handlePair(data)
-          //   break
-          case this.EventBus.GET_RECORD: // 获取治疗记录
-            console.log('显示获取治疗记录', this.globalData.paired, data, this.getPageUrl())
-            // 如果未配对，启动配对
-            if (!this.globalData.paired) await this.createPaired()
-            await this.handleRecord(data)
-            break
-          case this.EventBus.LONG_RECIVED: // 长连接心跳包
-            // console.log('长连接心跳包', msgCode, data, this.handleLongRecived)
-            await this.handleLongRecived(data)
-            break
-        }
+    async eventBusCallBack (res) {
+      let { msgCode, data = {} } = res
+      let logMsg = this.EventBus.logMsg[msgCode]
+      let toast = logMsg.toast
+      // 1.将本次事件处理完成
+      switch (msgCode) {
+        case this.EventBus.BLE_UNREADY: // 框架未完成初始化
+          if (data.statusCode === 500 && data.err.errCode === 10001) {
+            toast += ',请检查手机蓝牙是否打开'
+            toast += data.err.errCode
+          }
+          break
+        case this.EventBus.CONNECT_FAIL: // 设备连接失败
+        case this.EventBus.CONNECT_BREAK: // 被动断开连接
+        case this.EventBus.PAIR_FAIL: // 设备配对失败
+        case this.EventBus.PAIR_BREAK: // 设备配对断开
+          if (data.statusCode === 501) {
+            if (data.err.errCode === 10012 || data.err.errCode === 10013) toast += ',请检查设备是否开机'
+            toast += data.err.errCode
+          }
+          break
+        case this.EventBus.GET_SERIALNO: // 设备序列号数据，蓝牙连接成功后只回调一次
+          this.globalData.deviceInfo = data
+          // console.log('设备序列号数据，蓝牙连接成功后只回调一次', this.globalData.deviceInfo)
+          break
+        case this.EventBus.GET_RECORD: // 获取治疗记录
+          this.globalData.record = data
+          break
+        case this.EventBus.COMMAND_FAIL: // 指令发送失败
+          this.toast(data)
+          break
       }
-      this.EventBus.register(this.eventBusCallBack)
+      // 2.处理状态
+      await this.stateManage({ ...logMsg, toast }, msgCode, data)
+      // 3.执行后续相关动作
+      switch (msgCode) {
+        case this.EventBus.BLE_ONLINE: // 手机蓝牙已打开
+          await this.bleStateChangeAction(data)
+          break
+        case this.EventBus.BLE_OFFLINE: // 手机蓝牙未打开
+          this.BioStimBleModule.bluetoothOn()// 这个调用可能需要优化
+          await this.bleStateChangeAction(data)
+          break
+        case this.EventBus.BLE_UNREADY: // 框架未完成初始化
+          // setTimeout(this.libs.data.exit, 2000)
+          this.bleInit()
+          break
+        case this.EventBus.CONNECT_FAIL: // 设备连接失败
+        case this.EventBus.CONNECT_BREAK: // 被动断开连接
+        case this.EventBus.PAIR_FAIL: // 设备配对失败
+        case this.EventBus.PAIR_BREAK: // 设备配对断开
+          clearInterval(this.globalData.loopRecord)// 避免r指令堆积
+          if (data.statusCode === 504) {
+            toast += ',启用订阅失败,请退出并在5秒后重启APP'
+            toast += data.err.errCode
+            uni.showModal({
+              title: toast,
+              showCancel: false,
+              success: res => res.confirm && this.libs.data.exit()
+            })
+            return
+          }
+          // if (logMsg.stateName === 'paired') await this.closeBLEConnection()
+          this.reLaunchIndex('connect_close', data)
+          break
+        case this.EventBus.GET_SERIALNO: // 设备序列号数据，蓝牙连接成功后只回调一次
+          // case this.EventBus.CONNECTED: // 连接成功
+          // 使用GET_SERIALNO的逻辑会更严谨，但由于有时候收不到反馈，只能用CONNECTED代替
+          console.log('设备序列号数据，蓝牙连接成功后只回调一次', this.globalData.isNewDevice)
+          if (this.globalData.isNewDevice === 'N') await this.createPaired()
+          // 如果是优E康，检查治疗记录
+          if (this.globalData.isNewDevice === 'Y') await this.getRecord()
+          break
+        case this.EventBus.PAIRED: // 设备配对成功
+          this.handlePair(data)
+          break
+        case this.EventBus.GET_RECORD: // 获取治疗记录
+          console.log('显示获取治疗记录', this.bleState.paired, data, this.getPageUrl())
+          // 如果未配对，启动配对
+          if (!this.bleState.paired) await this.createPaired()
+          await this.handleRecord(data)
+          break
+        case this.EventBus.LONG_RECIVED: // 长连接心跳包
+          // console.log('长连接心跳包', msgCode, data, this.handleLongRecived)
+          await this.handleLongRecived(data)
+          break
+      }
     },
     handlePair (boolean) {
       console.log('设备配对结果', boolean, this.globalData.handlePair)
@@ -306,7 +326,7 @@ export default {
       console.log('治疗结束，更新治疗记录', _record)
 
       // 前端处理今日已治疗的数据，减少后台请求
-      _record.workout.todayState = 'Y'
+      // _record.workout.todayState = 'Y'
       // _finishObj.title = _finishObj.workoutName + '（今天已治疗）'
 
       let _res = await this.libs.request(this.libs.api.limitDeviceApp.treatment.endTreatment, _record)
@@ -392,7 +412,7 @@ export default {
 
       this.showFall = true
       uni.showModal({
-        content: '贴片跌落,暂停治疗，请贴好后开始',
+        content: '电极片从人体中脱落，治疗暂停。请粘贴到正确的部位后，点击开始按钮继续治疗。',
         showCancel: false,
         success: res => this.showFall = !res.confirm
       })
@@ -401,8 +421,7 @@ export default {
     },
     // 搜索设备
     async bleSearch () {
-      if (this.globalData.searching) return
-      this.BioStimBleModule.startBluetoothDevicesDiscovery()
+      if (this.bleState.bleReady && !this.bleState.searching) this.BioStimBleModule.startBluetoothDevicesDiscovery()
     },
     // 停止搜索
     stopSearch () {
@@ -419,23 +438,27 @@ export default {
       console.log('选择设备', this.globalData.device)
       this.libs.data.setStorage('device', this.globalData.device)
     },
-    // 链接设备
+    // 连接设备
     async connectDevice () {
       // 检查初始化状态，可能会与监听事件产生时机问题
       // 未初始化，注册打开后自动执行的事件
-      if (!this.globalData.bleReady) {
-        // this.toast('蓝牙不可链接')
-        this.globalData.bleStateChange.availableTrue.connectDevice = this.connectDevice
-        return
-      }
-      // 如果在搜索就停止搜索
-      if (this.globalData.searching) await this.stopSearch()
-      // 如果在链接或者已经链接，断开原来的链接
-      if (this.globalData.connected) await this.closeBLEConnection()
-      delete this.globalData.bleStateChange.availableTrue.connectDevice
-      console.log('链接设备', this.globalData.device)
+      await this.BioStimBleModule.getServiceReady()
+      // if (!(await this.BioStimBleModule.getServiceReady('boolean'))) {
+      //   this.globalData.bleStateChange.availableTrue.connectDevice = this.connectDevice
+      //   this.toast('请检查手机蓝牙是否打开')
+      //   return
+      // }
+      uni.showLoading({
+        title: '设备连接中...',
+        mask: true
+      })
+      // if (this.globalData.bleStateChange.availableTrue.connectDevice) delete this.globalData.bleStateChange.availableTrue.connectDevice
+
+      console.log('连接设备', this.globalData.device)
       let _connected = await this.BioStimBleModule.createBLEConnection(this.globalData.device.uuid)
       uni.hideLoading()
+
+      if (_connected.statusCode !== 200) return this.toast('连接失败')
       // 执行配对
       return _connected
     },

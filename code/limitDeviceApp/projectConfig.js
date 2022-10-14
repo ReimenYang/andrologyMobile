@@ -14,7 +14,7 @@ module.exports = {
     app: true
   }, // 项目要运行的环境
   vision: '0.01Bate', // 项目版本
-  updateTime: '20220704', // 版本升级时间
+  updateTime: '20221009', // 版本升级时间
   // webDeveloper: '127.0.0.1', // 前端开发本地路径
   webDeveloper: '10.10.20.101', // Reimen
   // webDeveloper: 'dev-weiming.xinuowang.com', 	// Reimen

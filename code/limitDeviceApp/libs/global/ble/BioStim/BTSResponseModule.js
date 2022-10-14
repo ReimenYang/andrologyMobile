@@ -21,7 +21,7 @@ export class BTSResponseModule {
       ACK: {
         c: EventBus.GET_SERIALNO,
         r: EventBus.GET_RECORD,
-        e: EventBus.SET_INIT
+        e: EventBus.SET_INIT// 多通道有问题
       },
       DATA: {
         s: EventBus.LONG_RECIVED,

@@ -42,6 +42,7 @@ export default {
     }
   },
   onShow () {
+    this.imageList = []
     this.globalData.workout.channelList.forEach(item => {
       item.imageUrl.split(',').forEach(url => {
         this.imageList.push({
@@ -60,7 +61,7 @@ export default {
   methods: {
     nextStep () {
       if (this.index + 1 < this.imageList.length) return this.index++
-      uni.redirectTo({ url: '/pages/bluetooth/setCurrent' })
+      uni.redirectTo({ url: '/pages/bluetooth/setTime' })
     },
     prevStep () {
       if (0 < this.index) return this.index--

@@ -14,7 +14,7 @@
           v-if="userInfo.title"
         >
           <view
-            v-if="paired"
+            v-if="bleState.paired"
             slot="footer"
             @click="toConnect('navigateTo')"
           >
@@ -25,42 +25,10 @@
           </view>
         </xnw-item>
       </view>
-      <view class="connect">
-        <!-- <view
-          class="status"
-          @click="toConnect('navigateTo')"
-        >
-          连接设备
-        </view> -->
-        <view class="controlBox">
-          <!-- <text class="control">
-            连接旧设备
-          </text>
-          <text class="control split">
-            连接新设备
-          </text> -->
-          <!-- <text
-            class="control"
-            v-if="device.name"
-            @click="toConnect('connect')"
-          >
-            <text class="deviceName">
-              {{ device.name }}
-            </text>
-            <text>{{ paired?"切换":"未连接" }}</text>
-          </text> -->
-        </view>
-      </view>
-      <!-- <view class="questionnairesBanner">
-        <image
-          :src="globalData.config.questionnairesBanner"
-          mode="widthFix"
-        />
-      </view> -->
       <view
         class="unPaired"
-        v-if="!paired"
-        @click="toConnect('navigateTo')"
+        v-if="!bleState.paired"
+        @click="toConnect()"
         :style="setBg()"
       >
         <view
@@ -72,7 +40,7 @@
       </view>
       <view
         class="workout"
-        v-if="paired"
+        v-if="bleState.paired"
       >
         <view class="itemBoxTitle">
           推荐方案
@@ -111,48 +79,23 @@ export default {
         post: '/static/face.png'
       },
       from: '',
-      paired: false,
       workoutList: [],
       RecordId: 0
     }
   },
   async onLoad (option) {
     this.from = option.from
-    // deviceTypeId 设备类型id
-    // 14:DJZ-A
-    // 15:ble
-    // 16:优E康
-    let params = {
-      pageSize: 100, deviceTypeId: '16',
-      // composeName: 'ble2',
-      // workoutNameOrDesc: 'ee6'// 测试用
-      isNewDevice: this.libs.configProject.isNewDevice,
-      phone: this.globalData.userInfo.phone
-    }
-    this.globalData.workoutList = (await this.libs.request(this.libs.api.limitDeviceApp.scheme.getSchemeList, params)).data
 
-    this.globalData.workoutList.forEach(item => {
-      // let note = ''
-      // if (item.todayState === 'Y') note = '（今天已治疗）'
-      item.workoutName = item.name
-      item.workoutDescription = item.description
-      item.workoutId = item.id
-      item.title = item.workoutName // + note,
-      item.tags = [{ txt: '治疗' }],
-        item.contents = [{
-          txt: `治疗时长 ${item.duration / 60}分钟`
-        }, {
-          txt: item.workoutDescription
-        }]
-    })
-
-    this.init()
+    // this.init()
   },
   onHide () {
     delete this.globalData.pageInit
     delete this.globalData.handlePair
   },
-  onShow () {
+  async onShow () {
+    this.globalData.pageInit = this.init
+    this.globalData.handlePair = this.pageHandlePair
+
     let _hour = new Date().getHours()
     if (_hour <= 5) this.userInfo.title = '凌晨好！'
     if (6 <= _hour && _hour <= 10) this.userInfo.title = '早上好！'
@@ -164,59 +107,81 @@ export default {
     this.userInfo.contents = [{
       txt: this.globalData.userInfo.phone.replace(/(\d{3})\d*(\d{4})/, '$1****$2')
     }]
-    this.globalData.pageInit = this.init
-    this.globalData.handlePair = this.pageHandlePair
     console.log('首页show')
-    this.pageHandlePair(this.globalData.paired)
+    await this.getWorkoutList()
+    this.pageHandlePair(this.bleState.paired)
   },
   methods: {
+    async init () {
+      // this.device = this.globalData.device = this.libs.data.getStorage('device')
+      // 获取上次使用的设备
+      // console.log('首页init')
+      // this.pageHandlePair(this.bleState.paired)
+
+      // 防止死循环 自动连接
+      if (!this.from) return await this.toConnect()
+    },
     pageHandlePair (boolean) {
-      this.paired = boolean
+      // this.paired = boolean
       let str = '点击连接设备'
-      // console.log('首页handlePair', this.globalData.device, boolean)
-      if (this.globalData.device && this.globalData.device.name) str = '设备 ' + this.globalData.device.name + (this.paired ? '已连接 ' : '未连接 ')
+      console.log('首页handlePair', this.globalData.device, boolean)
+      if (this.globalData.device && this.globalData.device.name) str = '设备 ' + this.globalData.device.name + (boolean ? '已连接 ' : '未连接 ')
       this.$set(this.userInfo, 'footer', str)
-      if (!this.paired) return
+      if (!boolean) return
       this.workoutList = this.globalData.workoutList
       // 过滤多通道方案，易循环特有
       this.workoutList = this.globalData.workoutList.filter(item => item.deviceType.split(',').includes(this.globalData.device.mode))
       if (boolean) this.getRecord()
     },
-    async init () {
-      this.device = this.globalData.device = this.libs.data.getStorage('device')
-      // 获取上次使用的设备
-      // console.log('首页init')
-      this.pageHandlePair(this.globalData.paired)
-      // 防止死循环
-      if (this.from) return
-      // console.log('首页初始化', this.device.name)
-      // 有连接记录,自动连接设备
-      if (this.device.name) return await this.toConnect()
+    async getWorkoutList () {
+      // deviceTypeId 设备类型id
+      // 14:DJZ-A
+      // 15:ble
+      // 16:优E康
+      let params = {
+        pageSize: 100, deviceTypeId: '16',
+        // composeName: 'ble2',
+        // workoutNameOrDesc: 'ee6'// 测试用
+        isNewDevice: this.libs.configProject.isNewDevice,
+        phone: this.globalData.userInfo.phone
+      }
+      this.globalData.workoutList = (await this.libs.request(this.libs.api.limitDeviceApp.scheme.getSchemeList, params)).data
+
+      this.globalData.workoutList.forEach(item => {
+        // let note = ''
+        // if (item.todayState === 'Y') note = '（今天已治疗）'
+        item.workoutName = item.name
+        item.workoutDescription = item.description
+        item.workoutId = item.id
+        item.title = item.workoutName // + note,
+        item.tags = [{ txt: '治疗' }],
+          item.contents = [{
+            txt: `治疗时长 ${item.duration / 60}分钟`
+          }, {
+            txt: item.workoutDescription
+          }]
+      })
     },
     async toConnect (type) {
-      if (type && !this.globalData.bleReady) return this.toast('请检查手机蓝牙是否打开')
-      // 点标题跳转到连接页
-      if (type === 'navigateTo') return uni.navigateTo({ url: '/pages/bluetooth/connect' })
-      // 点设备名的切换
-      // if (type === 'connect' && this.globalData.paired) return uni.navigateTo({ url: '/pages/bluetooth/connect' })
+      // 点切换或没有设备信息跳转到连接页
+      if (type === 'navigateTo' || !this.device.name) return uni.navigateTo({ url: '/pages/bluetooth/connect' })
       // 点设备名的连接
-      if (!this.globalData.paired) await this.connectDevice()
+      if (!this.bleState.paired) return await this.connectDevice()
       // if(this.globalData.paired) return this.getRecord()
     },
     async toReady (workout) {
-      if (!this.globalData.bleReady) return this.toast('请检查手机蓝牙是否打开')
       // 第一次连接
-      if (!this.device.name) return this.toast('未绑定设备')
+      // if (!this.device.name) return this.toast('未绑定设备')
       // if (!this.device.name) return uni.navigateTo({ url: '/pages/bluetooth/connect?nextTo=/pages/bluetooth/paste' })
       // 曾连接，未配对，尝试配对
-      if (!this.globalData.paired) await this.connectDevice()
+      // if (!this.bleState.paired) await this.connectDevice()
       // 尝试失败
-      if (!this.globalData.paired) return
+      // if (!this.bleState.paired) return
       // this.globalData.workout = (await this.libs.request(this.libs.api.wyjkDevice.consumerElectronics.viewWorkoutDetail, { workoutId: workout.workoutId })).data
       this.globalData.workout = workout
       console.log('workoutDetail程序明细', this.globalData.workout)
       // 此时可能处于匹配状态
-      uni.navigateTo({ url: '/pages/bluetooth/setTime' })
+      uni.navigateTo({ url: '/pages/bluetooth/paste' })
     },
     setBg () {
       if (this.device.name) return 'background-image: url("/static/neverLink.png")'
@@ -227,17 +192,14 @@ export default {
 </script>
 <style lang="scss" scoped>
 .wrap {
-  padding: 20rpx;
-  box-sizing: border-box;
-
-  &.indexBg {
-    background: var(--indexBg) no-repeat top center/100%;
-  }
-
   height: 100vh;
   display: flex;
   flex-direction: column;
-
+  padding: 20rpx;
+  box-sizing: border-box;
+  &.indexBg {
+    background: var(--indexBg) no-repeat top center/100%;
+  }
   .userInfo {
     .toConnect {
       float: right;
@@ -265,39 +227,6 @@ export default {
         color: #999;
       }
     }
-  }
-  .connect {
-    position: absolute;
-    top: 70rpx;
-    right: 0;
-
-    .status {
-      line-height: 80rpx;
-      text-align: right;
-      font-size: var(--font-h4);
-    }
-
-    .controlBox {
-      .control {
-        padding-left: 20rpx;
-        font-size: var(--font-h5);
-        color: var(--theme-color);
-
-        &.split {
-          margin-left: 20rpx;
-          border-left: var(--border-style);
-        }
-
-        .deviceName {
-          padding-right: 20rpx;
-          color: var(--color-light);
-        }
-      }
-    }
-  }
-
-  .questionnairesBanner uni-image {
-    width: 100%;
   }
   .unPaired {
     width: 80vw;

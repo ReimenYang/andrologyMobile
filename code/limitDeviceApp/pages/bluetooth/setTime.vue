@@ -55,7 +55,7 @@ export default {
       uni.hideLoading()
       // 这里应该在EventBus响应的回调做个别处理？？
       this.globalData.workout.duration = this.workTime
-      uni.redirectTo({ url: '/pages/bluetooth/paste' })
+      uni.redirectTo({ url: '/pages/bluetooth/setCurrent' })
     }
   }
 }

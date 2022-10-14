@@ -53,10 +53,10 @@
 </template>
 
 <script>
-import mixinBLE from '@/pages/index/mixinBLE.js'
+// import mixinBLE from '@/pages/index/mixinBLE.js'
 import connectBle from '@/pages/bluetooth/_connect'
 export default {
-  mixins: [mixinBLE],
+  // mixins: [mixinBLE],
   components: { connectBle },
   data () {
     return {

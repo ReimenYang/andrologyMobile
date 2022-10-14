@@ -18,7 +18,7 @@ export default {
   },
   data () {
     return {
-      steps: [{ title: '治疗时长' }, { title: '贴电极片' }, { title: '测试电流' }]
+      steps: [{ title: '贴电极片' }, { title: '治疗时长' }, { title: '测试电流' }]
     }
   }
 }

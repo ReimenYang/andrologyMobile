@@ -73,7 +73,7 @@ export default {
       config: {
         data: [{
           key: 'name',
-          title: '治疗程序',
+          title: '调整电刺激强度', // '治疗程序',
           setClass: '',
           style: '',
           textContent: ''
@@ -146,7 +146,7 @@ export default {
       // 设置过程中，心跳包的值可能导致界面设置值跳动所以采取迂回的方式处理，但可能会导致设置和实际不同
       let { channel, stateRunning, remainingTime } = this.globalData.deviceState[data.channel]
 
-      this.config.data[0].textContent = `${this.workoutName} ${this.totalTime / 60}分钟`
+      // this.config.data[0].textContent = `${this.workoutName} ${this.totalTime / 60}分钟`
 
       // stateRunning 运行状态，可以是: 0 设置 ，1 运行，2 暂停，3 停止，4 锁定
       // 停止倒计时：设置，暂停，停止
@@ -193,6 +193,7 @@ export default {
     },
     // 初始化强度按钮
     async initCurrent () {
+      this.config.data = this.config.data.slice(0, 1)
       for (const channel in this.globalData.deviceState) {
         let target = this.globalData.workoutRecord.workout.channelList.find(item => item.channel === Number(channel))
         console.log('初始化强度按钮', typeof channel, channel, target, this.globalData.workoutRecord.workout)
@@ -206,7 +207,7 @@ export default {
           this.config.data.push({
             channel,
             key,
-            title: ['A', 'B', 'C', 'D'][channel - 1] + (i ? 1 : 2),
+            title: ['A', 'B', 'C', 'D'][channel - 1] + (i ? 2 : 1),
             setClass: '',
             style: '',
             number: {
@@ -283,6 +284,9 @@ export default {
   .schemeName {
     padding: 0 0 2em;
     color: var(--color-normal);
+  }
+  .itemBox /deep/ .form .formGroup .title {
+    width: 7em;
   }
   .note {
     font-size: var(--font-h4);

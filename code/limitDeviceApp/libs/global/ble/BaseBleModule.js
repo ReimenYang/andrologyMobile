@@ -12,12 +12,6 @@ let BaseBleModule = {}
 
 BaseBleModule.connectTimeOut = 10 * 1000 // 连接低功耗蓝牙设备超时设置
 BaseBleModule.writeTime = 100 // 控制writeBLECharacteristicValue时间间隔
-// 这里的 deviceId 需要已经通过 createBLEConnection 与对应设备建立链接
-let deviceId = ''
-// 这里的 serviceId 需要已经通过 getBLEDeviceServices 与对应设备建立链接
-let serviceId = '' //
-// 这里的 characteristicId 需要已经通过 getBLEDeviceCharacteristics 与对应设备建立链接
-let characteristicId = ''
 // 小程序需要转为大写
 // 在ble项目中是固定值
 const mock = {
@@ -26,8 +20,8 @@ const mock = {
     characteristicId: '0000ffb2-0000-1000-8000-00805f9b34fb'
   },
   limitDeviceApp: { // 易循环
-    serviceId: '00010203-0405-0607-0809-0a0b0c0d1910',
-    characteristicId: '00010203-0405-0607-0809-0a0b0c02b11'
+    serviceId: '0000FFB0-0000-1000-8000-00805F9B34FB',
+    characteristicId: '0000ffb2-0000-1000-8000-00805f9b34fb'
   },
   deviceApp: {
     serviceId: '0000FFB0-0000-1000-8000-00805F9B34FB',
@@ -38,6 +32,12 @@ const mock = {
     characteristicId: '0000ffb2-0000-1000-8000-00805f9b34fb'
   }
 }[project.projectName]
+// 这里的 deviceId 需要已经通过 createBLEConnection 与对应设备建立连接
+let deviceId = ''
+// 这里的 serviceId 需要已经通过 getBLEDeviceServices 与对应设备建立连接
+let serviceId = mock.serviceId //
+// 这里的 characteristicId 需要已经通过 getBLEDeviceCharacteristics 与对应设备建立连接
+let characteristicId = mock.characteristicId
 // 写入指令队列
 let commandArray = []
 let platform = typeof uni !== 'undefined' && uni.getSystemInfoSync().platform
@@ -53,22 +53,59 @@ let writeMsg = {
   512: '指令进入队列',
   513: '指令执行失败',
 }
-function sleep () { return new Promise(resolve => setTimeout(resolve, BaseBleModule.writeTime)) }
-/**
- * 打开蓝牙开关
- */
-BaseBleModule.turnOnBluetooth = async () => {
-  if (platform === 'ios') return plus.runtime.openURL(encodeURI('App-Prefs:root=Bluetooth')) // 测试没有效果
 
-  let main = plus.android.runtimeMainActivity()
-  let Context = plus.android.importClass('android.content.Context')
-  let BManager = main.getSystemService(Context.BLUETOOTH_SERVICE)
-  plus.android.importClass(BManager) // 引入相关的method函数
-  let BAdapter = BManager.getAdapter()
-  plus.android.importClass(BAdapter) // 引入相关的method函数，这样之后才会有isEnabled函数支持
-  if (!BAdapter.isEnabled()) await BAdapter.enable()
-  console.log('蓝牙打开状态：', BAdapter.isEnabled())
+// 制造阻塞
+function sleep (time = BaseBleModule.writeTime) { return new Promise(resolve => setTimeout(resolve, time)) }
+
+/**
+ * 用Html5+运行期环境主组件Native.js https://www.html5plus.org/doc/zh_cn/android.html
+ */
+let main = plus.android.runtimeMainActivity()// 获取运行期环境主Activity实例对象
+let Context = plus.android.importClass('android.content.Context')// 获取所有场景类（如打电话、发短信）
+let BManager = main.getSystemService(Context.BLUETOOTH_SERVICE)
+plus.android.importClass(BManager) // 引入相关的method函数
+let BAdapter = BManager.getAdapter()
+plus.android.importClass(BAdapter) // 引入相关的method函数，这样之后才会有isEnabled函数支持
+
+BaseBleModule.getDeviceId = () => deviceId
+/**
+ * 蓝牙状态
+ */
+BaseBleModule.bluetoothState = () => {
+  // console.log('蓝牙状态：', BAdapter.isEnabled())
+  return BAdapter.isEnabled()
 }
+/**
+ * 打开蓝牙
+ */
+BaseBleModule.bluetoothOn = () => {
+  return new Promise(resolve => {
+    if (platform === 'ios') {
+      plus.runtime.openURL(encodeURI('App-Prefs:root=Bluetooth')) // 未测试效果
+      return resolve()
+    }
+    let res = BAdapter.enable() // res 是用户的选择
+    console.log('打开蓝牙：', res, BAdapter.isEnabled())
+    resolve(res)
+  })
+}
+/**
+ * 关闭蓝牙
+ */
+BaseBleModule.bluetoothOff = () => {
+  return new Promise(resolve => {
+    if (platform === 'ios') {
+      plus.runtime.openURL(encodeURI('App-Prefs:root=Bluetooth')) // 未测试效果
+      return resolve()
+    }
+    let res = BAdapter.disable()
+    console.log('关闭蓝牙', res, BAdapter.isEnabled())
+    resolve(res)
+  })
+}
+
+// 监听蓝牙适配器状态变化事件,会执行两次，后一次才是真实状态,未启用openBluetoothAdapter，此监听依然起效
+BaseBleModule.onBluetoothAdapterStateChange = typeof uni !== 'undefined' && uni.onBluetoothAdapterStateChange
 
 /**
  * 初始化蓝牙模块
@@ -88,9 +125,6 @@ BaseBleModule.closeBluetoothAdapter = async () => {
   if (err) console.error('蓝牙模块关闭失败', err)
   return { statusCode: err ? 500 : 200, data, err }
 }
-
-// 监听蓝牙适配器状态变化事件,会执行两次，后一次才是真实状态
-BaseBleModule.onBluetoothAdapterStateChange = typeof uni !== 'undefined' && uni.onBluetoothAdapterStateChange
 
 // 开始搜寻附近的蓝牙外围设备
 BaseBleModule.startBluetoothDevicesDiscovery = async () => {
@@ -121,7 +155,7 @@ BaseBleModule.createBLEConnection = async _deviceId => {
   let [err, data] = await uni.createBLEConnection({ deviceId: _deviceId, timeout: BaseBleModule.connectTimeOut })
   if (err) console.error('createBLEConnection fail:', err)
   if (!err) deviceId = _deviceId
-  return { statusCode: err ? 501 : 200, data, err }
+  return { statusCode: err ? 502 : 200, data, err }
 }
 
 // 断开与低功耗蓝牙设备的连接。
@@ -131,7 +165,8 @@ BaseBleModule.closeBLEConnection = async () => {
   // if (!deviceId) return { statusCode: 201, data: err, err }
   // if (err) return { statusCode: 521, err }
 
-  deviceId = serviceId = characteristicId = ''
+  deviceId = ''
+  // deviceId = serviceId = characteristicId = ''
   return { statusCode: 200, data, err }
 }
 
@@ -164,7 +199,7 @@ BaseBleModule.getBLEDeviceServices = async () => {
 // 获取蓝牙设备某个服务中所有特征值(characteristic)。
 // 这里的获取characteristicId
 BaseBleModule.getBLEDeviceCharacteristics = async () => {
-  // 这里的 deviceId 需要已经通过 createBLEConnection 与对应设备建立链接
+  // 这里的 deviceId 需要已经通过 createBLEConnection 与对应设备建立连接
   let [err, _data] = await uni.getBLEDeviceCharacteristics({ deviceId, serviceId })
   // ble serviceUUID错误会报没有这个服务，导致api报错：10004	no service	没有找到指定服务
   // [undefined, { "errMsg": "getBLEDeviceCharacteristics:fail no service", "errCode": 10004, "code": 10004 }]
@@ -188,7 +223,7 @@ BaseBleModule.notifyBLECharacteristicValueChange = async () => {
   // return new Promise(resolve => {
   //   uni.notifyBLECharacteristicValueChange({
   //     state: true, // 启用 notify 功能
-  //     // 这里的 deviceId 需要已经通过 createBLEConnection 与对应设备建立链接
+  //     // 这里的 deviceId 需要已经通过 createBLEConnection 与对应设备建立连接
   //     deviceId,
   //     serviceId,
   //     characteristicId,
@@ -405,7 +440,7 @@ BaseBleModule.writeSuccess = () => {
   // 切割指令队列第一个并返回
   let commandFinish = commandArray.shift()
   setCommandHistory(commandFinish.id, 200, '完成指令')
-  if (!commandFinish.command.startsWith('DATA:k')) console.log('完成指令', commandFinish.command)
+  // if (!commandFinish.command.startsWith('DATA:k')) console.log('完成指令', commandFinish.command)
   if (commandArray.length > 0) BaseBleModule.writeBLECharacteristicValue()
   // 抛出完成指令的结果
   return { statusCode: 200, data: commandFinish }
