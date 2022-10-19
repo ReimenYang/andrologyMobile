@@ -57,7 +57,7 @@ export default class EventBus {
   static LONG_RECIVED = 'longRecived'// 手机与设备之间的连接断开长连接心跳包
   static SET_CURRENT = 'setCurrent'// 设置电流强度
   static GET_SERIALNO = 'getSerialno'// 设备序列号数据，蓝牙连接成功后只回调一次
-  static GET_RECORD = 'getRecord'// 获取硬件的最后一个治疗程序的状态
+  static GET_RECORD = 'getRecord'// 获取硬件的最后一个训练程序的状态
 
   static logMsg = {
     bleReady: {

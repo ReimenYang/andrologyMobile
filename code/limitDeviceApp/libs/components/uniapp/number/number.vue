@@ -16,7 +16,7 @@
       @focus="_onFocus"
       @blur="_onBlur"
       class="uni-numbox__value"
-      type="number"
+      type="text"
       v-model="inputValue"
     >
     <view
@@ -81,7 +81,9 @@ export default {
   },
   watch: {
     value (val) {
-      this.inputValue = +val
+      const scale = this._getDecimalScale()
+      console.log(val, scale, this.inputValue, typeof this.inputValue)
+      this.inputValue = (+val).toFixed(String(scale).length - 1)
     },
     inputValue (newVal, oldVal) {
       if (+newVal !== +oldVal) {
@@ -118,7 +120,7 @@ export default {
           value = this.min * scale
         }
       }
-      this.inputValue = (value / scale).toFixed(String(scale).length)
+      this.inputValue = (value / scale).toFixed(String(scale).length - 1)
       this.$emit(type, this.inputValue)
     },
     _getDecimalScale () {

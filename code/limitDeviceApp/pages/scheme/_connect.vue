@@ -9,7 +9,7 @@
       </view>
       <view class="itemBorder" />
       <view class="itemTitle">
-        治疗程序
+        训练程序
       </view>
       <view class="name">
         {{ workoutDetail.name }}

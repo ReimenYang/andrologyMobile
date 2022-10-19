@@ -5,7 +5,7 @@
   >
     <p-header
       backIcon="show"
-      title="准备治疗"
+      title="准备训练"
     />
     <p-wrap
       :hasHeader="true"
@@ -18,7 +18,7 @@
       >
         <view class="itemBox">
           <view class="itemTitle">
-            {{ `${item.channelName}1：请设置刺激强度` }}
+            {{ `${item.channelName}1刺激强度` }}
           </view>
           <xnw-number
             v-model="item.settingCHL"
@@ -35,7 +35,7 @@
           v-if="item.splices===2"
         >
           <view class="itemTitle">
-            {{ `${item.channelName}2：请设置刺激强度` }}
+            {{ `${item.channelName}2刺激强度` }}
           </view>
           <xnw-number
             v-model="item.settingCHR"
@@ -63,7 +63,7 @@ export default {
   data () {
     return {
       currentList: [{ settingCHL: 0, settingCHR: 0, channel: 1, splices: 2 }],
-      step: 5,
+      step: .5,
       showModal: false
     }
   },
@@ -73,7 +73,7 @@ export default {
       mask: true
     })
     this.globalData.handleLongRecived = this.handleLongRecived
-    // 获取硬件的最后一个治疗程序的状态
+    // 获取硬件的最后一个训练程序的状态
     // this.getRecord()
   },
   onShow () {
@@ -93,8 +93,9 @@ export default {
     currentChange (n, side, type, item) {
       let channel = item.channel
       let deviceState = this.globalData.deviceState[channel]
+      console.log(n, side, type, item, this.globalData.deviceState, channel, deviceState)
       let value = deviceState[side]
-      console.log(type, channel, side, n, value)
+      console.log(value)
       if (n - value === 0) return
       if (type === 'minus') side === 'settingCHL' ? this.leftMinus(channel) : this.rightMinus(channel)
       if (type === 'plus') side === 'settingCHL' ? this.leftPlus(channel) : this.rightPlus(channel)
@@ -102,10 +103,11 @@ export default {
       deviceState[side] = n
     },
     async handleLongRecived (data) {
+      let _ready = this.globalData.workout.channelList.length === Object.keys(this.globalData.deviceState).length
+      if (_ready) uni.hideLoading() // 通道数据健全
+
       let channel = data.channel - 0
       let _deviceState = this.globalData.deviceState[channel]
-      if (_deviceState) uni.hideLoading() // 通道数据健全
-
       let { settingCHL, settingCHR } = _deviceState
       let target = this.currentList.find(item => item.channel === channel)
       if (Number(target.settingCHL) !== Number(settingCHL)) {
@@ -118,7 +120,7 @@ export default {
       }
     },
     async nextStep () {
-      if (!this.globalData.paired) return this.toast('请先配对并初始化设备')
+      if (!this.bleState.paired) return this.toast('请先配对并初始化设备')
       let currentReady = this.currentList.map(item => {
         let { settingCHL, settingCHR } = this.globalData.deviceState[item.channel]
         return Number(settingCHL) !== 0 && (item.splices !== 2 || Number(settingCHR) !== 0)
@@ -135,15 +137,15 @@ export default {
       await this.setRecord(recordId)
       setTimeout(async () => {// 设备写入recordId需要时间
         await this.startTreatment()
-        // 请求治疗id，写入治疗设备
+        // 请求训练id，写入训练设备
         let { workoutId, duration, workoutName, workoutDescription, portNum = 2, initCommand = '0,0,0' } = this.globalData.workout
         let [, , phaseNumber] = initCommand.split(',')
         let { sn, phone } = this.globalData.userInfo
-        let params = {
+        let params = this.globalData.workoutRecord = {
           workoutId, duration, workoutName, workoutDescription, portNum, phaseNumber,
           totalTime: duration,
           workout: this.globalData.workout,
-          time: 0, // 已治疗时间
+          time: 0, // 已训练时间
           recordId,
           deviceName: this.device.name,
           terminalInfo: { deviceName: this.device.name },
@@ -152,11 +154,11 @@ export default {
           isStop: 0,
           phone, sn
         }
-
-        let _data = (await this.libs.request(this.libs.api.limitDeviceApp.treatment.startTreatment, params)).data
-        this.globalData.workoutRecord = { ..._data, ...params }
+        console.log('请求训练id，写入训练设备', this.globalData.workoutRecord)
         uni.hideLoading()
         uni.reLaunch({ url: '/pages/bluetooth/running' })
+        let _data = (await this.libs.request(this.libs.api.limitDeviceApp.treatment.startTreatment, params)).data
+        this.globalData.workoutRecord = { ..._data, ...params }
       }, 1000)
     }
   }
@@ -183,10 +185,14 @@ export default {
       color: #fff;
     }
   }
-
+  .itemBox {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
   .uni-numbox {
     zoom: 1.5;
-    margin: 30rpx auto;
+    margin: 15rpx 0;
   }
 
   .btn {

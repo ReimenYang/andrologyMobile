@@ -22,7 +22,7 @@ export default {
     return {
       config: {
         ble: {
-          title: '杉山低频神经肌肉治疗仪下载',
+          title: '杉山低频神经肌肉训练仪下载',
           ios: 'https://apps.apple.com/cn/app/id1526096144',
           android: 'https://sapi.xinuowang.com:9000/product-public/donwload/ble/lastest.apk',
           app: 'https://a.app.qq.com/o/simple.jsp?pkgname=com.shanshan.ble',

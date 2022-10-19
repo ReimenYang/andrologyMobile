@@ -21,7 +21,7 @@
     </view>
     <view class="note">
       如需要调整刺激强度，请在设备进行调整<br>
-      如需要停止治疗，请直接点击设备的电源键
+      如需要停止训练，请直接点击设备的电源键
     </view>
   </view>
 </template>
@@ -53,7 +53,7 @@ export default {
       this.minute = Math.floor(remain / 60)
       this.second = remain % 60
       if (this.second < 10) this.second = '0' + this.second
-      if (remain <= 0) return console.log('治疗结束')
+      if (remain <= 0) return console.log('训练结束')
       return setTimeout(this.countdown, 1000)
     }
   }

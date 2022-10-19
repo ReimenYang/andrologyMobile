@@ -7,7 +7,7 @@
       {{ schemeDetail.name }}
     </view>
     <view class="title">
-      治疗程序
+      训练程序
     </view>
     <view class="workoutList">
       <xnw-item
@@ -36,13 +36,13 @@ export default {
 
     this.schemeDetail.workoutList.forEach(item => {
       let note = ''
-      if (doneList.includes(item.id)) note = '（今天已治疗）'
+      if (doneList.includes(item.id)) note = '（今天已训练）'
       this.workoutList.push({
         ...item,
         title: item.name + note,
-        tags: [{ txt: '治疗' }],
+        tags: [{ txt: '训练' }],
         contents: [{
-          txt: `治疗时长 ${item.duration / 60}分钟`
+          txt: `训练时长 ${item.duration / 60}分钟`
         }, {
           txt: '程序描述 ' + item.description
         }]

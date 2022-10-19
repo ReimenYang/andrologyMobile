@@ -19,7 +19,7 @@ export default {
   data () {
     let list = [
       { txt: '康复理疗', icon: 'yaoxiang', url: '/pages/scheme/index' },
-      { txt: '治疗记录', icon: 'baogao', url: '/pages/scheme/record' },
+      { txt: '训练记录', icon: 'baogao', url: '/pages/scheme/record' },
       // { txt: '健康资讯', icon: 'read', url: '/pages/scheme/index' },
       { txt: '联系我们', icon: 'dianhua', url: '/pages/index/contact' }
     ]

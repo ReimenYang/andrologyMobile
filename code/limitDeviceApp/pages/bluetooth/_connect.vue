@@ -4,16 +4,16 @@
     :style="{'--theme-color':globalData.config.theme}"
   >
     <view class="itemBoxTitle">
-      <text
+      <view
         class="titleLoading"
-        v-if="searching"
+        v-if="bleState.searching"
       >
         <image
           class="loading"
           src="@/static/loading.png"
           mode="widthFix"
         />搜索中...
-      </text>
+      </view>
       可连接设备
     </view>
     <view class="deviceList">

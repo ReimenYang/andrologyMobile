@@ -35,12 +35,11 @@ export default {
     }
   },
   async onLoad (option) {
-    console.log(this.globalData.config.guideConnect)
     this.nextTo = option.nextTo || '/pages/scheme/index'
+    this.globalData.pageInit = this.init
   },
   onShow () {
     this.globalData.handlePair = this.pageHandlePair
-    this.globalData.pageInit = this.bleSearch
   },
   onHide () {
     this.stopSearch()
@@ -48,6 +47,10 @@ export default {
     // delete this.globalData.handlePair
   },
   methods: {
+    init () {
+      delete this.globalData.pageInit
+      this.bleSearch()
+    },
     async nextStep () {
       console.log('开始连接')
       this.stopSearch()

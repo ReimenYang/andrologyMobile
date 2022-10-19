@@ -2,7 +2,7 @@
   <view class="themeBg wrap">
     <p-header
       backIcon="show"
-      title="准备治疗"
+      title="准备训练"
     />
     <p-wrap
       :hasHeader="true"
@@ -49,7 +49,7 @@
       <block v-if="stepsActive===2">
         <view class="item">
           <view class="itemTitle">
-            请设置治疗时长
+            请设置训练时长
           </view>
           <view class="name time">
             <uni-number-box
@@ -105,7 +105,7 @@
             </view>
           </view>
           <view class="note">
-            开始治疗后，还需要调整刺激强度时，请在设 备直接进行调整
+            开始训练后，还需要调整刺激强度时，请在设 备直接进行调整
           </view>
         </view>
       </block>
@@ -142,7 +142,7 @@
       />
       <xnw-footer
         v-if="stepsActive===3"
-        :textConfirm="`${getChannelPhaseNextIndex()===channelPhase.length?'开始治疗':'下一个'}（${getChannelPhaseNextIndex()}/${channelPhase.length}）`"
+        :textConfirm="`${getChannelPhaseNextIndex()===channelPhase.length?'开始训练':'下一个'}（${getChannelPhaseNextIndex()}/${channelPhase.length}）`"
         :showCancel="false"
         @onConfirm="channelPhaseNext"
       />
@@ -158,7 +158,7 @@ export default {
   components: { connect },
   data () {
     return {
-      steps: [{ title: '连接设备' }, { title: '贴电极片' }, { title: '治疗时长' }, { title: '调试强度' }],
+      steps: [{ title: '连接设备' }, { title: '贴电极片' }, { title: '训练时长' }, { title: '调试强度' }],
       stepsActive: 0,
       userInfo: this.globalData.userInfo,
       schemeDetail: {},
@@ -232,7 +232,7 @@ export default {
 
     this.time = this.workoutDetail.duration / 60
 
-    console.log('准备治疗', this.time, this.schemeDetail, this.workoutDetail, this.channelPhase)
+    console.log('准备训练', this.time, this.schemeDetail, this.workoutDetail, this.channelPhase)
   },
   methods: {
     nextStep (channel) {

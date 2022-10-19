@@ -53,7 +53,7 @@
         scrollY
       >
         <view class="uni-title">
-          治疗程序列表:
+          训练程序列表:
         </view>
         <view
           class="uni-list-box"
@@ -74,7 +74,7 @@
         </view>
       </scroll-view>
       <view>
-        治疗时间：
+        训练时间：
         <xnw-number
           :disabled="!workoutProject.initcommand||!workoutProject.initCommand"
           :min="1"
@@ -128,9 +128,9 @@ export default {
       { name: '左电流-', fun: this.leftMinus },
       { name: '右电流+', fun: this.rightPlus },
       { name: '右电流-', fun: this.rightMinus },
-      { name: '开始治疗', fun: this.startTreatment, style: 'primary' },
-      { name: '暂停治疗', fun: this.pauseTreatment },
-      { name: '退出治疗', fun: this.endTreatment },
+      { name: '开始训练', fun: this.startTreatment, style: 'primary' },
+      { name: '暂停训练', fun: this.pauseTreatment },
+      { name: '退出训练', fun: this.endTreatment },
       { name: '断开蓝牙设备', fun: this.closeBLEConnection }
     ]
   },

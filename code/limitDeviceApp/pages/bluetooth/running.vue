@@ -26,7 +26,7 @@
     </view>
     <!-- <view class="note">
       如需要调整刺激强度，请在设备进行调整<br>
-      如需要停止治疗，请直接点击设备的电源键
+      如需要停止训练，请直接点击设备的电源键
     </view> -->
     <view :class="remain? 'itemBox' : 'itemBox lockBtn' ">
       <view class="control">
@@ -69,11 +69,11 @@ export default {
       remain: 0,
       minute: 0,
       second: 0,
-      step: 5,
+      step: .5,
       config: {
         data: [{
           key: 'name',
-          title: '调整电刺激强度', // '治疗程序',
+          title: '调整电刺激强度', // '训练程序',
           setClass: '',
           style: '',
           textContent: ''
@@ -195,8 +195,8 @@ export default {
     async initCurrent () {
       this.config.data = this.config.data.slice(0, 1)
       for (const channel in this.globalData.deviceState) {
-        let target = this.globalData.workoutRecord.workout.channelList.find(item => item.channel === Number(channel))
         console.log('初始化强度按钮', typeof channel, channel, target, this.globalData.workoutRecord.workout)
+        let target = this.globalData.workoutRecord.workout.channelList.find(item => item.channel === Number(channel))
         if (!target) continue
         const item = this.globalData.deviceState[channel]
         let { settingCHL, settingCHR, stateRunning } = item

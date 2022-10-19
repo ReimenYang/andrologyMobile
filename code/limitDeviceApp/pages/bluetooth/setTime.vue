@@ -5,7 +5,7 @@
   >
     <p-header
       backIcon="show"
-      title="准备治疗"
+      title="准备训练"
     />
     <p-wrap
       :hasHeader="true"
@@ -14,7 +14,7 @@
       <!-- <p-steps :active="0" /> -->
       <view class="itemBox">
         <view class="itemTitle">
-          请设置治疗时长
+          请设置训练时长
         </view>
         <xnw-number
           v-model="time"

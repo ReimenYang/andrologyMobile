@@ -5,7 +5,7 @@
   >
     <p-header
       backIcon="show"
-      title="准备治疗"
+      title="准备训练"
     />
     <p-wrap
       :hasHeader="true"

@@ -85,7 +85,7 @@ export default {
   },
   async onLoad (option) {
     this.from = option.from
-
+    await this.getWorkoutList()
     // this.init()
   },
   onHide () {
@@ -108,7 +108,8 @@ export default {
       txt: this.globalData.userInfo.phone.replace(/(\d{3})\d*(\d{4})/, '$1****$2')
     }]
     console.log('首页show')
-    await this.getWorkoutList()
+    // 20221019 需求 减少请求
+    // await this.getWorkoutList()
     this.pageHandlePair(this.bleState.paired)
   },
   methods: {
@@ -119,7 +120,7 @@ export default {
       // this.pageHandlePair(this.bleState.paired)
 
       // 防止死循环 自动连接
-      if (!this.from) return await this.toConnect()
+      if (!this.from && this.device.name) return await this.toConnect()
     },
     pageHandlePair (boolean) {
       // this.paired = boolean
@@ -149,24 +150,22 @@ export default {
 
       this.globalData.workoutList.forEach(item => {
         // let note = ''
-        // if (item.todayState === 'Y') note = '（今天已治疗）'
+        // if (item.todayState === 'Y') note = '（今天已训练）'
         item.workoutName = item.name
         item.workoutDescription = item.description
         item.workoutId = item.id
         item.title = item.workoutName // + note,
-        item.tags = [{ txt: '治疗' }],
+        item.tags = [{ txt: '训练' }],
           item.contents = [{
-            txt: `治疗时长 ${item.duration / 60}分钟`
+            txt: `训练时长 ${item.duration / 60}分钟`
           }, {
             txt: item.workoutDescription
           }]
       })
     },
     async toConnect (type) {
-      // 点切换或没有设备信息跳转到连接页
-      if (type === 'navigateTo' || !this.device.name) return uni.navigateTo({ url: '/pages/bluetooth/connect' })
-      // 点设备名的连接
-      if (!this.bleState.paired) return await this.connectDevice()
+      let _connected = this.bleState.paired ? {} : await this.connectDevice()
+      if (type === 'navigateTo' || (!this.bleState.paired && _connected.statusCode !== 200)) return uni.navigateTo({ url: '/pages/bluetooth/connect' })
       // if(this.globalData.paired) return this.getRecord()
     },
     async toReady (workout) {

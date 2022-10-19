@@ -29,10 +29,10 @@
             </view>
             <view class="info">
               <view class="schemeName">
-                {{ item.workoutName }}
+                {{ item.workout }}
               </view>
               <view class="workoutName">
-                治疗时长 {{ Math.floor(item.duration) }}min
+                训练时长 {{ Math.floor(item.duration) }}min
               </view>
             </view>
           </view>

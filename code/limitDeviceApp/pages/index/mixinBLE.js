@@ -1,24 +1,24 @@
 export default {
   data () {
-    let {
-      bleReady, // 蓝牙api是否完成初始化
-      bleOnline, // 手机蓝牙是否处于可连接状态
-      searching, // 是否在搜索蓝牙设备
-      connected, // 手机是否与设备对接上,可以发指令
-      paired, // 手机是否与设备配对上，已经发送c指令，处于pbt状态
-      devicesReady // 初始化指令是否发送成功，设备处于可开始状态
-    } = this.globalData
+    // let {
+    //   bleReady, // 蓝牙api是否完成初始化
+    //   bleOnline, // 手机蓝牙是否处于可连接状态
+    //   searching, // 是否在搜索蓝牙设备
+    //   connected, // 手机是否与设备对接上,可以发指令
+    //   paired, // 手机是否与设备配对上，已经发送c指令，处于pbt状态
+    //   devicesReady // 初始化指令是否发送成功，设备处于可开始状态
+    // } = this.globalData
     return {
       BioStimBleModule: this.libs.global.ble.BioStimBleModule,
       EventBus: this.libs.global.ble.EventBus,
       device: this.libs.data.getStorage('device'),
       workTime: 60, // 单位：秒
-      bleReady, // 蓝牙api是否完成初始化，对应openBluetoothAdapter
-      bleOnline, // 手机蓝牙是否处于可连接状态,对应getBLEConnectStatus
-      searching, // 是否在搜索蓝牙设备，对应startBluetoothDevicesDiscovery
-      connected, // 手机是否与设备对接上，并成功开启了数据交互监听,可以发指令，对应createBLEConnection
-      paired, // 手机是否与设备配对上，执行完获取设备信息指令，并按一定的业务规则进行判断，符合联机条件，处于pbt状态
-      devicesReady, // 初始化指令是否发送成功，设备处于可开始状态
+      // bleReady, // 蓝牙api是否完成初始化，对应openBluetoothAdapter
+      // bleOnline, // 手机蓝牙是否处于可连接状态,对应getBLEConnectStatus
+      // searching, // 是否在搜索蓝牙设备，对应startBluetoothDevicesDiscovery
+      // connected, // 手机是否与设备对接上，并成功开启了数据交互监听,可以发指令，对应createBLEConnection
+      // paired, // 手机是否与设备配对上，执行完获取设备信息指令，并按一定的业务规则进行判断，符合联机条件，处于pbt状态
+      // devicesReady, // 初始化指令是否发送成功，设备处于可开始状态
       fallTime: 0, // 最近跌落提示时间
       fallTimeInterval: 5 * 1000, // 跌落判断间隔
       showFall: false, // 跌落提示框
@@ -26,6 +26,7 @@ export default {
       bleState: {}
     }
   },
+  created () { this.bleState = this.BioStimBleModule.bleState },
   async onShow () {
     // this.paired = this.bleState.paired
     this.device = this.globalData.device = this.libs.data.getStorage('device')
@@ -107,37 +108,37 @@ export default {
       if (availableEven) Object.keys(availableEven).forEach(key => availableEven[key](res))
     },
     async stateManage (target, msgCode) {
-      let { log, toast, stateName, state, time = 2000, icon = 'none' } = target
-      if (typeof state !== 'boolean' || this[stateName] === state) return
+      let { log, toast, stateName, time = 2000, icon = 'none' } = target
+      if (typeof state !== 'boolean') return
       // 操作当前状态
-      this.$set(this, stateName, state)
-      this.globalData[stateName] = state
+      // this.$set(this, stateName, state)
+      // this.globalData[stateName] = state
       // this.paired = this.globalData.paired
 
-      if (stateName !== 'searching' && !state) {
-        // 状态顺序，搜索状态与其他状态的关系需要注意
-        let stateList = ['bleReady', 'bleOnline',
-          // 'searching',
-          'connected', 'paired', 'devicesReady']
-        // 操作后续状态
-        stateList.slice(stateList.indexOf(stateName) + 1).forEach(_state => {
-          this.$set(this, _state, false)
-          this.globalData[_state] = false
-          // if (_state === 'paired') this.handlePair(this.bleState.paired)
-        })
-      }
+      // if (stateName !== 'searching' && !state) {
+      //   // 状态顺序，搜索状态与其他状态的关系需要注意
+      //   let stateList = ['bleReady', 'bleOnline',
+      //     // 'searching',
+      //     'connected', 'paired', 'devicesReady']
+      //   // 操作后续状态
+      //   stateList.slice(stateList.indexOf(stateName) + 1).forEach(_state => {
+      //     this.$set(this, _state, false)
+      //     this.globalData[_state] = false
+      //     // if (_state === 'paired') this.handlePair(this.bleState.paired)
+      //   })
+      // }
       // if (stateName === 'paired') this.handlePair(this.bleState.paired)
       if (toast) this.toast(toast, time, icon)
+      let { bleReady, bleOnline, searching, connected, paired, devicesReady } = this.BioStimBleModule.bleState// this.globalData
       console.log(
         '触发来源', msgCode,
         '操作状态', log, stateName,
-        'bleReady', this.globalData.bleReady,
-        'bleOnline', this.globalData.bleOnline,
-        'searching', this.globalData.searching,
-        'connected', this.globalData.connected,
-        'paired', this.globalData.paired,
-        'devicesReady', this.globalData.devicesReady,
-        this.BioStimBleModule.bleState
+        'bleReady', bleReady,
+        'bleOnline', bleOnline,
+        'searching', searching,
+        'connected', connected,
+        'paired', paired,
+        'devicesReady', devicesReady
       )
     },
     async bleInit () {
@@ -197,7 +198,7 @@ export default {
           this.globalData.deviceInfo = data
           // console.log('设备序列号数据，蓝牙连接成功后只回调一次', this.globalData.deviceInfo)
           break
-        case this.EventBus.GET_RECORD: // 获取治疗记录
+        case this.EventBus.GET_RECORD: // 获取训练记录
           this.globalData.record = data
           break
         case this.EventBus.COMMAND_FAIL: // 指令发送失败
@@ -242,14 +243,14 @@ export default {
           // 使用GET_SERIALNO的逻辑会更严谨，但由于有时候收不到反馈，只能用CONNECTED代替
           console.log('设备序列号数据，蓝牙连接成功后只回调一次', this.globalData.isNewDevice)
           if (this.globalData.isNewDevice === 'N') await this.createPaired()
-          // 如果是优E康，检查治疗记录
+          // 如果是优E康，检查训练记录
           if (this.globalData.isNewDevice === 'Y') await this.getRecord()
           break
         case this.EventBus.PAIRED: // 设备配对成功
           this.handlePair(data)
           break
-        case this.EventBus.GET_RECORD: // 获取治疗记录
-          console.log('显示获取治疗记录', this.bleState.paired, data, this.getPageUrl())
+        case this.EventBus.GET_RECORD: // 获取训练记录
+          console.log('显示获取训练记录', this.bleState.paired, data, this.getPageUrl())
           // 如果未配对，启动配对
           if (!this.bleState.paired) await this.createPaired()
           await this.handleRecord(data)
@@ -278,7 +279,7 @@ export default {
       if (!recordId) return// 设备没有记录
 
       let _record = (await this.libs.request(this.libs.api.limitDeviceApp.treatment.getRecordByRecordId, { recordId, deviceName: this.globalData.device.name })).data
-      console.log('治疗记录', 'workoutRecord' + recordId, _record)
+      console.log('训练记录', 'workoutRecord' + recordId, _record)
       if (!_record) return// app没有记录
       _record.isStop = isStop
       _record.duration = totalTime
@@ -298,13 +299,13 @@ export default {
       if (isStop === '0') {
         // if (!this.globalData.workout) {
         //   let _workout = this.workoutList.find(item => item.workoutId === this.globalData.workoutRecord.workoutId)
-        //   if (!_workout) return this.toast('找不到记录对应的治疗方案')
+        //   if (!_workout) return this.toast('找不到记录对应的训练方案')
         //   this.globalData.workout = JSON.parse(JSON.stringify(_workout))
         // }
 
         // this.globalData.workout.duration = totalTime || this.workTime
         // this.globalData.workout.time = time || 0
-        // console.log('治疗方案', this.globalData.workout)
+        // console.log('训练方案', this.globalData.workout)
 
         switch (_page) {
           case 'pages/bluetooth/running':
@@ -318,16 +319,16 @@ export default {
 
       // 已结束
       // if (isStop === '1') {
-      // 这个地方有歧义，未结束的会显示设置的治疗时长，已结束的会显示实际治疗时长
+      // 这个地方有歧义，未结束的会显示设置的训练时长，已结束的会显示实际训练时长
       _record.duration = _record.specificDuration = time
       // _record.recordId = _record.id
       _record.endDateTime = this.libs.data.dateNow(_record.startTime + parseFloat(time) * 1000)
-      console.log('已结束', isStop, !isStop, '结束时间：', _record.endDateTime, '治疗时长：', time)
-      console.log('治疗结束，更新治疗记录', _record)
+      console.log('已结束', isStop, !isStop, '结束时间：', _record.endDateTime, '训练时长：', time)
+      console.log('训练结束，更新训练记录', _record)
 
-      // 前端处理今日已治疗的数据，减少后台请求
+      // 前端处理今日已训练的数据，减少后台请求
       // _record.workout.todayState = 'Y'
-      // _finishObj.title = _finishObj.workoutName + '（今天已治疗）'
+      // _finishObj.title = _finishObj.workoutName + '（今天已训练）'
 
       let _res = await this.libs.request(this.libs.api.limitDeviceApp.treatment.endTreatment, _record)
       if (_res) this.clearRecord()
@@ -357,6 +358,8 @@ export default {
       let deviceState = this.globalData.deviceState
       if (!deviceState) this.globalData.deviceState = deviceState = {}
       let { channel } = data
+      data.settingCHL = data.settingCHL / 10
+      data.settingCHR = data.settingCHR / 10
       // 提示跌落
       let isFall = await this.isFall(data)
       let { settingCHL, settingCHR } = await this.getCurrent(data, deviceState)
@@ -369,11 +372,11 @@ export default {
       //   '当前左强度', intensityCHL ,
       //   '当前右强度', intensityCHR ,
       //   '运行状态', { '0': '设置', '1': '运行', '2': '暂停', '3': '停止', '4': '锁定' }[stateRunning],
-      //   '阶段状态', { '1': '上升', '2': '平台', '3': '下降', '4': '休息', '5': '调整刺激强度', '6': '输出开路', '7': '治疗完成' }[statePhase],
+      //   '阶段状态', { '1': '上升', '2': '平台', '3': '下降', '4': '休息', '5': '调整刺激强度', '6': '输出开路', '7': '训练完成' }[statePhase],
       //   '阶段左强度', settingCHL ,
       //   '阶段右强度', settingCHR ,
-      //   '左贴片', { '1': '治疗中', '2': '脱落' }[stateCHL],
-      //   '右贴片', { '1': '治疗中', '2': '脱落' }[stateCHR],
+      //   '左贴片', { '1': '训练中', '2': '脱落' }[stateCHL],
+      //   '右贴片', { '1': '训练中', '2': '脱落' }[stateCHR],
       //   '跌落判断', isFall,
       //   this.getPageUrl()
       // )
@@ -412,7 +415,7 @@ export default {
 
       this.showFall = true
       uni.showModal({
-        content: '电极片从人体中脱落，治疗暂停。请粘贴到正确的部位后，点击开始按钮继续治疗。',
+        content: '电极片从人体中脱落，训练暂停。请粘贴到正确的部位后，点击开始按钮继续训练。',
         showCancel: false,
         success: res => this.showFall = !res.confirm
       })
@@ -421,7 +424,7 @@ export default {
     },
     // 搜索设备
     async bleSearch () {
-      if (this.bleState.bleReady && !this.bleState.searching) this.BioStimBleModule.startBluetoothDevicesDiscovery()
+      if (this.bleState.bleReady && !this.bleState.searching) return this.BioStimBleModule.startBluetoothDevicesDiscovery()
     },
     // 停止搜索
     stopSearch () {
@@ -558,9 +561,9 @@ export default {
       if (this.globalData.isNewDevice === 'Y' && !channel) channel = 255
       return this.BioStimBleModule.nextPhase(channel)
     },
-    // 开始治疗
+    // 开始训练
     startTreatment (channel, command = '') {
-      console.log('开始治疗')
+      console.log('开始训练')
       if (this.globalData.isNewDevice === 'Y' && !channel) channel = 255
       return this.BioStimBleModule.startTreatment({ command, channel })
     },
@@ -569,7 +572,7 @@ export default {
       if (this.globalData.isNewDevice === 'Y' && !channel) channel = 255
       return this.BioStimBleModule.pauseTreatment({ command, channel })
     },
-    // 结束治疗
+    // 结束训练
     endTreatment (channel, command = '') {
       if (this.globalData.isNewDevice === 'Y' && !channel) channel = 255
       return this.BioStimBleModule.endTreatment({ command, channel })

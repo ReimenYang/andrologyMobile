@@ -12,6 +12,7 @@ let BaseBleModule = {}
 
 BaseBleModule.connectTimeOut = 10 * 1000 // 连接低功耗蓝牙设备超时设置
 BaseBleModule.writeTime = 100 // 控制writeBLECharacteristicValue时间间隔
+BaseBleModule.tryMax = 20 // 尝试启动服务次数
 // 小程序需要转为大写
 // 在ble项目中是固定值
 const mock = {
@@ -21,7 +22,8 @@ const mock = {
   },
   limitDeviceApp: { // 易循环
     serviceId: '0000FFB0-0000-1000-8000-00805F9B34FB',
-    characteristicId: '0000ffb2-0000-1000-8000-00805f9b34fb'
+    // characteristicId: '0000ffb2-0000-1000-8000-00805f9b34fb'
+    characteristicId: '0000FFB2-0000-1000-8000-00805F9B34FB'
   },
   deviceApp: {
     serviceId: '0000FFB0-0000-1000-8000-00805F9B34FB',
@@ -184,31 +186,41 @@ BaseBleModule.onBLEConnectionStateChange = callback => {
 
 // 获取蓝牙设备所有服务(service)。
 // 这里获取serviceId
-BaseBleModule.getBLEDeviceServices = async () => {
+BaseBleModule.getBLEDeviceServices = async (n = 0) => {
+  if (n > BaseBleModule.tryMax) return { statusCode: 502, err: 'getBLEDeviceServices 启动失败' }
+  await sleep(1000)
   let [err, _data] = await uni.getBLEDeviceServices({ deviceId })
   // ble 有这个服务，但返回了空数据:{"services":[],"errMsg":"getBLEDeviceServices:ok"}
   // 部分手机在调用getBLEDeviceServices方法前加入10秒阻塞可以获取到
   // 获取到的UUID可以有很多，功能不尽相同，只做提示，不会实际调用，具体应用需要跟硬件厂家沟通
-  if (_data.services.length) console.info('getBLEDeviceServices:', _data, err)
-  if (err) console.error('getBLEDeviceServices fail:', err)
+  if (err) {
+    console.error('getBLEDeviceServices fail:', err)
+    return { statusCode: 502, err }
+  }
+  console.info('getBLEDeviceServices:', _data, err, n)
+  if (!_data.services.length) return BaseBleModule.getBLEDeviceServices(n + 1)
   let data = serviceId = mock.serviceId
-  // return { statusCode: err ? 502 : 200, data, err }
   return { statusCode: 200, data }
 }
 
 // 获取蓝牙设备某个服务中所有特征值(characteristic)。
 // 这里的获取characteristicId
-BaseBleModule.getBLEDeviceCharacteristics = async () => {
+BaseBleModule.getBLEDeviceCharacteristics = async (n = 0) => {
+  if (n > BaseBleModule.tryMax) return { statusCode: 503, err: 'getBLEDeviceServices 启动失败' }
+  await sleep(1000)
   // 这里的 deviceId 需要已经通过 createBLEConnection 与对应设备建立连接
   let [err, _data] = await uni.getBLEDeviceCharacteristics({ deviceId, serviceId })
   // ble serviceUUID错误会报没有这个服务，导致api报错：10004	no service	没有找到指定服务
   // [undefined, { "errMsg": "getBLEDeviceCharacteristics:fail no service", "errCode": 10004, "code": 10004 }]
   // 部分手机在调用getBLEDeviceServices方法前加入10秒阻塞可以获取到
   // 获取到的UUID可以有很多，功能不尽相同，只做提示，不会实际调用，具体应用需要跟硬件厂家沟通
-  if (_data) console.info('getBLEDeviceCharacteristics:', _data, err)
-  if (err) console.error('getBLEDeviceCharacteristics fail:', err)
+  if (err) {
+    console.error('getBLEDeviceCharacteristics fail:', err)
+    return { statusCode: 503, err }
+  }
+  console.info('getBLEDeviceCharacteristics:', _data, err, n)
+  if (!_data.characteristics.length) return BaseBleModule.getBLEDeviceCharacteristics(n + 1)
   let data = characteristicId = mock.characteristicId
-  // return { statusCode: err ? 503 : 200, data, err }
   return { statusCode: 200, data }
 }
 

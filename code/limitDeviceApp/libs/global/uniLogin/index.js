@@ -1,8 +1,8 @@
 import { appid, apiKey, apiSecret } from '@/projectConfig.js'
 import libs from '@/libs'
 let uniLogin = {}
-async function debug (str) {
-  await libs.request({ method: 'GET', url: 'http://10.10.20.101:8888/f45.png?debug=' + str }, {}, { important: true })
+function debug (str) {
+  libs.request({ method: 'GET', url: 'http://10.10.20.101:8888/f45.png?debug=' + str }, {}, { important: true })
 }
 // 检查一键登录配置
 uniLogin.checkProvider = provider => {
@@ -10,9 +10,13 @@ uniLogin.checkProvider = provider => {
     uni.getProvider({
       service: 'oauth',
       success (data) {
-        if (data.provider.includes(provider)) resolve({ statusCode: 200, data })
+        console.log('检查一键登录配置', data)
+        debug(`一键登录配置&data=${JSON.stringify(data)}&provider=${provider}`)
+        // if (data.provider.includes(provider)) resolve({ statusCode: 200, data })
+        resolve({ statusCode: 200, data })
       },
       fail (err) {
+        debug(`一键登录配置error&err=${JSON.stringify(err)}&provider=${provider}`)
         console.log('检查一键登录配置error', err)
         uni.showToast({
           title: '检查一键登录配置失败,' + err,
@@ -73,19 +77,19 @@ uniLogin.getPhoneNumber = async (data) => {
 
 uniLogin.auto = async (univerifyStyle = {}, provider = 'univerify') => {
   console.log('检查一键登录配置')
-  await debug(`检查一键登录配置&univerifyStyle=${JSON.stringify(univerifyStyle)}&provider=${provider}`)
+  debug(`检查一键登录配置&univerifyStyle=${JSON.stringify(univerifyStyle)}&provider=${provider}`)
   await uniLogin.checkProvider(provider)
-  await debug('预登录')
+  debug('预登录')
   console.log('预登录')
-  // await uniLogin.preLogin(provider, univerifyStyle)
-  await debug('一键登录')
+  await uniLogin.preLogin(provider, univerifyStyle)
+  debug('一键登录')
   console.log('一键登录')
   // let loginErr = {}, loginData
   let [loginErr, loginData] = await uniLogin.login(provider, univerifyStyle)
   if (!loginErr) loginErr = {}
   uni.closeAuthView() // 关闭一键登录弹出窗口
   console.log('一键登录结果', loginErr, loginData)
-  await debug(`一键登录结果&loginErr=${JSON.stringify(loginErr)}&loginData=${JSON.stringify(loginData)}`)
+  debug(`一键登录结果&loginErr=${JSON.stringify(loginErr)}&loginData=${JSON.stringify(loginData)}`)
   switch (loginErr.code) {
     case 30002:
       // 点击其他方式登陆

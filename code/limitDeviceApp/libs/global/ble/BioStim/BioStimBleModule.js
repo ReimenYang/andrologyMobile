@@ -1,5 +1,5 @@
 /**
- * 杉山ble治疗仪操作类
+ * 杉山ble训练仪操作类
  *
  * 6
  * 改造前的基本思路：
@@ -94,8 +94,8 @@ function ab2hex (buffer) {
 // 制造阻塞
 function sleep (time) { return new Promise(resolve => setTimeout(resolve, time)) }
 
-async function debug (str) {
-  await libs.request({ method: 'GET', url: 'http://10.10.20.101:8888/f45.png?debug=' + str }, {}, { important: true })
+function debug (str) {
+  libs.request({ method: 'GET', url: 'http://10.10.20.101:8888/f45.png?debug=' + str }, {}, { important: true })
 }
 
 const BioStimBleModule = {}
@@ -119,7 +119,7 @@ async function setBleState (type, boolean, data) {
   BioStimBleModule.bleState[type] = boolean
   switch (type) {
     case 'bleOnline':
-      if (boolean) return EventBus.post(new EventBus(EventBus.BLE_OFFLINE, data))
+      if (boolean) return EventBus.post(new EventBus(EventBus.BLE_ONLINE, data))
       await setBleState('searching', false, data)
       await setBleState('connected', false, data)
       EventBus.post(new EventBus(EventBus.BLE_OFFLINE, data))
@@ -142,8 +142,8 @@ async function setBleState (type, boolean, data) {
       EventBus.post(new EventBus(EventBus.PAIR_FAIL, data))
       break
     case 'devicesReady':
-      if (boolean) return EventBus.post(new EventBus(EventBus.BLE_OFFLINE, data))
-      EventBus.post(new EventBus(EventBus.BLE_OFFLINE, data))
+      if (boolean) return EventBus.post(new EventBus(EventBus.BLE_READY, data))
+      EventBus.post(new EventBus(EventBus.BLE_UNREADY, data))
       break
   }
 }
@@ -341,30 +341,34 @@ async function connectFail (type, data) {
 // 连接蓝牙设备
 BioStimBleModule.createBLEConnection = async deviceId => {
   await getServiceReady()
-  console.log('连接蓝牙设备', BioStimBleModule.bleState.connected, baseBleModule.getDeviceId, deviceId)
-  if (BioStimBleModule.bleState.connected && baseBleModule.getDeviceId === deviceId) return { statusCode: 200, data: '已经与该设备已连接', err: '已经与该设备已连接' }
+  let { connected, searching } = BioStimBleModule.bleState
+  console.log('连接蓝牙设备', connected, searching, baseBleModule.getDeviceId(), deviceId)
+  if (connected && baseBleModule.getDeviceId() === deviceId) return { statusCode: 200, data: '已经与该设备已连接', err: '已经与该设备已连接' }
 
   EventBus.post(new EventBus(EventBus.CONNECTING)) // 设备连接中
 
   // 如果在搜索就停止搜索
-  if (BioStimBleModule.bleState.searching) await BioStimBleModule.stopBluetoothDevicesDiscovery()
+  if (searching) await BioStimBleModule.stopBluetoothDevicesDiscovery()
   // 如果在连接或者已经连接，断开原来的连接
-  if (BioStimBleModule.bleState.connected) await BioStimBleModule.closeBLEConnection()
+  if (connected) await BioStimBleModule.closeBLEConnection()
 
   let _connection = await baseBleModule.createBLEConnection(deviceId)
   if (_connection.statusCode !== 200) return await connectFail('_connection', _connection)
+  console.log(_connection)
 
   // 在不知道servicesUUID和characteristicsUUID的情况下，部分手机启用这个阻塞，可以获取到UUID列表
   // await sleep(10000)
+  let _services = await baseBleModule.getBLEDeviceServices()
+  // if (_services.statusCode !== 200) return await connectFail('_services', _services)
+  console.log(_services)
 
-  // let _services = await baseBleModule.getBLEDeviceServices()
-  // if (_services.statusCode !== 200) return await connectFail ('_services', _services)
+  // await sleep(3000)
+  let _characteristics = await baseBleModule.getBLEDeviceCharacteristics()
+  // if (_characteristics.statusCode !== 200) return await connectFail('_characteristics', _characteristics)
+  console.log(_characteristics)
 
-  // let _characteristics = await baseBleModule.getBLEDeviceCharacteristics()
-  // if (_characteristics.statusCode !== 200) return await connectFail ('_characteristics', _characteristics)
-
-  // 连接低频神经治疗仪成功后执行的操作
-  if (platform === 'android') await sleep(3000) // 延时1000ms,太快容易导致uni的10004错误
+  // 连接低频神经训练仪成功后执行的操作
+  if (platform === 'android') await sleep(2000) // 延时1000ms,太快容易导致uni的10004错误
   let _notify = await baseBleModule.notifyBLECharacteristicValueChange()
   if (_notify.statusCode !== 200) return await connectFail('_notify', _notify)
 
@@ -391,7 +395,7 @@ BioStimBleModule.createBLEConnection = async deviceId => {
   return data
 }
 
-// 配对低频神经治疗仪
+// 配对低频神经训练仪
 BioStimBleModule.createPaired = async pairedRule => {
   EventBus.post(new EventBus(EventBus.PAIRING)) // 设备配对中
 
@@ -431,7 +435,7 @@ BioStimBleModule.onBLECharacteristicValueChange = () => {
 }
 
 /**
- * 发送初始化指令,简单理解就是设置治疗时长那一步(同步方法)
+ * 发送初始化指令,简单理解就是设置训练时长那一步(同步方法)
  * 这是单通道设置方法，多通道则多次调用即可
  */
 BioStimBleModule.sendInitCmd = async (options, time) => {
@@ -550,7 +554,7 @@ BioStimBleModule.nextPhase = channel => {
 }
 
 /**
- * 获取硬件的最后一个治疗程序的状态
+ * 获取硬件的最后一个训练程序的状态
  */
 BioStimBleModule.getRecord = () => {
   return writePort(DeviceCmd.getRecord())
@@ -564,28 +568,28 @@ BioStimBleModule.clearRecord = () => {
 }
 
 /**
- * 治疗记录
+ * 训练记录
  */
 BioStimBleModule.setRecord = recordId => {
   return writePort(DeviceCmd.setRecord(recordId))
 }
 
 /**
- * 开始治疗(同步方法)
+ * 开始训练(同步方法)
  */
 BioStimBleModule.startTreatment = ({ command, channel }) => {
   return writePort(DeviceCmd.startTreatment(({ command, channel })))
 }
 
 /**
- * 暂停治疗(同步方法)
+ * 暂停训练(同步方法)
  */
 BioStimBleModule.pauseTreatment = ({ command, channel }) => {
   return writePort(DeviceCmd.pauseTreatment(({ command, channel })))
 }
 
 /**
- * 结束治疗(同步方法)
+ * 结束训练(同步方法)
  */
 BioStimBleModule.endTreatment = async ({ command, channel }) => {
   await writePort(DeviceCmd.endTreatment(({ command, channel })))
@@ -606,10 +610,10 @@ BioStimBleModule.getBLEConnectStatus = async () => {
   await getServiceReady()
   let res = await baseBleModule.getBLEConnectStatus()
   // 发送蓝牙配对失败通知
-  if (res.statusCode !== 200) return EventBus.post(new EventBus(EventBus.BLE_OFFLINE, res))
+  if (res.statusCode !== 200) return EventBus.post(new EventBus(EventBus.CONNECT_BREAK, res))
 
   // 发送蓝牙配对成功通知
-  EventBus.post(new EventBus(EventBus.BLE_ONLINE, res))
+  EventBus.post(new EventBus(EventBus.CONNECTED, res))
 }
 
 // 指令历史

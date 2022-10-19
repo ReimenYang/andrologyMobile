@@ -1,5 +1,5 @@
 /**
- * 杉山ble治疗仪指令校验器
+ * 杉山ble训练仪指令校验器
  *
  * 3
  * 对设备回调信息进行分类处理
@@ -92,35 +92,35 @@ export class BTSResponseModule {
           // <IntensityCHR> 当前右通道刺激强度，0 ~ 995；
           // <BAT> 当前电池状态，0 ~ 100；
           // <StateRunning> 运行状态，可以是: 设置，0 / 运行，1 / 暂停，2 / 停止，3 / 锁定，4
-          // <StatePhase> 阶段状态，可以是: 上升，1 / 平台，2 / 下降，3 / 休息，4 / 调整刺激强度，5 / 输出开路，6/ 治疗完成，7
+          // <StatePhase> 阶段状态，可以是: 上升，1 / 平台，2 / 下降，3 / 休息，4 / 调整刺激强度，5 / 输出开路，6/ 训练完成，7
           // <RemainingTime> 剩余时间，0~3600
           // <Wavepercent> 波形阶段状态，百分比，30代表百分之三十该阶段状态时间，如当<StatePhase>为1，<Wavepercent>为30，当前运行到上升阶段百分之30的位置。
           // <SettingCHL> 阶段一设置的左插口电量强度
           // <SettingCHR> 阶段一设置的右插口电量强度
-          // <StateCHL> 左插口运行状态，1--治疗中，2--脱落
-          // <StateCHR> 右插口运行状态，1--治疗中，2--脱落
+          // <StateCHL> 左插口运行状态，1--训练中，2--脱落
+          // <StateCHR> 右插口运行状态，1--训练中，2--脱落
           let [count, channel, numPhase, intensityCHL, intensityCHR, bat, stateRunning, statePhase, remainingTime, wavepercent, settingCHL, settingCHR, stateCHL, stateCHR, sum] = option
           this.data = { ...this.data, count, channel, numPhase, intensityCHL, intensityCHR, bat, stateRunning, statePhase, remainingTime, wavepercent, settingCHL, settingCHR, stateCHL, stateCHR, sum }
         }
         break
       case 'r':
         {
-          // 获取硬件的最后一个治疗程序的状态
+          // 获取硬件的最后一个训练程序的状态
           // DATA:r,<RecordId>,<TotalTime>,<Time>,<IsStop>,<sum>\r\n\0
           // 解析：
-          // <RecordId> 治疗记录id
-          // <TotalTime> 设置的治疗时长
-          // <Time> 已治疗的时长
+          // <RecordId> 训练记录id
+          // <TotalTime> 设置的训练时长
+          // <Time> 已训练的时长
           // <IsStop> 是否已中止，1是，0否
 
           // 注：
-          // 治疗正常结束时，<Time>应该和<TotalTime>一致，且<IsStop> 为1
-          // 治疗过程中，用户手动关闭设备后，再打开设备时，返回的内容：
+          // 训练正常结束时，<Time>应该和<TotalTime>一致，且<IsStop> 为1
+          // 训练过程中，用户手动关闭设备后，再打开设备时，返回的内容：
           // <TotalTime>为设置的时长
-          // <Time>为关闭时已治疗的时长
+          // <Time>为关闭时已训练的时长
           // <IsStop> 为1
-          // 硬件收到新的设置程序指令时，才清空缓存，更新为新一次治疗的数据
-          // 如果没有治疗数据：返回ACK:\r\n\0
+          // 硬件收到新的设置程序指令时，才清空缓存，更新为新一次训练的数据
+          // 如果没有训练数据：返回ACK:\r\n\0
           let [recordId, totalTime, time, isStop, sum] = option
           this.data = { ...this.data, recordId, totalTime, time, isStop, sum }
         }
@@ -161,8 +161,8 @@ export class BTSResponseModule {
           // <CMD>为指令码
           // <SettingCHL>左插口第一阶段强度
           // <SettingCHR> 右插口第一阶段强度
-          // <StateCHL> 左插口运行状态，1--治疗中，2--脱落
-          // <StateCHR> 右插口运行状态，1--治疗中，2--脱落
+          // <StateCHL> 左插口运行状态，1--训练中，2--脱落
+          // <StateCHR> 右插口运行状态，1--训练中，2--脱落
           let [channel, cmd, settingCHL, settingCHR, stateCHL, stateCHR, sum] = option
           this.data = { ...this.data, channel, cmd, settingCHL, settingCHR, stateCHL, stateCHR, sum }
         }

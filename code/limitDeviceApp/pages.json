@@ -45,7 +45,7 @@
     {
       "path": "pages/scheme/getReady",
       "style": {
-        "navigationBarTitleText": "准备治疗",
+        "navigationBarTitleText": "准备训练",
         "navigationStyle": "custom",
         "navigationBarTextStyle": "white"
       }
@@ -53,13 +53,13 @@
     {
       "path": "pages/bluetooth/running",
       "style": {
-        "navigationBarTitleText": "治疗"
+        "navigationBarTitleText": "训练"
       }
     },
     {
       "path": "pages/scheme/record",
       "style": {
-        "navigationBarTitleText": "治疗记录"
+        "navigationBarTitleText": "训练记录"
       }
     },
     {
@@ -85,7 +85,7 @@
     {
       "path": "pages/bluetooth/setTime",
       "style": {
-        "navigationBarTitleText": "治疗时长",
+        "navigationBarTitleText": "训练时长",
         "navigationStyle": "custom",
         "navigationBarTextStyle": "white"
       }

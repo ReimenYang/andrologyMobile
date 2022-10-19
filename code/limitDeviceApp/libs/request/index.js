@@ -17,6 +17,7 @@ function toastBox (errMsg, obj, dataRes) {
 const validateStatus = status => 200 <= status && status < 300
 
 async function request (api, params = {}, config = {}) {
+  let time = utils.data.dateNow()
   let headers = configProject.globalData.headers || {}
   let header = JSON.parse(JSON.stringify(headers))
   if (headers && !config.important) config = { headers, ...config }
@@ -91,15 +92,15 @@ async function request (api, params = {}, config = {}) {
   let statusCode = dataRes.statusCode || dataRes.status
   let errorMessage = dataRes.errorMessage || ''
   // 一般失败请求处理
-  if (errRes) return toastBox(apiName + '请求无效' + respondseError, { ...api, data, ...config }, dataRes)
+  if (errRes) return toastBox(apiName + '请求无效' + respondseError + time, { ...api, data, ...config }, dataRes)
   // 有些网络层拦截错误在返回的数据里面
-  if (!validateStatus(statusCode)) return toastBox(apiName + '请求失败，' + statusCode + errorMessage, { ...api, url, data, ...config }, dataRes)
+  if (!validateStatus(statusCode)) return toastBox(apiName + '请求失败，' + statusCode + errorMessage + time, { ...api, url, data, ...config }, dataRes)
 
   // 判断业务返回的错误
   if ((_data.code && (_data.code !== 0 && _data.code !== 200)) || (_data.statuscode && _data.statuscode !== '0000')) {
-    toastBox('业务提示：' + (_data.msg || _data.statusmsg || _data.errorMessage), apiName + (_data.code || _data.statuscode), { ...api, data, ...config }, dataRes)
+    toastBox('业务提示：' + (_data.msg || _data.statusmsg || _data.errorMessage) + time, apiName + (_data.code || _data.statuscode), { ...api, data, ...config }, dataRes)
   }
-  console.log('请求结果', url, _data)
+  console.log(time, '请求结果', url, _data)
   return _data
 }
 
