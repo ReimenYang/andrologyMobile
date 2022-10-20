@@ -1,8 +1,9 @@
 import { appid, apiKey, apiSecret } from '@/projectConfig.js'
 import libs from '@/libs'
 let uniLogin = {}
+let debugOpen = false
 function debug (str) {
-  libs.request({ method: 'GET', url: 'http://10.10.20.101:8888/f45.png?debug=' + str }, {}, { important: true })
+  if (debugOpen) libs.request({ method: 'GET', url: 'http://10.10.20.101:8888/f45.png?debug=' + str }, {}, { important: true })
 }
 // 检查一键登录配置
 uniLogin.checkProvider = provider => {

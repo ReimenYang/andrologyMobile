@@ -11,7 +11,7 @@ import adminUms from './adminUms'
 import adminCms from './adminCms'
 import adminSsyypt from './adminSsyypt'
 import manageApi from './adminSsyypt'
-import limitDeviceApp from './limitDeviceApp'
+import ECirculation from './ECirculation'
 import wyjkDevice from './wyjkDevice'
 
 
@@ -19,4 +19,4 @@ import wyjkDevice from './wyjkDevice'
 // routing: {method: "POST",url: "/wyjk-tbherogameperiod/busapi/routing",dataType: "json"},
 // routing: {method: "POST",url: "https://sapi.xinuowang.com/jianfeiwx/api/busapi/routing",dataType: "json"},
 
-export default { ssyypt, cms, oms, pms, sms, ums, core, admin, adminManage, adminUms, adminCms, adminSsyypt, manageApi, limitDeviceApp, wyjkDevice }
+export default { ssyypt, cms, oms, pms, sms, ums, core, admin, adminManage, adminUms, adminCms, adminSsyypt, manageApi, ECirculation, wyjkDevice }

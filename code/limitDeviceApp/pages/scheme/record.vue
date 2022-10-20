@@ -56,7 +56,7 @@ export default {
     }
   },
   async onShow () {
-    this.recordList = (await this.libs.request(this.libs.api.limitDeviceApp.treatment.getTreatmentData, { phone: this.globalData.userInfo.phone, pageSize: 1000 })).data
+    this.recordList = (await this.libs.request(this.libs.api.ECirculation.treatment.getTreatmentData, { phone: this.globalData.userInfo.phone, pageSize: 1000 })).data
     console.log('进入记录', this.recordList)
     this.recordList.forEach(item => {
       let _data = item.startDateTime || item.treatementDate

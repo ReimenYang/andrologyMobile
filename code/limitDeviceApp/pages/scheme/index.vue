@@ -146,7 +146,7 @@ export default {
         isNewDevice: this.libs.configProject.isNewDevice,
         phone: this.globalData.userInfo.phone
       }
-      this.globalData.workoutList = (await this.libs.request(this.libs.api.limitDeviceApp.scheme.getSchemeList, params)).data
+      this.globalData.workoutList = (await this.libs.request(this.libs.api.ECirculation.scheme.getSchemeList, params)).data
 
       this.globalData.workoutList.forEach(item => {
         // let note = ''
@@ -194,8 +194,10 @@ export default {
   height: 100vh;
   display: flex;
   flex-direction: column;
-  padding: 20rpx;
   box-sizing: border-box;
+  /deep/ .wrap {
+    padding: 20rpx;
+  }
   &.indexBg {
     background: var(--indexBg) no-repeat top center/100%;
   }

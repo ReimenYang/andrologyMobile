@@ -278,7 +278,7 @@ export default {
       clearInterval(this.globalData.loopRecord)
       if (!recordId) return// 设备没有记录
 
-      let _record = (await this.libs.request(this.libs.api.limitDeviceApp.treatment.getRecordByRecordId, { recordId, deviceName: this.globalData.device.name })).data
+      let _record = (await this.libs.request(this.libs.api.ECirculation.treatment.getRecordByRecordId, { recordId, deviceName: this.globalData.device.name })).data
       console.log('训练记录', 'workoutRecord' + recordId, _record)
       if (!_record) return// app没有记录
       _record.isStop = isStop
@@ -330,7 +330,7 @@ export default {
       // _record.workout.todayState = 'Y'
       // _finishObj.title = _finishObj.workoutName + '（今天已训练）'
 
-      let _res = await this.libs.request(this.libs.api.limitDeviceApp.treatment.endTreatment, _record)
+      let _res = await this.libs.request(this.libs.api.ECirculation.treatment.endTreatment, _record)
       if (_res) this.clearRecord()
       // this.libs.data.removeStorage(recordId)
       delete this.globalData.workoutRecord

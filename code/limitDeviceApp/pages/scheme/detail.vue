@@ -31,7 +31,7 @@ export default {
     this.schemeDetail = this.globalData.schemeList.find(item => item.id === (option.schemeId - 0)) || {}
     let phone = this.globalData.userInfo.phone
     let schemeId = this.schemeDetail.id
-    let schemeStateList = (await this.libs.request(this.libs.api.limitDeviceApp.scheme.getSchemeState, { phone, schemeId })).data
+    let schemeStateList = (await this.libs.request(this.libs.api.ECirculation.scheme.getSchemeState, { phone, schemeId })).data
     let doneList = schemeStateList.filter(item => item.workoutState === 'Y').map(item => item.workloutId)
 
     this.schemeDetail.workoutList.forEach(item => {

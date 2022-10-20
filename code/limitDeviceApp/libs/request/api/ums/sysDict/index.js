@@ -40,7 +40,8 @@ const apis = {
   // App版本信息
   updateAppConfig: {
     ble: { ...def, url: _path + 'updateAppConfig/ble' },
-    consume: { ...def, url: _path + 'updateAppConfig/consume' }// 优E康
+    consume: { ...def, url: _path + 'updateAppConfig/consume' }, // 优E康
+    ECirculation: { ...def, url: 'https://testbl.xinuowang.com/wyjk-ums/v1/api/' + _path + 'updateAppConfig/ECirculation' }// 易循环
   },
   // 字典获取
   getSysDict: data => ({ ...def, url: 'sys-dict/temporaryItemsByType/' + data }),

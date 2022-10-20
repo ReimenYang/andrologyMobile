@@ -7,20 +7,24 @@
     <p-wrap
       :hasHeader="true"
       :hasFooter="true"
+      style="position: relative"
     >
       <view class="intro">
         <xnw-item :info="intro" />
       </view>
-      <view class="help">
+      <!-- <view class="help">
         <view class="helpTitle">
           使用教程
         </view>
         <view class="item">
           <xnw-from :config="help" />
         </view>
+      </view> -->
+      <view class="appVersion">
+        {{ globalData.headers.appVersion }}
       </view>
     </p-wrap>
-    <p-menu :defaultIndex="3" />
+    <p-menu :defaultIndex="2" />
   </view>
 </template>
 <script>
@@ -28,10 +32,10 @@ export default {
   data () {
     return {
       intro: {
-        title: '网约家康杉山(广东)健康科技有限公司',
+        title: '广州壹零健康科技有限公司',
         contents: [
-          { txt: '客服微信：example_id' },
-          { txt: '客服热线：020-38100230' },
+          // { txt: '客服微信：example_id' },
+          { txt: '客服热线：15302265955' },
           { txt: '服务时间：工作日 9:00 ~ 18:00' }
         ]
       },
@@ -79,6 +83,15 @@ export default {
     /deep/ .title {
       width: 10em;
     }
+  }
+  .appVersion {
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+    line-height: 3;
+    font-size: var(--font-h6);
+    color: var(--color-disabled);
+    text-align: center;
   }
 }
 </style>

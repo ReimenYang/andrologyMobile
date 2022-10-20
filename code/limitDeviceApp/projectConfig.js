@@ -13,14 +13,14 @@ module.exports = {
     browser: false,
     app: true
   }, // 项目要运行的环境
-  vision: '0.01Bate', // 项目版本
-  updateTime: '20221019', // 版本升级时间
+  vision: '0.02Bate', // 项目版本
+  updateTime: '20221020', // 版本升级时间
   // webDeveloper: '127.0.0.1', // 前端开发本地路径
   webDeveloper: '10.10.20.101', // Reimen
   // webDeveloper: 'dev-weiming.xinuowang.com', 	// Reimen
   // webDeveloper: '10.10.20.41',
   // webDeveloper: 'localhost'
-  mode: 'limitDeviceApp', // dev 开发环境、 test 测试环境、 produce 正式环境、 demo 演示环境、 pre 预发布环境
+  mode: 'ECirculation', // dev 开发环境、 test 测试环境、 produce 正式环境、 demo 演示环境、 pre 预发布环境
 
   /**  消费电子特有字段*/
 

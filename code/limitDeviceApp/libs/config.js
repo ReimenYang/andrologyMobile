@@ -12,7 +12,7 @@ const setting = {
     demo: 'https://sapi.xinuowang.com', // 'http://10.10.20.46:9999', // demo演示环境
     pre: 'https://prepublish.xinuowang.com', // 预发布环境
     produce: 'https://sapi.xinuowang.com', // produce正式环境
-    limitDeviceApp: 'http://consume.sspendi.com' // 易循环
+    ECirculation: 'http://consume.sspendi.com' // 易循环
   },
   // 页面访问路径
   host: {
@@ -21,7 +21,7 @@ const setting = {
     demo: 'https://sapi.xinuowang.com', // 'http://10.10.20.46', // demo演示环境
     pre: 'https://prepublish.xinuowang.com', // 预发布环境
     produce: 'https://sapi.xinuowang.com', // produce正式环境
-    limitDeviceApp: 'http://' + webDeveloper // 易循环
+    ECirculation: 'http://' + webDeveloper // 易循环
   },
 
   // 页面访问端口
@@ -48,7 +48,7 @@ const setting = {
       deviceApp: '8841', // 网约家康2.0-设备端
       managePc: '8850', // 业务管理平台PC端
       manageMobile: '8851', // 业务管理平台手机端
-      limitDeviceApp: '8860', // 易循环
+      ECirculation: '8860', // 易循环
       limitDeviceAdmin: '8861', // 消费电子管理后台
       consume: '8862', // 优E康
       uniApp: '8001', // uniApp模板
@@ -58,7 +58,7 @@ const setting = {
     demo: {},
     pre: {},
     produce: {},
-    limitDeviceApp: {}
+    ECirculation: {}
   },
 
   baseUrl: {
@@ -83,7 +83,7 @@ const setting = {
     manageMobile: 'manageMobile', // 业务管理平台手机端
     uniApp: 'uniApp', // uniApp模板
     demo: 'demo', // vue3模板
-    limitDeviceApp: 'limitDeviceApp', // 易循环
+    ECirculation: 'ECirculation', // 易循环
     limitDeviceAdmin: 'limitDeviceAdmin', // 消费电子管理后台
     consume: 'consume', // 优E康
   },
@@ -104,7 +104,7 @@ const setting = {
     adminSms: '/wyjk-sms/', // 会议管理, 营销管理
     adminSsyypt: '/wyjk-ssdt-bleapi/', // ble后台管理, 治疗计划日志,设备管理,病症管理,工作室设备数据统计, 设备租用统计
     manageApi: '/manageApi/', // 业务管理平台
-    limitDeviceApp: '/api/', // 多通道消费电子
+    ECirculation: '/api/', // 多通道消费电子
     wyjkDevice: '/wyjkDevice/', // 单通道消费电子：consume（痛经）
   }
 }

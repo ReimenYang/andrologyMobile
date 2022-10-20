@@ -3,6 +3,7 @@
     <p-downBLE
       v-if="showUpdate"
       :setting="setting"
+      @onConfirm="onConfirm"
       @onCancel="onCancel"
     />
     <view
@@ -65,37 +66,40 @@ export default {
       isNeed: false,
       showUpdate: false,
       setting: {
-        type: 'consume', // 优E康
+        type: 'ECirculation', // 优E康
         showModal: 'dialog',
         from: 'app',
       }
     }
   },
   async onLoad () {
-    uni.redirectTo({ url: '/pages/scheme/index' })
+    // uni.redirectTo({ url: '/pages/scheme/index' })
     //  2022-9-14 需求跳过此页面
-    // this.init()
+    this.init()
   },
   methods: {
     async init () {
       // 检查用户信息
-      this.userInfo = this.globalData.userInfo
+      // this.userInfo = this.globalData.userInfo
       // 优E康
       // this.isNeed = !this.userInfo.realname
       // 易循环
-      this.showInput = { realname: !this.userInfo.realname, sn: !this.userInfo.sn }
-      this.isNeed = Object.values(this.showInput).includes(true)
+      // this.showInput = { realname: !this.userInfo.realname, sn: !this.userInfo.sn }
+      // this.isNeed = Object.values(this.showInput).includes(true)
       // 检查更新信息
-      // let { lowest, lastest } = JSON.parse((await this.libs.request(this.libs.api.ums.sysDict.updateAppConfig.consume)).data.description)
-      // let vision = this.libs.configProject.vision
-      // this.setting.isForce = parseFloat(vision) < parseFloat(lowest) ? 'Y' : 'N'
-      // this.showUpdate = parseFloat(vision) < parseFloat(lastest)
-
+      let { lowest, lastest } = JSON.parse((await this.libs.request(this.libs.api.ums.sysDict.updateAppConfig.ECirculation)).data.description)
+      let vision = this.libs.configProject.vision
+      this.setting.isForce = parseFloat(vision) < parseFloat(lowest) ? 'Y' : 'N'
+      this.showUpdate = parseFloat(vision) < parseFloat(lastest)
+      console.log(lowest, lastest, vision, this.setting.isForce, this.showUpdate)
       if (!this.isNeed && !this.showUpdate) return uni.redirectTo({ url: '/pages/scheme/index' })
     },
     onCancel () {
       this.showUpdate = false
       if (!this.isNeed) return uni.redirectTo({ url: '/pages/scheme/index' })
+    },
+    onConfirm () {
+      this.libs.data.exit()
     },
     async submit () {
       let { realname, sn } = this.userInfo
@@ -103,7 +107,7 @@ export default {
       if (!realname) return this.toast('请输入用户名')
       if (!sn) return this.toast('请输入设备序列号')
       this.globalData.userInfo = { ...this.userInfo, ...this.globalData.device }
-      let res = await this.libs.request(this.libs.api.limitDeviceApp.user.binding, this.globalData.userInfo)
+      let res = await this.libs.request(this.libs.api.ECirculation.user.binding, this.globalData.userInfo)
       if (res.code !== 200) return
       uni.redirectTo({ url: '/pages/scheme/index' })
     }

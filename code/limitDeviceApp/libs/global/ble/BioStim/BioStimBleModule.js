@@ -93,9 +93,9 @@ function ab2hex (buffer) {
 
 // 制造阻塞
 function sleep (time) { return new Promise(resolve => setTimeout(resolve, time)) }
-
+let debugOpen = false
 function debug (str) {
-  libs.request({ method: 'GET', url: 'http://10.10.20.101:8888/f45.png?debug=' + str }, {}, { important: true })
+  if (debugOpen) libs.request({ method: 'GET', url: 'http://10.10.20.101:8888/f45.png?debug=' + str }, {}, { important: true })
 }
 
 const BioStimBleModule = {}
@@ -498,7 +498,7 @@ BioStimBleModule.sendInitCmd = async (options, time) => {
   // 不保存方案：isSave等于0，planNo是1
   // 保存方案：isSave等于1，channel是1
   // 保存方案的需求还没确定
-  const canSave = ['consume'].includes(project.projectName)
+  const canSave = ['consume', 'ECirculation'].includes(project.mode)
   if (!canSave) {
     await writePort(DeviceCmd.setChannelEnd(channel))
     return

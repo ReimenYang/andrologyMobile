@@ -3,7 +3,7 @@ import App from './App'
 import checkReady from '@/libs/uniInit'
 import libs from '@/libs'
 // import jsencrypt from '@/js_sdk/jsencrypt-Rsa/jsencrypt/jsencrypt.vue'
-let { projectName, vision, updateTime, globalData, deviceTypeId, subName, isNewDevice, whiteList, blackList } = libs.configProject
+let { mode, vision, updateTime, globalData, deviceTypeId, subName, isNewDevice, whiteList, blackList } = libs.configProject
 let BioStimBleModule = libs.global.ble.BioStimBleModule
 if (whiteList.length) BioStimBleModule.whiteList = whiteList
 if (blackList.length) BioStimBleModule.blackList = blackList
@@ -37,8 +37,8 @@ async function login (phone) {
   }[subName]
   globalData.headers = {
     appTerminalPlatform: libs.data.systemInfo.platform,
-    appVersion: [projectName, vision, updateTime].join('.'),
-    appGroup: projectName,
+    appVersion: [mode, vision, updateTime].join('.'),
+    appGroup: mode,
     accessToken,
     deviceTypeId,
     appid,
@@ -52,7 +52,7 @@ async function login (phone) {
   // let userInfo = globalData.userInfo = data.coreUser
 
   // 易循环
-  let { data } = await libs.request(libs.api.limitDeviceApp.user.login, { phone })
+  let { data } = await libs.request(libs.api.ECirculation.user.login, { phone })
   data.realname = data.userName
   let userInfo = globalData.userInfo = data
 

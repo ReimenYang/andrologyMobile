@@ -128,37 +128,34 @@ export default {
 
       if (currentReady.includes(false)) return this.toast('刺激强度不能设置为0')
 
-      uni.showLoading({
-        title: '准备开始',
-        mask: true
-      })
-
       let recordId = this.libs.data.random(7)// 代替请求recordId
       await this.setRecord(recordId)
       setTimeout(async () => {// 设备写入recordId需要时间
+        uni.showLoading({
+          title: '准备开始',
+          mask: true
+        })
         await this.startTreatment()
         // 请求训练id，写入训练设备
         let { workoutId, duration, workoutName, workoutDescription, portNum = 2, initCommand = '0,0,0' } = this.globalData.workout
         let [, , phaseNumber] = initCommand.split(',')
         let { sn, phone } = this.globalData.userInfo
         let params = this.globalData.workoutRecord = {
-          workoutId, duration, workoutName, workoutDescription, portNum, phaseNumber,
+          deviceName: this.device.name, recordId, workoutId, duration,
+          workoutName, workoutDescription, portNum, phaseNumber,
           totalTime: duration,
           workout: this.globalData.workout,
           time: 0, // 已训练时间
-          recordId,
-          deviceName: this.device.name,
           terminalInfo: { deviceName: this.device.name },
           startTime: new Date().valueOf(),
           startDateTime: this.libs.data.dateNow(),
           isStop: 0,
           phone, sn
         }
-        console.log('请求训练id，写入训练设备', this.globalData.workoutRecord)
+        let _data = (await this.libs.request(this.libs.api.ECirculation.treatment.startTreatment, params)).data
+        console.log('请求训练id，写入训练设备', params, _data)
         uni.hideLoading()
         uni.reLaunch({ url: '/pages/bluetooth/running' })
-        let _data = (await this.libs.request(this.libs.api.limitDeviceApp.treatment.startTreatment, params)).data
-        this.globalData.workoutRecord = { ..._data, ...params }
       }, 1000)
     }
   }
