@@ -62,12 +62,17 @@ function sleep (time = BaseBleModule.writeTime) { return new Promise(resolve => 
 /**
  * 用Html5+运行期环境主组件Native.js https://www.html5plus.org/doc/zh_cn/android.html
  */
-let main = plus.android.runtimeMainActivity()// 获取运行期环境主Activity实例对象
-let Context = plus.android.importClass('android.content.Context')// 获取所有场景类（如打电话、发短信）
-let BManager = main.getSystemService(Context.BLUETOOTH_SERVICE)
-plus.android.importClass(BManager) // 引入相关的method函数
-let BAdapter = BManager.getAdapter()
-plus.android.importClass(BAdapter) // 引入相关的method函数，这样之后才会有isEnabled函数支持
+let BAdapter = {
+  isEnabled: () => true
+}
+if (platform === 'android') {
+  let main = plus.android.runtimeMainActivity()// 获取运行期环境主Activity实例对象
+  let Context = plus.android.importClass('android.content.Context')// 获取所有场景类（如打电话、发短信）
+  let BManager = main.getSystemService(Context.BLUETOOTH_SERVICE)
+  plus.android.importClass(BManager) // 引入相关的method函数
+  BAdapter = BManager.getAdapter()
+  plus.android.importClass(BAdapter) // 引入相关的method函数，这样之后才会有isEnabled函数支持
+}
 
 BaseBleModule.getDeviceId = () => deviceId
 /**
