@@ -64,7 +64,7 @@
 const headDATA = 'DATA:',
   headACK = 'ACK:',
   headERR = 'ERR:',
-  end = '\r\n\0'
+  end = ''// '\r\n\0'// 由于ios兼容性问题，结束标志改为writeBLECharacteristicValue写入前加入
 /**
  * 构建简单指令
  * 用于相对固定的指令上

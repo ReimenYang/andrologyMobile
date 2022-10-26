@@ -326,73 +326,6 @@ BaseBleModule.commandMQ = (command) => {
 
 // 向低功耗蓝牙设备特征值中写入二进制数据。注意：必须设备的特征值支持 write 才可以成功调用。
 // 因为每次写入不超过20字节，所以做了分包处理https://www.jianshu.com/p/6e89e73b92a8
-// BaseBleModule.writeBLECharacteristicValue = (commandObj) => {
-//   return new Promise(resolve => {
-//     if (endFlag !== true) {
-//       statusCode = 511// 'busy'
-//       err = writeMsg[statusCode]
-//       setCommandHistory(commandObj.id, statusCode, err)
-//       return resolve({ statusCode, err, data: { commandObj, commandArray, commandHistory: BaseBleModule.commandHistory } })
-//     }
-//     let { id, command } = commandArray[0]
-//     let statusCode, err
-//     if (!command) {
-//       statusCode = 205// 'empty'
-//       err = writeMsg[statusCode]
-//       console.log(err)
-//       setCommandHistory(id, statusCode, err)
-//       return resolve({ statusCode, err })
-//     }
-//     // console.log('写入指令', command, commandArray)
-//     // 转换后的二进制队列，为发送使用
-//     let splitList = []
-//     // 指令切割数据
-//     let commandArr = BaseBleModule.commandSplit(command)
-//     // 按指令切割数据，把每个切割后的数据的每个字母转换为二进制
-//     commandArr.forEach(str => {
-//       let buffer = new ArrayBuffer(str.length)
-//       let dataView = new DataView(buffer)
-//       for (let i = 0; i < str.length; i++) {
-//         // charAt()对于生僻字可能会产生错误，可参考使用codePointAt()
-//         // https://es6.ruanyifeng.com/#docs/string-methods#实例方法：codePointAt
-//         dataView.setUint8(i, str.charAt(i).charCodeAt())
-//       }
-//       splitList.push(dataView.buffer)
-//     })
-//     // 按二进制队列发送指令，间隔100毫秒
-//     endFlag = splitList.length - 1
-//     splitList.forEach((value, i) => {
-//       setTimeout(() => {
-//         // hbuilder的log在穿过多层结构的setTimeout会出现丢失的现象，因此需要重新定义一下
-//         // let { } = BaseBleModule
-//         // 向低功耗蓝牙设备特征值中写入二进制数据。注意：必须设备的特征值支持 write 才可以成功调用。
-//         uni.writeBLECharacteristicValue({
-//           // deviceId 需要在 getBluetoothDevices 或 onBluetoothDeviceFound 接口中获取
-//           // value是ArrayBuffer类型
-//           deviceId, serviceId, characteristicId, value,
-//           success () { // 注意ios不会回调这个回调
-//             // 检查当前指令是否已经发完
-//             if (i === endFlag) resolve(BaseBleModule.writeSuccess())
-//             // statusCode = 203// 'partSuccess'
-//             // if (endFlag === true) statusCode = 204// 'orderErr'
-//             // 输出部分成功的log
-//             // err = writeMsg[statusCode]
-//             // console.log(err, data, command)
-//           },
-//           fail (res) { // 注意ios不会回调这个回调
-//             endFlag = true
-//             statusCode = 513// 'fail'
-//             err = writeMsg[statusCode] + JSON.stringify(res)
-//             console.log(command, err)
-//             setCommandHistory(id, statusCode, err)
-//             resolve({ statusCode, err })
-//           }
-//         })
-//         if (platform === 'ios' && i === endFlag) resolve(BaseBleModule.writeSuccess())
-//       }, BaseBleModule.writeTime * (i + 1))
-//     })
-//   })
-// }
 BaseBleModule.writeBLECharacteristicValue = async commandObj => {
   let statusCode, err
   if (endFlag !== true) {
@@ -413,7 +346,7 @@ BaseBleModule.writeBLECharacteristicValue = async commandObj => {
 
   // console.log('写入指令', command, commandArray)
   // 指令切割数据
-  let commandArr = BaseBleModule.commandSplit(command)
+  let commandArr = BaseBleModule.commandSplit(command + '\r\n\0')
   // 按指令切割数据，把每个切割后的数据的每个字母转换为二进制
 
   // 转换后的二进制队列，为发送使用
@@ -435,20 +368,28 @@ BaseBleModule.writeBLECharacteristicValue = async commandObj => {
     // 向低功耗蓝牙设备特征值中写入二进制数据。注意：必须设备的特征值支持 write 才可以成功调用。
     // deviceId 需要在 getBluetoothDevices 或 onBluetoothDeviceFound 接口中获取
     // value是ArrayBuffer类型
-    let [err] = await uni.writeBLECharacteristicValue({ deviceId, serviceId, characteristicId, value })
-    await sleep()
-    if (err) {
-      console.error('写入失败', command, err)
-      commandArray = []
-      endFlag = true
-      statusCode = 513// 'fail'
-      err = writeMsg[statusCode] + command + JSON.stringify(err)
-      console.log(command, err)
-      setCommandHistory(id, statusCode, err)
-      return { statusCode, err }
+
+    // ios 没有回调
+    if (platform === 'ios') {
+      uni.writeBLECharacteristicValue({ deviceId, serviceId, characteristicId, value })
+      await sleep()
+      if (i === endFlag) return BaseBleModule.writeSuccess()
+    } else {
+      let [err] = await uni.writeBLECharacteristicValue({ deviceId, serviceId, characteristicId, value })
+      await sleep()
+      if (err) {
+        console.error('写入失败', command, err)
+        commandArray = []
+        endFlag = true
+        statusCode = 513// 'fail'
+        err = writeMsg[statusCode] + command + JSON.stringify(err)
+        console.log(command, err)
+        setCommandHistory(id, statusCode, err)
+        return { statusCode, err }
+      }
+      // if (platform === 'ios' && i === endFlag) return BaseBleModule.writeSuccess()
+      if (i === endFlag) return BaseBleModule.writeSuccess()
     }
-    // if (platform === 'ios' && i === endFlag) return BaseBleModule.writeSuccess()
-    if (i === endFlag) return BaseBleModule.writeSuccess()
   }
 }
 // writeBLECharacteristicValue成功的动作

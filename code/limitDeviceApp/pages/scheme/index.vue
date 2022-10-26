@@ -128,10 +128,6 @@ export default {
       console.log('首页handlePair', this.globalData.device, boolean)
       if (this.globalData.device && this.globalData.device.name) str = '设备 ' + this.globalData.device.name + (boolean ? '已连接 ' : '未连接 ')
       this.$set(this.userInfo, 'footer', str)
-      if (!boolean) return
-      this.workoutList = this.globalData.workoutList
-      // 过滤多通道方案，易循环特有
-      this.workoutList = this.globalData.workoutList.filter(item => item.deviceType.split(',').includes(this.globalData.device.mode))
       if (boolean) this.getRecord()
     },
     async getWorkoutList () {
@@ -162,10 +158,17 @@ export default {
             txt: item.workoutDescription
           }]
       })
+      this.workoutList = this.globalData.workoutList
+      // 过滤多通道方案，易循环特有
+      this.workoutList = this.globalData.workoutList.filter(item => item.deviceType.split(',').includes(this.globalData.device.mode))
     },
     async toConnect (type) {
+      // 从未连接设备或跳转
+      if (type === 'navigateTo' || !this.device.name) return uni.navigateTo({ url: '/pages/bluetooth/connect' })
+      // 曾连接，未配对，先尝试连接，连接失败进行跳转
       let _connected = this.bleState.paired ? {} : await this.connectDevice()
-      if (type === 'navigateTo' || (!this.bleState.paired && _connected.statusCode !== 200)) return uni.navigateTo({ url: '/pages/bluetooth/connect' })
+      console.log('连接情况', _connected)
+      if (!this.bleState.paired && _connected.statusCode !== 200) return uni.navigateTo({ url: '/pages/bluetooth/connect' })
       // if(this.globalData.paired) return this.getRecord()
     },
     async toReady (workout) {

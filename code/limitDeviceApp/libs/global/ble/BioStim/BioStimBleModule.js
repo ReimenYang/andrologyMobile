@@ -418,7 +418,9 @@ BioStimBleModule.onBLECharacteristicValueChange = () => {
     mCharacteristicValue.push(tmpValue)
     let result = mCharacteristicValue.join('')
     let hasHead = result.startsWith(DeviceCmd.headDATA) || result.startsWith(DeviceCmd.headACK) || result.startsWith(DeviceCmd.headERR)
-    let hasEnd = result.endsWith(DeviceCmd.end)
+    // 需要兼容ios，这里特殊处理
+    // let hasEnd = result.endsWith(DeviceCmd.end)
+    let hasEnd = result.endsWith('\r\n\0')
     // 有头有尾的完整包
     if (hasHead && hasEnd) {
       // 解析返回结果
