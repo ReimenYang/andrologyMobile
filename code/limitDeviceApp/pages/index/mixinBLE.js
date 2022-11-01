@@ -297,15 +297,15 @@ export default {
       this.globalData.workoutRecord = _record
       // 未结束
       if (isStop === '0') {
-        // if (!this.globalData.workout) {
-        //   let _workout = this.workoutList.find(item => item.workoutId === this.globalData.workoutRecord.workoutId)
-        //   if (!_workout) return this.toast('找不到记录对应的训练方案')
-        //   this.globalData.workout = JSON.parse(JSON.stringify(_workout))
-        // }
+        if (!this.globalData.workout) {
+          // let _workout = this.workoutList.find(item => item.workoutId === this.globalData.workoutRecord.workoutId)
+          // if (!_workout) return this.toast('找不到记录对应的训练方案')
+          this.globalData.workout = _record.workout
+        }
 
         // this.globalData.workout.duration = totalTime || this.workTime
         // this.globalData.workout.time = time || 0
-        // console.log('训练方案', this.globalData.workout)
+        console.log('训练方案', this.globalData.workout)
 
         switch (_page) {
           case 'pages/bluetooth/running':
@@ -340,20 +340,6 @@ export default {
       // return
       // }
     },
-    // 防止跳电
-    async getCurrent (data, deviceState) {
-      let channel = data.channel
-      let _deviceState = deviceState[channel]
-      // 设备状态未有记录
-      if (!_deviceState) return data
-      let now = new Date().valueOf()
-      let setCurrentTimeStamp = this.globalData.setCurrentTimeStamp || {}
-      let timeStamp = setCurrentTimeStamp[channel]
-      // 当前时间大于最后设置强度时间+等待时间
-      if (timeStamp + this.setCurrentTimeInterval < now) return data
-      // 处于等待区间
-      return _deviceState
-    },
     async handleLongRecived (data) {
       let deviceState = this.globalData.deviceState
       if (!deviceState) this.globalData.deviceState = deviceState = {}
@@ -362,7 +348,7 @@ export default {
       data.settingCHR = data.settingCHR / 10
       // 提示跌落
       let isFall = await this.isFall(data)
-      let { settingCHL, settingCHR } = await this.getCurrent(data, deviceState)
+      let { settingCHL, settingCHR } = data
       deviceState[channel] = { ...data, isFall, settingCHL, settingCHR }
 
       // let { count, channel, numPhase, intensityCHL, intensityCHR, bat, stateRunning, statePhase, remainingTime, wavepercent, settingCHL, settingCHR, stateCHL, stateCHR, sum } = data
@@ -392,7 +378,7 @@ export default {
       // }
     },
     async isFall (data) {
-      let { statePhase, stateCHL, stateCHR } = data
+      let { channel, statePhase, stateCHL, stateCHR } = data
       // stateRunning 运行状态，可以是: 0 设置 ，1 运行，2 暂停，3 停止，4 锁定
       // 停止倒计时：设置，暂停，停止
       // 不可调电：暂停，停止，锁定
@@ -402,25 +388,32 @@ export default {
       // 提醒间隔判断
       let timestamp = new Date().valueOf()
       if (timestamp - this.fallTime < this.fallTimeInterval) return ''
-      let left = (stateCHL === '2') ? 'left' : ''
-      let right = (stateCHR === '2') ? 'right' : ''
-      let fallState = left + right
+      let fallState = []
+      if (stateCHL === '2') fallState.push('settingCHL')
+      if (stateCHR === '2') fallState.push('settingCHR')
+      let postion = this.globalData.workout.channelList
+        .map(item => item.spliceList)
+        .flat()
+        .filter(item => item.channel === Number(channel) && fallState.includes(item.side))
+        .map(item => item.postion)
+        .join()
+
+      console.log('判断跌落', postion)
       // console.log(data)
       // console.log(stateCHL === '2', settingCHL !== '0', stateCHL === '2' && settingCHL !== '0')
       // console.log(stateCHR === '2', settingCHR !== '0', stateCHR === '2' && settingCHR !== '0')
       // console.log(left, right, fallState, this.showFall, !fallState, !fallState || this.showFall)
       // 判断提示框显示和真假脱落 强度10以下未必真实
-      if (!fallState || this.showFall) return fallState
-      console.log('判断跌落')
+      if (!postion || this.showFall) return postion
 
       this.showFall = true
       uni.showModal({
-        content: '电极片从人体中脱落，训练暂停。请粘贴到正确的部位后，点击开始按钮继续训练。',
+        content: postion + '电极片从人体中脱落，训练暂停。请粘贴到正确的部位后，点击开始按钮继续训练。',
         showCancel: false,
         success: res => this.showFall = !res.confirm
       })
       this.fallTime = timestamp
-      return fallState
+      return postion
     },
     // 搜索设备
     async bleSearch () {

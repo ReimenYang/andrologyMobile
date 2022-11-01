@@ -85,7 +85,7 @@ export default {
   },
   async onLoad (option) {
     this.from = option.from
-    await this.getWorkoutList()
+    // await this.getWorkoutList()
     // this.init()
   },
   onHide () {
@@ -109,7 +109,7 @@ export default {
     }]
     console.log('首页show')
     // 20221019 需求 减少请求
-    // await this.getWorkoutList()
+    await this.getWorkoutList()
     this.pageHandlePair(this.bleState.paired)
   },
   methods: {
@@ -151,12 +151,19 @@ export default {
         item.workoutDescription = item.description
         item.workoutId = item.id
         item.title = item.workoutName // + note,
-        item.tags = [{ txt: '训练' }],
-          item.contents = [{
-            txt: `训练时长 ${item.duration / 60}分钟`
-          }, {
-            txt: item.workoutDescription
-          }]
+        item.tags = [{ txt: '训练' }]
+        item.contents = [{
+          txt: `训练时长 ${item.duration / 60}分钟`
+        }, {
+          txt: item.workoutDescription
+        }]
+        item.channelList.forEach(channelItem => {
+          channelItem.spliceList.forEach(obj => {
+            obj.channel = channelItem.channel
+            obj.current = '0.0'
+            obj.side = obj.spliceNum === 1 ? 'settingCHL' : 'settingCHR'
+          })
+        })
       })
       this.workoutList = this.globalData.workoutList
       // 过滤多通道方案，易循环特有
@@ -180,6 +187,7 @@ export default {
       // 尝试失败
       // if (!this.bleState.paired) return
       // this.globalData.workout = (await this.libs.request(this.libs.api.wyjkDevice.consumerElectronics.viewWorkoutDetail, { workoutId: workout.workoutId })).data
+
       this.globalData.workout = workout
       console.log('workoutDetail程序明细', this.globalData.workout)
       // 此时可能处于匹配状态

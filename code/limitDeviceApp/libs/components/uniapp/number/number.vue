@@ -82,7 +82,7 @@ export default {
   watch: {
     value (val) {
       const scale = this._getDecimalScale()
-      console.log(val, scale, this.inputValue, typeof this.inputValue)
+      // console.log(val, scale, this.inputValue, typeof this.inputValue)
       this.inputValue = (+val).toFixed(String(scale).length - 1)
     },
     inputValue (newVal, oldVal) {

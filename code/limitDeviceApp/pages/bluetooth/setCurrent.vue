@@ -12,42 +12,7 @@
       :hasFooter="true"
     >
       <!-- <p-steps :active="2" /> -->
-      <block
-        v-for="item in currentList"
-        :key="item.id"
-      >
-        <view class="itemBox">
-          <view class="itemTitle">
-            {{ `${item.channelName}1刺激强度` }}
-          </view>
-          <xnw-number
-            v-model="item.settingCHL"
-            :min="0"
-            :max="900"
-            :step="step"
-            @minus="n => currentChange(n,'settingCHL','minus',item)"
-            @plus="n => currentChange(n,'settingCHL','plus',item)"
-            :typeDisabled="true"
-          />
-        </view>
-        <view
-          class="itemBox"
-          v-if="item.splices===2"
-        >
-          <view class="itemTitle">
-            {{ `${item.channelName}2刺激强度` }}
-          </view>
-          <xnw-number
-            v-model="item.settingCHR"
-            :min="0"
-            :max="900"
-            :step="step"
-            @minus="n => currentChange(n,'settingCHR','minus',item)"
-            @plus="n => currentChange(n,'settingCHR','plus',item)"
-            :typeDisabled="true"
-          />
-        </view>
-      </block>
+      <set-current />
     </p-wrap>
     <xnw-footer
       textConfirm="下一步"
@@ -58,75 +23,22 @@
 </template>
 <script>
 import mixinBLE from '@/pages/index/mixinBLE.js'
+import setCurrent from '@/pages/bluetooth/_setCurrent'
 export default {
   mixins: [mixinBLE],
-  data () {
-    return {
-      currentList: [{ settingCHL: 0, settingCHR: 0, channel: 1, splices: 2 }],
-      step: .5,
-      showModal: false
-    }
-  },
-  async onLoad () {
-    uni.showLoading({
-      title: '请等待..',
-      mask: true
-    })
-    this.globalData.handleLongRecived = this.handleLongRecived
-    // 获取硬件的最后一个训练程序的状态
-    // this.getRecord()
-  },
-  onShow () {
-    this.currentList = this.globalData.workout.channelList.map(item => ({
-      id: item.id,
-      channel: item.channel,
-      channelName: ['A', 'B', 'C', 'D'][item.channel - 1],
-      settingCHL: 0, settingCHR: 0, splices: item.splices
-    }))
-  },
+  components: { setCurrent },
   onBackPress () {
     this.endTreatment()
-    delete this.globalData.handleLongRecived
     delete this.globalData.deviceState
   },
   methods: {
-    currentChange (n, side, type, item) {
-      let channel = item.channel
-      let deviceState = this.globalData.deviceState[channel]
-      console.log(n, side, type, item, this.globalData.deviceState, channel, deviceState)
-      let value = deviceState[side]
-      console.log(value)
-      if (n - value === 0) return
-      if (type === 'minus') side === 'settingCHL' ? this.leftMinus(channel) : this.rightMinus(channel)
-      if (type === 'plus') side === 'settingCHL' ? this.leftPlus(channel) : this.rightPlus(channel)
-      // 修改设备指定通道强度，防止界面跳动，如果s指令返回值不一样，还是会跳动
-      deviceState[side] = n
-    },
-    async handleLongRecived (data) {
-      let _ready = this.globalData.workout.channelList.length === Object.keys(this.globalData.deviceState).length
-      if (_ready) uni.hideLoading() // 通道数据健全
-
-      let channel = data.channel - 0
-      let _deviceState = this.globalData.deviceState[channel]
-      let { settingCHL, settingCHR } = _deviceState
-      let target = this.currentList.find(item => item.channel === channel)
-      if (Number(target.settingCHL) !== Number(settingCHL)) {
-        console.log('settingCHL', channel, settingCHL, typeof settingCHL, target.settingCHL, typeof target.settingCHL)
-        target.settingCHL = settingCHL
-      }
-      if (Number(target.settingCHR) !== Number(settingCHR)) {
-        console.log('settingCHR', channel, settingCHR)
-        target.settingCHR = settingCHR
-      }
-    },
     async nextStep () {
       if (!this.bleState.paired) return this.toast('请先配对并初始化设备')
-      let currentReady = this.currentList.map(item => {
-        let { settingCHL, settingCHR } = this.globalData.deviceState[item.channel]
-        return Number(settingCHL) !== 0 && (item.splices !== 2 || Number(settingCHR) !== 0)
-      })
+      let currentList = Object.values(this.globalData.deviceState).reduce((a, b) => [...a, Number(b.settingCHL), Number(b.settingCHR)], [])
+      console.log(this.globalData.deviceState, currentList, currentList.includes(0))
+      let currentReady = !currentList.includes(0)
 
-      if (currentReady.includes(false)) return this.toast('刺激强度不能设置为0')
+      if (!currentReady) return this.toast('刺激强度不能设置为0')
 
       let recordId = this.libs.data.random(7)// 代替请求recordId
       await this.setRecord(recordId)
@@ -182,23 +94,14 @@ export default {
       color: #fff;
     }
   }
-  .itemBox {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .uni-numbox {
-    zoom: 1.5;
-    margin: 15rpx 0;
-  }
-
-  .btn {
-    height: 140rpx;
-    padding: 0 20rpx;
-    display: flex;
-    align-items: center;
-    border-top: var(--border-normal);
-    background: #fff;
+  /deep/ .form .formGroup {
+    padding: 30rpx 0;
+    .title {
+      width: 8em;
+    }
+    .uni-numbox {
+      zoom: 1.5;
+    }
   }
 }
 </style>

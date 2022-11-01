@@ -2,7 +2,6 @@
   <view
     class="wrap"
     :style="{'--theme-color':globalData.config.theme}"
-    v-if="recordReady"
   >
     <clock
       class="info"
@@ -43,7 +42,10 @@
           <view class="stop" />
         </view>
       </view>
-      <xnw-from :config="config" />
+      <set-current
+        :disabled="holdState"
+        v-if="workoutName"
+      />
     </view>
     <xnw-footer
       v-if="!remain"
@@ -57,10 +59,9 @@
 <script>
 import clock from '@/libs/components/uniapp/simplePie/simplePie.vue'
 import mixinBLE from '@/pages/index/mixinBLE.js'
+import setCurrent from '@/pages/bluetooth/_setCurrent'
 export default {
-  components: {
-    clock
-  },
+  components: { clock, setCurrent },
   mixins: [mixinBLE],
   data () {
     return {
@@ -69,24 +70,10 @@ export default {
       remain: 0,
       minute: 0,
       second: 0,
-      step: .5,
-      config: {
-        data: [{
-          key: 'name',
-          title: '调整电刺激强度', // '训练程序',
-          setClass: '',
-          style: '',
-          textContent: ''
-        }]
-      },
       isRunning: null,
       holdState: false, // 拦截心跳包改变状态
       phaseNumber: 0,
-      loopCountdown: null,
       setRecordIntervalTime: 2000, // r指令获取周期
-      // showModal: false,
-      // longRecivedReady: false,
-      recordReady: false
     }
   },
   async onLoad () {
@@ -122,7 +109,6 @@ export default {
       this.workoutName = workoutName
       this.totalTime = Number(duration)
       console.log('运行初始化', this.globalData.workoutRecord, this.totalTime)
-      this.recordReady = true
     },
     // 暂停倒计时
     countStop () {
@@ -144,9 +130,7 @@ export default {
     },
     async handleLongRecived (data) {
       // 设置过程中，心跳包的值可能导致界面设置值跳动所以采取迂回的方式处理，但可能会导致设置和实际不同
-      let { channel, stateRunning, remainingTime } = this.globalData.deviceState[data.channel]
-
-      // this.config.data[0].textContent = `${this.workoutName} ${this.totalTime / 60}分钟`
+      let { stateRunning, remainingTime } = this.globalData.deviceState[data.channel]
 
       // stateRunning 运行状态，可以是: 0 设置 ，1 运行，2 暂停，3 停止，4 锁定
       // 停止倒计时：设置，暂停，停止
@@ -167,65 +151,9 @@ export default {
         }
       }
 
-      this.recivedCurrent(channel)
-
       this.remain = remainingTime - 0
       this.countdown()
-
-      // 断开蓝牙再进会出现卡死
-      // console.log('从s指令获取信息', channel, this.config.data)
-      let isDone = !!this.config.data.find(item => item.channel === channel)
-      if (!isDone) await this.initCurrent()
-      // this.longRecivedReady = isDone
-
-      if (isDone) uni.hideLoading()
-    },
-    // 从s指令获取强度信息，设置调电按钮
-    setCurrentFun (n, side, channel) {
-      let deviceState = this.globalData.deviceState[channel]
-      let value = deviceState[side]
-      console.log(side, '数字控件', n, value, deviceState)
-      if (n - value < 0) side === 'settingCHL' ? this.leftMinus(channel) : this.rightMinus(channel)
-      if (value - n < 0) side === 'settingCHL' ? this.leftPlus(channel) : this.rightPlus(channel)
-      deviceState[side] = n
-      this.lockState()
-      this.countStop()
-    },
-    // 初始化强度按钮
-    async initCurrent () {
-      this.config.data = this.config.data.slice(0, 1)
-      for (const channel in this.globalData.deviceState) {
-        console.log('初始化强度按钮', typeof channel, channel, target, this.globalData.workoutRecord.workout)
-        let target = this.globalData.workoutRecord.workout.channelList.find(item => item.channel === Number(channel))
-        if (!target) continue
-        const item = this.globalData.deviceState[channel]
-        let { settingCHL, settingCHR, stateRunning } = item
-        let _global = { min: 0, max: 900, step: this.step, typeDisabled: true, style: 'float:right', disabled: stateRunning === '2' }
-        for (let i = 0; i < target.splices; i++) {
-          let value = (i ? settingCHR : settingCHL)
-          let key = i ? 'settingCHR' : 'settingCHL'
-          this.config.data.push({
-            channel,
-            key,
-            title: ['A', 'B', 'C', 'D'][channel - 1] + (i ? 2 : 1),
-            setClass: '',
-            style: '',
-            number: {
-              ..._global,
-              value,
-              change: (n) => this.setCurrentFun(n, key, channel)
-            }
-          })
-        }
-      }
-    },
-    recivedCurrent (channel) {
-      let { settingCHL, settingCHR, stateRunning } = this.globalData.deviceState[channel]
-      this.config.data.forEach(item => {
-        if (item.channel !== channel) return
-        item.number.disabled = stateRunning === '2'
-        item.number.value = item.key === 'settingCHL' ? settingCHL : settingCHR
-      })
+      uni.hideLoading()
     },
     toIndex () {
       clearInterval(this.globalData.loopRecord)
@@ -285,8 +213,12 @@ export default {
     padding: 0 0 2em;
     color: var(--color-normal);
   }
-  .itemBox /deep/ .form .formGroup .title {
-    width: 7em;
+  .itemBox /deep/ .form .formGroup {
+    padding: 30rpx 0;
+    .title {
+      width: 8em;
+      text-align: left;
+    }
   }
   .note {
     font-size: var(--font-h4);

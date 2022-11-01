@@ -23,7 +23,9 @@
           :style="item.number.style"
           :value="item.number.value"
           :disabled="item.number.disabled"
-          @change="(val)=>onchange(val,item,{},'number')"
+          @change="val=> onchange(val,item,{},'number')"
+          @minus="val => onMinus(val,item)"
+          @plus="val => onPlus(val,item)"
         />
         <!-- 文本域控件 -->
         <textarea
@@ -222,6 +224,8 @@ export default {
       }
       if (item[component].change) return item[component].change(val, item, e, component, 'change')
     },
+    onMinus (val, item) { if (item.number.onMinus) return item.number.onMinus(val, item, 'minus') },
+    onPlus (val, item) { if (item.number.onPlus) return item.number.onPlus(val, item, 'plus') },
     ontextarea (val, item, e, action) {
       switch (action) {
         case 'input':
