@@ -1,6 +1,6 @@
 module.exports = {
   name: '易循环', // 项目名称
-  projectName: 'consume', // 项目代号
+  projectName: 'ECirculation', // 项目代号
   port: 8862, // 本地运行的端口
   framework: 'uni', // 使用前端框架:vue||uni
   appid: '__UNI__0940A4C',
@@ -20,7 +20,7 @@ module.exports = {
   // webDeveloper: 'dev-weiming.xinuowang.com', 	// Reimen
   // webDeveloper: '10.10.20.41',
   // webDeveloper: 'localhost'
-  mode: 'ECirculation', // dev 开发环境、 test 测试环境、 produce 正式环境、 demo 演示环境、 pre 预发布环境
+  mode: 'dev', // dev 开发环境、 test 测试环境、 produce 正式环境、 demo 演示环境、 pre 预发布环境
 
   /**  消费电子特有字段*/
 

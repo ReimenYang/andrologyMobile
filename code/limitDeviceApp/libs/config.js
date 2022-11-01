@@ -1,28 +1,36 @@
 import project from '../projectConfig.js'
 const { mode, projectName, webDeveloper, framework } = project // dev开发环境、test测试环境、produce正式环境、demo演示环境、pre预发布环境
 let globalData = {}
-
+let apiServers = {}, host = {}
+switch (projectName) {
+  case 'ECirculation':// 易循环
+    apiServers.dev = 'http://consume.sspendi.com'
+    host.dev = 'http://' + webDeveloper
+    break
+  default:
+    apiServers = {
+      // dev: 'http://10.10.20.67:9999', // 邦森局域网
+      // dev: 'http://219.135.144.91:6799', // 邦森外网映射
+      dev: 'https://testbl.xinuowang.com:9998', // dev测试环境
+      test: 'https://testbl.xinuowang.com', // test测试环境
+      demo: 'https://sapi.xinuowang.com', // 'http://10.10.20.46:9999', // demo演示环境
+      pre: 'https://prepublish.xinuowang.com', // 预发布环境
+      produce: 'https://sapi.xinuowang.com', // produce正式环境
+    }
+    host = {
+      dev: 'http://' + webDeveloper, // dev开发环境
+      test: 'https://testbl.xinuowang.com', // test测试环境
+      demo: 'https://sapi.xinuowang.com', // 'http://10.10.20.46', // demo演示环境
+      pre: 'https://prepublish.xinuowang.com', // 预发布环境
+      produce: 'https://sapi.xinuowang.com', // produce正式环境
+    }
+    break
+}
 // 接口访问路径1
 const setting = {
-  apiServers: {
-    // dev: 'http://10.10.20.67:9999', // 邦森局域网
-    // dev: 'http://219.135.144.91:6799', // 邦森外网映射
-    dev: 'https://testbl.xinuowang.com:9998', // dev测试环境
-    test: 'https://testbl.xinuowang.com', // test测试环境
-    demo: 'https://sapi.xinuowang.com', // 'http://10.10.20.46:9999', // demo演示环境
-    pre: 'https://prepublish.xinuowang.com', // 预发布环境
-    produce: 'https://sapi.xinuowang.com', // produce正式环境
-    ECirculation: 'http://consume.sspendi.com' // 易循环
-  },
+  apiServers,
   // 页面访问路径
-  host: {
-    dev: 'http://' + webDeveloper, // dev开发环境
-    test: 'https://testbl.xinuowang.com', // test测试环境
-    demo: 'https://sapi.xinuowang.com', // 'http://10.10.20.46', // demo演示环境
-    pre: 'https://prepublish.xinuowang.com', // 预发布环境
-    produce: 'https://sapi.xinuowang.com', // produce正式环境
-    ECirculation: 'http://' + webDeveloper // 易循环
-  },
+  host,
 
   // 页面访问端口
   webPorts: {
@@ -57,8 +65,7 @@ const setting = {
     test: {},
     demo: {},
     pre: {},
-    produce: {},
-    ECirculation: {}
+    produce: {}
   },
 
   baseUrl: {

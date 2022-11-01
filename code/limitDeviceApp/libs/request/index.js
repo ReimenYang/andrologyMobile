@@ -23,8 +23,8 @@ async function request (api, params = {}, config = {}) {
   if (headers && !config.important) config = { headers, ...config }
   api = JSON.parse(JSON.stringify(api))
 
-  // limitDeviceAdmin项目特有逻辑
-  if (configProject.mode === 'ECirculation') params = { pageSize: 20, token: headers && headers.token, ...params }
+  // ECirculation项目特有逻辑
+  if (configProject.projectName === 'ECirculation') params = { pageSize: 20, token: headers && headers.token, ...params }
   let apiName = api.url.split('/').slice(-1).join()
   let _host = configProject.urlApi
   // if(this.libs.data.getStorage('proxy')) _host = this.libs.data.getStorage('proxy')
