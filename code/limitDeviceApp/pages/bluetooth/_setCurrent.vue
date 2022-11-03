@@ -18,6 +18,7 @@ export default {
       },
       currentList: [],
       step: .5,
+      timeStamp: new Date().valueOf(), // 记录设置时间
       waiting: 2 * 1000, // 调电判断间隔
       intervalTime: 2000, // 同步设备强度间隔
       currentInterval: () => console.log('未设置强度心跳')
@@ -51,7 +52,6 @@ export default {
           title: item.postion,
           setClass: '',
           style: '',
-          timeStamp: new Date().valueOf(),
           number: {
             ..._global,
             value: item.current,
@@ -67,7 +67,7 @@ export default {
       let deviceState = this.globalData.deviceState[channel]
       let value = deviceState[side]
       if (n - value === 0) return
-      item.timeStamp = new Date().valueOf()// 记录设置时间
+      this.timeStamp = new Date().valueOf()// 记录设置时间
       if (type === 'minus') side === 'settingCHL' ? this.leftMinus(channel) : this.rightMinus(channel)
       if (type === 'plus') side === 'settingCHL' ? this.leftPlus(channel) : this.rightPlus(channel)
     },
@@ -91,7 +91,7 @@ export default {
 
           let now = new Date().valueOf()
           // 当前时间少于最后设置强度时间+等待时间，不做操作
-          if (now < item.timeStamp + this.waiting) return
+          if (now < this.timeStamp + this.waiting) return
 
           // 当前时间大于最后设置强度时间+等待时间，且强度不同步，更新强度显示
           if (item.key === 'settingCHL' && item.number.value === settingCHL) return
