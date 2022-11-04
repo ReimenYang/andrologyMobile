@@ -8,3 +8,18 @@
 MD5: 2D:D0:2D:AF:B4:9A:AF:5E:DE:A6:DA:53:1A:0A:87:15
 SHA1: 8C:B3:D3:EB:C5:47:01:DD:4B:7D:8C:A0:00:93:B6:8A:61:01:14:50
 SHA256: 9C:AB:99:48:B4:34:2E:B5:E0:21:4E:1B:30:D8:52:04:B8:2F:54:A2:94:21:F1:6D:46:59:3D:A2:2A:9A:40:DA
+
+包名
+com.reimen.consume
+
+
+苹果开发者账号
+账号：h18022879156@163.com 
+密码：10Health2022
+双重认证手机号码：18022879156
+证书密码：10Health2022
+
+https://github.com/
+ReimenYang
+215230873@qq.com
+a13690517331
