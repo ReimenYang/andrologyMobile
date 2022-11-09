@@ -38,8 +38,10 @@ Vue.mixin({
     // 开始初始化
     if (libs.configProject.globalData.appReady !== true) {
       await libs.data()
-      await init(this)
       uni.report('设备信息', libs.data.systemInfo)
+      let updateAppConfig = (await this.libs.request(this.libs.api.ums.sysDict.updateAppConfig[libs.configProject.projectName])).data
+      if (updateAppConfig) libs.configProject.globalData.updateAppConfig = JSON.parse(updateAppConfig.description)
+      await init(this)
     }
   },
   async mounted () {

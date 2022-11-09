@@ -2,8 +2,8 @@
     "name" : "易循环",
     "appid" : "__UNI__0940A4C",
     "description" : "",
-    "versionName" : "1.0.0",
-    "versionCode" : "100",
+    "versionName" : "1.0.1",
+    "versionCode" : 101,
     "transformPx" : false,
     "networkTimeout" : {
         "request" : 60000,
@@ -207,5 +207,6 @@
         "uniStatistics" : {
             "enable" : true
         }
-    }
+    },
+    "fallbackLocale" : "zh-Hans"
 }

@@ -99,7 +99,7 @@ export default {
       if (!this.isNeed) return uni.redirectTo({ url: '/pages/scheme/index' })
     },
     onConfirm () {
-      this.libs.data.exit()
+      this.libs.data.exit('退出并下载更新app')
     },
     async submit () {
       let { realname, sn } = this.userInfo

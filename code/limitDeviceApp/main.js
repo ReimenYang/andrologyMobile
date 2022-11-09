@@ -77,12 +77,12 @@ const app = new Vue({ ...App })
   if (libs.data.networkType === 'none') return libs.data.exitbyNetwork()
   let phone = libs.data.getStorage('phone')
   if (!phone) {
+    phone = libs.data.random(7)
     // phone = 13268125215//罗
-    phone = 18924166730// 红米
+    // phone = 18924166730// 红米
     // phone = 15914214657 //邦森
-    // Hbuilder X 3.4.7的一键登录(uni.login)出现坑爹情况 TypeError: Cannot read property 'route' of null
-    // 旧版本能正常通过
-    phone = await libs.global.uniLogin.auto(univerifyStyle)
+    // 检查是否应用市场审核中
+    if (!globalData.updateAppConfig.review.includes(vision)) phone = await libs.global.uniLogin.auto(univerifyStyle)
     libs.data.setStorage('phone', phone)
   }
 

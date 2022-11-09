@@ -43,7 +43,7 @@ uniLogin.preLogin = (provider, univerifyStyle) => {
           title: '预登录失败,' + err.metadata.msg,
           duration: 5000, icon: 'none'
         })
-        if (univerifyStyle.force) setTimeout(uniLogin.exitApp, 5000)
+        if (univerifyStyle.force) libs.data.exit('客户端未装手机卡，或数据流量为打开，或信号不佳导致登录失败')
       }
     })
   })
@@ -77,7 +77,7 @@ uniLogin.getPhoneNumber = async (data) => {
 }
 
 uniLogin.auto = async (univerifyStyle = {}, provider = 'univerify') => {
-  console.log('检查一键登录配置')
+  console.log('检查一键登录配置', univerifyStyle.force)
   debug(`检查一键登录配置&univerifyStyle=${JSON.stringify(univerifyStyle)}&provider=${provider}`)
   await uniLogin.checkProvider(provider)
   debug('预登录')
@@ -104,10 +104,11 @@ uniLogin.auto = async (univerifyStyle = {}, provider = 'univerify') => {
     // univerifyStyle.force是自定义强制登录参数,uniapp无相关定义，true:不登录则退出程序，默认值： false
     case 30003:
       if (univerifyStyle.force) {
+        if (!getApp()) return libs.data.exitWhenAppNotReady('用户拒绝登录')
         uni.showModal({
           title: '确认退出应用？',
-          success: function (res) {
-            if (res.confirm) return uniLogin.exitApp()
+          success: res => {
+            if (res.confirm) return libs.data.exit('用户拒绝登录')
             return uniLogin.auto(provider, univerifyStyle)
           }
         })
@@ -122,20 +123,6 @@ uniLogin.auto = async (univerifyStyle = {}, provider = 'univerify') => {
       default:
         console.log('未处理的情况', provider)
         return resolve(provider)
-    }
-  })
-}
-
-uniLogin.exitApp = () => {
-  uni.getSystemInfo({
-    success: function (res) {
-      // 判断为安卓的手机
-      if (res.platform === 'android') {
-        plus.runtime.quit()
-      } else {
-        // 判断为ios的手机，退出App
-        plus.ios.import('UIApplication').sharedApplication().performSelector('exit')
-      }
     }
   })
 }

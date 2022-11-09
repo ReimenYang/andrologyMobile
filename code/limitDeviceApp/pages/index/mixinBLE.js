@@ -72,11 +72,7 @@ export default {
         availableFalse: {
           console () {
             console.log('关闭蓝牙')
-            // uni.showModal({
-            //   title: '蓝牙已关闭，请开启后重新打开app',
-            //   showCancel: false,
-            //   success: res => res.confirm && this.libs.data.exit()
-            // })
+            // this.libs.data.exit('蓝牙已关闭，请开启后重新打开app')
           },
           closeBluetoothAdapter () {
             console.log('蓝牙不可连接')
@@ -217,7 +213,7 @@ export default {
           await this.bleStateChangeAction(data)
           break
         case this.EventBus.BLE_UNREADY: // 框架未完成初始化
-          // setTimeout(this.libs.data.exit, 2000)
+          // this.libs.data.exit('框架未完成初始化')
           this.bleInit()
           break
         case this.EventBus.CONNECT_FAIL: // 设备连接失败
@@ -228,11 +224,7 @@ export default {
           if (data.statusCode === 504) {
             toast += ',启用订阅失败,请退出并在5秒后重启APP'
             toast += data.err.errCode
-            uni.showModal({
-              title: toast,
-              showCancel: false,
-              success: res => res.confirm && this.libs.data.exit()
-            })
+            this.libs.data.exit(toast)
             return
           }
           // if (logMsg.stateName === 'paired') await this.closeBLEConnection()
