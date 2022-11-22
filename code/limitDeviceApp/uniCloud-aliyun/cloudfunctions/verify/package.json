@@ -1,0 +1,7 @@
+{
+  "name": "verify",
+  "dependencies": {},
+  "extensions": {
+    "uni-cloud-verify": {}
+  }
+}

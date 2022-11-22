@@ -104,9 +104,14 @@ export default {
     if (18 <= _hour && _hour <= 19) this.userInfo.title = '傍晚好！'
     if (20 <= _hour) this.userInfo.title = '晚上好！'
 
-    this.userInfo.contents = [{
-      txt: this.globalData.userInfo.phone.replace(/(\d{3})\d*(\d{4})/, '$1****$2')
-    }]
+    this.userInfo.contents = [
+      {
+        txt: this.globalData.userInfo.phone.replace(
+          /(\d{3})\d*(\d{4})/,
+          '$1****$2'
+        )
+      }
+    ]
     console.log('首页show')
     // 20221019 需求 减少请求
     await this.getWorkoutList()
@@ -126,7 +131,11 @@ export default {
       // this.paired = boolean
       let str = '点击连接设备'
       console.log('首页handlePair', this.globalData.device, boolean)
-      if (this.globalData.device && this.globalData.device.name) str = '设备 ' + this.globalData.device.name + (boolean ? '已连接 ' : '未连接 ')
+      if (this.globalData.device && this.globalData.device.name)
+        str =
+          '设备 ' +
+          this.globalData.device.name +
+          (boolean ? '已连接 ' : '未连接 ')
       this.$set(this.userInfo, 'footer', str)
       if (boolean) this.getRecord()
     },
@@ -136,13 +145,19 @@ export default {
       // 15:ble
       // 16:优E康
       let params = {
-        pageSize: 100, deviceTypeId: '16',
+        pageSize: 100,
+        deviceTypeId: '16',
         // composeName: 'ble2',
         // workoutNameOrDesc: 'ee6'// 测试用
         isNewDevice: this.libs.configProject.isNewDevice,
         phone: this.globalData.userInfo.phone
       }
-      this.globalData.workoutList = (await this.libs.request(this.libs.api.ECirculation.scheme.getSchemeList, params)).data
+      this.globalData.workoutList = (
+        await this.libs.request(
+          this.libs.api.ECirculation.scheme.getSchemeList,
+          params
+        )
+      ).data
 
       this.globalData.workoutList.forEach(item => {
         // let note = ''
@@ -152,11 +167,14 @@ export default {
         item.workoutId = item.id
         item.title = item.workoutName // + note,
         item.tags = [{ txt: '训练' }]
-        item.contents = [{
-          txt: `训练时长 ${item.duration / 60}分钟`
-        }, {
-          txt: item.workoutDescription
-        }]
+        item.contents = [
+          {
+            txt: `训练时长 ${item.duration / 60}分钟`
+          },
+          {
+            txt: item.workoutDescription
+          }
+        ]
         item.channelList.forEach(channelItem => {
           channelItem.spliceList.forEach(obj => {
             obj.channel = channelItem.channel
@@ -167,15 +185,19 @@ export default {
       })
       this.workoutList = this.globalData.workoutList
       // 过滤多通道方案，易循环特有
-      this.workoutList = this.globalData.workoutList.filter(item => item.deviceType.split(',').includes(this.globalData.device.mode))
+      this.workoutList = this.globalData.workoutList.filter(item =>
+        item.deviceType.split(',').includes(this.globalData.device.mode)
+      )
     },
     async toConnect (type) {
       // 从未连接设备或跳转
-      if (type === 'navigateTo' || !this.device.name) return uni.navigateTo({ url: '/pages/bluetooth/connect' })
+      if (type === 'navigateTo' || !this.device.name)
+        return uni.navigateTo({ url: '/pages/bluetooth/connect' })
       // 曾连接，未配对，先尝试连接，连接失败进行跳转
       let _connected = this.bleState.paired ? {} : await this.connectDevice()
       console.log('连接情况', _connected)
-      if (!this.bleState.paired && _connected.statusCode !== 200) return uni.navigateTo({ url: '/pages/bluetooth/connect' })
+      if (!this.bleState.paired && _connected.statusCode !== 200)
+        return uni.navigateTo({ url: '/pages/bluetooth/connect' })
       // if(this.globalData.paired) return this.getRecord()
     },
     async toReady (workout) {
@@ -194,7 +216,8 @@ export default {
       uni.navigateTo({ url: '/pages/bluetooth/paste' })
     },
     setBg () {
-      if (this.device.name) return 'background-image: url("/static/neverLink.png")'
+      if (this.device.name)
+        return 'background-image: url("/static/neverLink.png")'
       return 'background-image: url("/static/unLink.png")'
     }
   }

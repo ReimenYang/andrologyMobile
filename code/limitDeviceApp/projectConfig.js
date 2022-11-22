@@ -13,8 +13,11 @@ module.exports = {
     browser: false,
     app: true
   }, // 项目要运行的环境
+  loginType: {
+    phone: true // 一键登录
+  }, // 用户登录方式
   vision: '0.02Bate', // 项目版本
-  updateTime: '20221109', // 版本升级时间
+  updateTime: '20221121', // 版本升级时间
   // webDeveloper: '127.0.0.1', // 前端开发本地路径
   webDeveloper: '10.10.20.101', // Reimen
   // webDeveloper: 'dev-weiming.xinuowang.com', 	// Reimen

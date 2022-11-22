@@ -112,7 +112,7 @@ BioStimBleModule.bleState = {
   searching: undefined, // 是否在搜索蓝牙设备，对应startBluetoothDevicesDiscovery
   connected: undefined, // 手机是否与设备对接上，并成功开启了数据交互监听,可以发指令，对应createBLEConnection
   paired: undefined, // 手机是否与设备配对上，执行完获取设备信息指令，并按一定的业务规则进行判断，符合联机条件，处于pbt状态
-  devicesReady: undefined // 初始化指令是否发送成功，设备处于可开始状态，在BTSResponseModule接受到e指令后设置
+  // devicesReady: undefined // 初始化指令是否发送成功，设备处于可开始状态，在BTSResponseModule接受到e指令后设置
 }
 
 async function setBleState (type, boolean, data) {
@@ -141,10 +141,10 @@ async function setBleState (type, boolean, data) {
       if (boolean) return EventBus.post(new EventBus(EventBus.PAIRED, data))
       EventBus.post(new EventBus(EventBus.PAIR_FAIL, data))
       break
-    case 'devicesReady':
-      if (boolean) return EventBus.post(new EventBus(EventBus.BLE_READY, data))
-      EventBus.post(new EventBus(EventBus.BLE_UNREADY, data))
-      break
+    // case 'devicesReady':
+    // if (boolean) return EventBus.post(new EventBus(EventBus.BLE_READY, data))
+    // EventBus.post(new EventBus(EventBus.BLE_UNREADY, data))
+    // break
   }
 }
 

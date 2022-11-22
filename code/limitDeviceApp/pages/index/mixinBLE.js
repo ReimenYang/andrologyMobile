@@ -88,7 +88,7 @@ export default {
           async openBluetoothAdapter (res) {
             console.log('蓝牙空闲，可连接', res)
             // if (_this.globalData.bleReady) await _this.BioStimBleModule.closeBluetoothAdapter()
-            // await _this.bleInit()
+            if (!this.BioStimBleModule.bleState) await _this.bleInit()
           }
         }
       }
@@ -125,7 +125,7 @@ export default {
       // }
       // if (stateName === 'paired') this.handlePair(this.bleState.paired)
       if (toast) this.toast(toast, time, icon)
-      let { bleReady, bleOnline, searching, connected, paired, devicesReady } = this.BioStimBleModule.bleState// this.globalData
+      let { bleReady, bleOnline, searching, connected, paired } = this.BioStimBleModule.bleState// this.globalData
       console.log(
         '触发来源', msgCode,
         '操作状态', log, stateName,
@@ -134,7 +134,7 @@ export default {
         'searching', searching,
         'connected', connected,
         'paired', paired,
-        'devicesReady', devicesReady
+        // 'devicesReady', devicesReady
       )
     },
     async bleInit () {
@@ -214,7 +214,7 @@ export default {
           break
         case this.EventBus.BLE_UNREADY: // 框架未完成初始化
           // this.libs.data.exit('框架未完成初始化')
-          this.bleInit()
+          // this.bleInit()
           break
         case this.EventBus.CONNECT_FAIL: // 设备连接失败
         case this.EventBus.CONNECT_BREAK: // 被动断开连接

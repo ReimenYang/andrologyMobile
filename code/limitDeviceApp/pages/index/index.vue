@@ -40,7 +40,7 @@
             v-model="userInfo.sn"
           >
         </view>
-        <connect-ble />
+        <!-- <connect-ble /> -->
       </view>
       <view class="btn">
         <xnw-footer
@@ -50,15 +50,17 @@
         />
       </view>
     </view>
+    过渡页
   </view>
 </template>
 
 <script>
 // import mixinBLE from '@/pages/index/mixinBLE.js'
-import connectBle from '@/pages/bluetooth/_connect'
+// import connectBle from '@/pages/bluetooth/_connect'
+import checkReady from '@/libs/uniInit'
 export default {
   // mixins: [mixinBLE],
-  components: { connectBle },
+  // components: { connectBle },
   data () {
     return {
       userInfo: {},
@@ -68,7 +70,7 @@ export default {
       setting: {
         type: 'ECirculation', // 优E康
         showModal: 'dialog',
-        from: 'app',
+        from: 'app'
       }
     }
   },
@@ -79,6 +81,8 @@ export default {
   },
   methods: {
     async init () {
+      uni.showLoading({ title: '初始化...' })
+      await checkReady()
       // 检查用户信息
       // this.userInfo = this.globalData.userInfo
       // 优E康
@@ -87,12 +91,25 @@ export default {
       // this.showInput = { realname: !this.userInfo.realname, sn: !this.userInfo.sn }
       // this.isNeed = Object.values(this.showInput).includes(true)
       // 检查更新信息
-      let { lowest, lastest } = JSON.parse((await this.libs.request(this.libs.api.ums.sysDict.updateAppConfig.ECirculation)).data.description)
-      let vision = this.libs.configProject.vision
-      this.setting.isForce = parseFloat(vision) < parseFloat(lowest) ? 'Y' : 'N'
-      this.showUpdate = parseFloat(vision) < parseFloat(lastest)
-      console.log(lowest, lastest, vision, this.setting.isForce, this.showUpdate)
-      if (!this.isNeed && !this.showUpdate) return uni.redirectTo({ url: '/pages/scheme/index' })
+      let {
+        vision,
+        lowest,
+        lastest,
+        isForce,
+        showUpdate
+      } = this.globalData.updateAppConfig
+      this.setting.isForce = isForce
+      this.showUpdate = showUpdate
+      console.log(
+        lowest,
+        lastest,
+        vision,
+        this.setting.isForce,
+        this.showUpdate
+      )
+      uni.hideLoading()
+      if (!this.isNeed && !this.showUpdate)
+        return uni.redirectTo({ url: '/pages/scheme/index' })
     },
     onCancel () {
       this.showUpdate = false
@@ -107,7 +124,10 @@ export default {
       if (!realname) return this.toast('请输入用户名')
       if (!sn) return this.toast('请输入设备序列号')
       this.globalData.userInfo = { ...this.userInfo, ...this.globalData.device }
-      let res = await this.libs.request(this.libs.api.ECirculation.user.binding, this.globalData.userInfo)
+      let res = await this.libs.request(
+        this.libs.api.ECirculation.user.binding,
+        this.globalData.userInfo
+      )
       if (res.code !== 200) return
       uni.redirectTo({ url: '/pages/scheme/index' })
     }
