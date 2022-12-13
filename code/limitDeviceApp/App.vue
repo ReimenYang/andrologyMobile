@@ -15,7 +15,8 @@ export default {
       }
     }
     let subName = libs.configProject.subName
-    let urlImg = libs.configProject.urlImg + 'consume/' + subName
+    // let urlImg = libs.configProject.urlImg + 'consume/' + subName
+    let urlImg = '/static/' + subName
     globalData.config = {
       ...config[subName],
       logo: urlImg + '/logo.png',

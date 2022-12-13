@@ -3,6 +3,11 @@ import App from './App'
 // import checkReady from '@/libs/uniInit'
 import libs from '@/libs'
 
+Vue.prototype.libs = libs
+Vue.prototype.request = libs.request
+Vue.prototype.api = libs.api
+Vue.prototype.globalData = libs.configProject.globalData
+
 let { globalData, isNewDevice, whiteList, blackList } = libs.configProject
 let BioStimBleModule = libs.global.ble.BioStimBleModule
 if (whiteList.length) BioStimBleModule.whiteList = whiteList

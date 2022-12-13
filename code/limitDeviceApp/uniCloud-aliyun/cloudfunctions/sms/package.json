@@ -1,7 +1,0 @@
-{
-  "name": "sms",
-  "dependencies": {},
-  "extensions": {
-    "uni-cloud-sms": {}
-  }
-}

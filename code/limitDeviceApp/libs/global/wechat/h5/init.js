@@ -1,11 +1,12 @@
 
 import libs from '@/libs'
 
-async function init () {
+async function init (app) {
   const { mode, globalData, urlPage, buildPath } = libs.configProject
   if (globalData.appReady) return
   try {
     globalData.appReady = 'loading'
+    if (app) globalData.enterRoute = app.$route
 
     let wyjkh5BaseUrl = buildPath(mode, 'wyjkh5')
     // 因为微信认证的原因，只要不是正式环境、预发布环境，都调用测试环境的家康项目

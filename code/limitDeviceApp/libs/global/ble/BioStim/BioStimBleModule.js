@@ -195,6 +195,7 @@ let writePort = async command => {
 }
 
 // 监听蓝牙开关打开状态,自动开始监听，蓝牙状态改变会执行两次，后一次才是真实状态
+// #ifdef APP
 !(async function onBluetoothAdapterStateChange () {
   let bleOnline = BioStimBleModule.bleState.bleOnline = baseBleModule.bluetoothState()
   console.log('打开客户端蓝牙状态监听', bleOnline)
@@ -207,7 +208,7 @@ let writePort = async command => {
     if (BioStimBleModule.autoInit && bleState.available && !BioStimBleModule.bleState.bleReady) await BioStimBleModule.openBluetoothAdapter()
   })
 })()
-
+// #endif
 /**
  * 初始化蓝牙模块
  * 其他蓝牙相关 API 必须在 uni.openBluetoothAdapter 调用之后使用。否则 API 会返回错误（errCode=10000）。

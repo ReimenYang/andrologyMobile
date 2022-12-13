@@ -65,6 +65,7 @@ function sleep (time = BaseBleModule.writeTime) { return new Promise(resolve => 
 let BAdapter = {
   isEnabled: () => true
 }
+// #ifdef APP
 if (platform === 'android') {
   let main = plus.android.runtimeMainActivity()// 获取运行期环境主Activity实例对象
   let Context = plus.android.importClass('android.content.Context')// 获取所有场景类（如打电话、发短信）
@@ -73,6 +74,7 @@ if (platform === 'android') {
   BAdapter = BManager.getAdapter()
   plus.android.importClass(BAdapter) // 引入相关的method函数，这样之后才会有isEnabled函数支持
 }
+// #endif
 
 BaseBleModule.getDeviceId = () => deviceId
 /**

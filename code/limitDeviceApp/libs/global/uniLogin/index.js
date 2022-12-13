@@ -1,4 +1,3 @@
-import { appid, apiKey, apiSecret } from '@/projectConfig.js'
 import libs from '@/libs'
 let uniLogin = {}
 let debugOpen = false
@@ -69,10 +68,12 @@ uniLogin.login = (provider = 'univerify', univerifyStyle = {}) => {
 
 // 提取手机号
 uniLogin.getPhoneNumber = async (data) => {
-  let _res = await uniCloud.callFunction({
-    name: 'AppPhoneLogin', data
-  })
-  let phoneNumber = _res.result.content.phoneNumber
+  console.log('提取手机号')
+  debug('提取手机号')
+  let _res = await libs.global.uniCloudApi({ ...data, actionType: 'getPhoneNumber' })
+  let phoneNumber = _res.content.phoneNumber
+  console.log(phoneNumber)
+  debug(phoneNumber)
   return phoneNumber
 }
 
@@ -99,7 +100,8 @@ uniLogin.auto = async (univerifyStyle = {}, provider = 'univerify') => {
       // 	animationType: 'slide-in-bottom',
       // 	animationDuration: 200
       // })
-      break
+      if (univerifyStyle.otherLoginButton.callBack) univerifyStyle.otherLoginButton.callBack()
+      return { statusCode: loginErr.code, data: '点击其他方式登陆' }
     // 30003 关闭登陆
     // univerifyStyle.force是自定义强制登录参数,uniapp无相关定义，true:不登录则退出程序，默认值： false
     case 30003:
@@ -113,17 +115,19 @@ uniLogin.auto = async (univerifyStyle = {}, provider = 'univerify') => {
           }
         })
       }
+      return { statusCode: loginErr.code, data: '用户关闭登陆' }
+    default:
+      if (loginErr.code) return { statusCode: loginErr.code, data: '登陆失败', err: loginErr.errMsg }
       break
   }
-  if (!loginData) return new Promise(resolve => resolve({ statusCode: loginErr.code, err: loginErr.errMsg }))
-  return new Promise(resolve => {
-    switch (provider) {
-      case 'univerify':// 手机一键登录
-        return resolve(uniLogin.getPhoneNumber({ ...loginData.authResult, appid, apiKey, apiSecret }))
-      default:
-        console.log('未处理的情况', provider)
-        return resolve(provider)
-    }
-  })
+  if (!loginData) return { statusCode: loginErr.code, err: loginErr.errMsg }
+  let phone = await uniLogin.getPhoneNumber(loginData.authResult)
+  switch (provider) {
+    case 'univerify':// 手机一键登录
+      return { statusCode: 200, data: phone }
+    default:
+      console.log('未处理的情况', provider)
+      return { statusCode: 201, data: '未处理的情况' + provider }
+  }
 }
 export default uniLogin

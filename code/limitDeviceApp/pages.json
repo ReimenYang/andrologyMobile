@@ -20,6 +20,20 @@
       }
     },
     {
+      "path": "pages/index/loginPhone",
+      "style": {
+        "navigationBarTitleText": "",
+        "autoBackButton": false
+      }
+    },
+    {
+      "path": "pages/index/loginCode",
+      "style": {
+        "navigationBarTitleText": "",
+        "autoBackButton": false
+      }
+    },
+    {
       "path": "pages/index/contact",
       "style": {
         "navigationBarTitleText": "联系我们",

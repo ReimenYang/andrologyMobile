@@ -127,19 +127,20 @@ export class BTSResponseModule {
         break
       case 'c':
         {
-          // DATA:c,<MachineId>,<SerialNumber>,<Data>,<Version>,<Sum>\r\n\0
-          // DATA:c,0347313331313931001d0026,0002-001-011,600,1,700
+          // DATA:c,<MachineId>,<SerialNumber>,<Data>,<Version>,<Ch1Version>,<Ch2Version>,<Ch3Version>,<Sum>\r\n\0
+          // DATA:c,0347313331313931001d0026,0002-001-011,600,1,1,1,0,700
           // <MachineId> 24位机器ID号,不参与Sum的计算
           // <SerialNumber> 产品属性,不参与Sum的计算（xxxx-xxx-xxx）
           // Data为版本日期（MMDD）
           // <Version>代表设备的版本号，优E康是1
           // <Sum>MachineId,SerialNumber不参与Sum的计算
-          let [machineId, serialNumber, data, version, sum] = option
+          let [machineId, serialNumber, data, version, ch1Ver, ch2Ver, ch3Ver, sum] = option
           // MachineId,SerialNumber不参与Sum的计算
-          option = [data, version, sum]
+          option = [data, version, ch1Ver, ch2Ver, ch3Ver, sum]
           this.data.serialno = machineId
           this.data.modelno = serialNumber.split('-')[0]
           this.data.version = version
+          this.data.channelVar = [ch1Ver, ch2Ver, ch3Ver].join('.')
           this.data.sum = sum
         }
         break

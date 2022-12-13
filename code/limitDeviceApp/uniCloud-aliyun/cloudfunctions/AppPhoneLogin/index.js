@@ -9,6 +9,7 @@ exports.main = async (loginRes) => {
     // apiSecret: '2523bede5154496dd21c9a9f68b2362c' // 在开发者中心开通服务并获取apiSecret
   })
   // 执行入库等操作，正常情况下不要把完整手机号返回给前端
+  console.log(res)
   return {
     code: 0,
     message: '获取手机号成功',

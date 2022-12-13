@@ -21,6 +21,8 @@ const apis = {
   getBodyDetail: { method: 'GET', url: 'cmsAIQuestionnaireNew/getBodyDetail', group: 'cms', dataType: 'keyValue' },
   // 根据授权码导出AI预测的记录列表
   exportUserAnswerByUserId: { method: 'POST', url: 'cmsAIQuestionnaireNew/exportUserAnswerByUserId', group: 'cms', dataType: 'keyValue' },
+  // 疼痛问卷根据授权码导出问卷记录列表
+  exportPainProjectUserAnswer: { method: 'POST', url: 'cmsAIQuestionnaireNew/exportPainProjectUserAnswer', group: 'cms', dataType: 'keyValue' },
 }
 
 export default apis

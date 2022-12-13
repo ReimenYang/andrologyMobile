@@ -233,7 +233,8 @@ export default {
         case this.EventBus.GET_SERIALNO: // 设备序列号数据，蓝牙连接成功后只回调一次
           // case this.EventBus.CONNECTED: // 连接成功
           // 使用GET_SERIALNO的逻辑会更严谨，但由于有时候收不到反馈，只能用CONNECTED代替
-          console.log('设备序列号数据，蓝牙连接成功后只回调一次', this.globalData.isNewDevice)
+          console.log('设备序列号数据，蓝牙连接成功后只回调一次', data, this.globalData.isNewDevice)
+          this.globalData.headers.deviceInfo = data
           if (this.globalData.isNewDevice === 'N') await this.createPaired()
           // 如果是优E康，检查训练记录
           if (this.globalData.isNewDevice === 'Y') await this.getRecord()

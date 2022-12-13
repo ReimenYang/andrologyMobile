@@ -4,10 +4,18 @@ module.exports = {
   port: 8862, // 本地运行的端口
   framework: 'uni', // 使用前端框架:vue||uni
   appid: '__UNI__0940A4C',
-  // apiKey: '2cbeb0083ca06ce71e0c8aa700f8da9b', // 在开发者中心开通服务并获取apiKey
-  // apiSecret: '2523bede5154496dd21c9a9f68b2362c', // 在开发者中心开通服务并获取apiSecret
-  apiKey: 'e72a85e683138b13b23129f065768f49', // 在开发者中心开通服务并获取apiKey
-  apiSecret: '61e88a6b012b160a927a064c9fb7ef52', // 在开发者中心开通服务并获取apiSecret
+  // 一键登录
+  // apiKey: '2cbeb0083ca06ce71e0c8aa700f8da9b', // 公司appid apiKey
+  // apiSecret: '2523bede5154496dd21c9a9f68b2362c', // 公司appid apiSecret
+  apiKey: 'e72a85e683138b13b23129f065768f49', // 个人appid apiKey
+  apiSecret: '61e88a6b012b160a927a064c9fb7ef52', // 个人appid apiSecret
+  // 发短信
+  smsKey: 'c2dd9accc4efb6d179eb1c986d9a0c22', // 个人appid apiKey
+  smsSecret: 'e328f8ba8628ecb3b0561ebbe06bbe15', // 个人appid apiSecret
+  // 云数据库
+  provider: 'aliyun', // aliyun、tencent
+  spaceId: 'ec34b204-8f78-4a39-8ebd-3c4b40bf1b0a', // 个人appid apiKey
+  clientSecret: 'Gwb8Fu5rEfeQEms8WnmjwA==', // 个人appid apiSecret
   projectType: {
     wechat: false,
     browser: false,
@@ -16,14 +24,14 @@ module.exports = {
   loginType: {
     phone: true // 一键登录
   }, // 用户登录方式
-  vision: '0.02Bate', // 项目版本
-  updateTime: '20221121', // 版本升级时间
+  vision: '0.03Bate', // 项目版本
+  updateTime: '20221213', // 版本升级时间
   // webDeveloper: '127.0.0.1', // 前端开发本地路径
   webDeveloper: '10.10.20.101', // Reimen
   // webDeveloper: 'dev-weiming.xinuowang.com', 	// Reimen
   // webDeveloper: '10.10.20.41',
   // webDeveloper: 'localhost'
-  mode: 'dev', // dev 开发环境、 test 测试环境、 produce 正式环境、 demo 演示环境、 pre 预发布环境
+  mode: 'produce', // dev 开发环境、 test 测试环境、 produce 正式环境、 demo 演示环境、 pre 预发布环境
 
   /**  消费电子特有字段*/
 

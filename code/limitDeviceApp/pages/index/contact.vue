@@ -21,7 +21,7 @@
         </view>
       </view> -->
       <view class="appVersion">
-        {{ globalData.headers.appVersion }}
+        {{ appVersion }}
       </view>
     </p-wrap>
     <p-menu :defaultIndex="2" />
@@ -46,9 +46,23 @@ export default {
           { title: '电池充电、更换电池' },
           { title: '如何使用电极片' }
         ]
-      }
+      },
+      appVersion: ''
     }
-  }
+  },
+  async onLoad () {
+    let { data } = await this.request(this.api.ECirculation.system.getSystemData)
+    this.intro = {
+      title: data.companyName,
+      contents: [
+        // { txt: '客服微信：example_id' },
+        { txt: '客服热线：' + data.contactPhone },
+        { txt: '服务时间：' + data.workingTime }
+      ]
+    }
+    let { appVersion, deviceInfo } = this.globalData.headers
+    this.appVersion = [appVersion, deviceInfo.version, deviceInfo.channelVar].join('-')
+  },
 }
 </script>
 <style lang="scss" scoped>

@@ -44,7 +44,9 @@ const apis = {
     ECirculation: { ...def, url: 'https://testbl.xinuowang.com/wyjk-ums/v1/api/' + _path + 'updateAppConfig/ECirculation' }// 易循环
   },
   // 字典获取
-  getSysDict: data => ({ ...def, url: 'https://testbl.xinuowang.com/wyjk-ums/v1/api/sys-dict/temporaryItemsByType/' + data }),
+  getSysDict: data => ({ ...def, url: 'sys-dict/temporaryItemsByType/' + data }),
+  // 特殊项目需要写死
+  // getSysDict: data => ({ ...def, url: 'https://testbl.xinuowang.com/wyjk-ums/v1/api/sys-dict/temporaryItemsByType/' + data }),
 }
 
 export default apis

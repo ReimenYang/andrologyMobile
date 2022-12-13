@@ -4,7 +4,11 @@ let globalData = {}
 let apiServers = {}, host = {}
 switch (projectName) {
   case 'ECirculation':// 易循环
-    apiServers.dev = 'http://consume.sspendi.com'
+    apiServers = {
+      dev: 'http://consume.sspendi.com',
+      test: 'http://consume.sspendi.com',
+      produce: 'http://consume.sspendi.com'
+    }
     host.dev = 'http://' + webDeveloper
     break
   default:

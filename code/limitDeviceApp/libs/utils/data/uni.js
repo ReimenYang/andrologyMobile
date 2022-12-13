@@ -9,7 +9,7 @@ async function getNetworkType () {
   // 校验网络是否授权并畅通
   let [_error] = await uni.request({
     'method': 'GET',
-    'url': 'https://testbl.xinuowang.com/wyjk-ums/v1/api/sys-dict/itemByDictLabel/updateAppConfig/ECirculation'
+    'url': 'https://static-ec34b204-8f78-4a39-8ebd-3c4b40bf1b0a.bspapp.com/updateAppConfig.json'
   })
   return _error ? 'none' : data.networkType
 }

@@ -50,12 +50,12 @@
         />
       </view>
     </view>
-    过渡页
   </view>
 </template>
 
 <script>
 // import mixinBLE from '@/pages/index/mixinBLE.js'
+import login from '@/pages/index/login.js'
 // import connectBle from '@/pages/bluetooth/_connect'
 import checkReady from '@/libs/uniInit'
 export default {
@@ -83,6 +83,8 @@ export default {
     async init () {
       uni.showLoading({ title: '初始化...' })
       await checkReady()
+      let userInfo = await login()
+      if (!userInfo) return uni.showToast({ title: '登录失败', icon: 'none', duration: 2000 })
       // 检查用户信息
       // this.userInfo = this.globalData.userInfo
       // 优E康
@@ -108,12 +110,12 @@ export default {
         this.showUpdate
       )
       uni.hideLoading()
-      if (!this.isNeed && !this.showUpdate)
-        return uni.redirectTo({ url: '/pages/scheme/index' })
+      if (!this.isNeed && !this.showUpdate && userInfo.statusCode !== 30002)
+        return uni.reLaunch({ url: '/pages/scheme/index' })
     },
     onCancel () {
       this.showUpdate = false
-      if (!this.isNeed) return uni.redirectTo({ url: '/pages/scheme/index' })
+      if (!this.isNeed) return uni.reLaunch({ url: '/pages/scheme/index' })
     },
     onConfirm () {
       this.libs.data.exit('退出并下载更新app')
