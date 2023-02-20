@@ -65,28 +65,56 @@
           </xnw-item>
         </view>
       </view>
+      发送长度：<input
+        type="number"
+        v-model="l"
+      >K
+      发送间隔：<input
+        type="number"
+        v-model="t"
+      >ms
+      <view class="btnGroup">
+        <view
+          @click="test"
+          class="btn"
+        >
+          按队列同步发送
+        </view>
+        <view
+          @click="testB"
+          class="btn"
+        >
+          加序号异步发送
+        </view>
+        <view
+          @click="testC"
+          class="btn"
+        >
+          一次性发送
+        </view>
+      </view>
     </p-wrap>
     <p-menu :defaultIndex="0" />
   </view>
 </template>
 <script>
 import mixinBLE from '@/pages/index/mixinBLE.js'
+import mixinWorkoutList from '@/pages/index/mixinWorkoutList.js'
 export default {
-  mixins: [mixinBLE],
+  mixins: [mixinBLE, mixinWorkoutList],
   data () {
     return {
       userInfo: {
         post: '/static/face.png'
       },
       from: '',
-      workoutList: [],
-      RecordId: 0
+      RecordId: 0,
+      l: 100,
+      t: 10
     }
   },
   async onLoad (option) {
     this.from = option.from
-    // await this.getWorkoutList()
-    // this.init()
   },
   onHide () {
     delete this.globalData.pageInit
@@ -106,10 +134,11 @@ export default {
 
     this.userInfo.contents = [
       {
-        txt: this.globalData.userInfo.phone.replace(
-          /(\d{3})\d*(\d{4})/,
-          '$1****$2'
-        )
+        // txt: this.globalData.userInfo.phone.replace(
+        //   /(\d{3})\d*(\d{4})/,
+        //   '$1****$2'
+        // )
+        txt: this.globalData.userInfo.realname
       }
     ]
     console.log('首页show')
@@ -138,56 +167,6 @@ export default {
           (boolean ? '已连接 ' : '未连接 ')
       this.$set(this.userInfo, 'footer', str)
       if (boolean) this.getRecord()
-    },
-    async getWorkoutList () {
-      // deviceTypeId 设备类型id
-      // 14:DJZ-A
-      // 15:ble
-      // 16:优E康
-      let params = {
-        pageSize: 100,
-        deviceTypeId: '16',
-        // composeName: 'ble2',
-        // workoutNameOrDesc: 'ee6'// 测试用
-        isNewDevice: this.libs.configProject.isNewDevice,
-        phone: this.globalData.userInfo.phone
-      }
-      this.globalData.workoutList = (
-        await this.libs.request(
-          this.libs.api.ECirculation.scheme.getSchemeList,
-          params
-        )
-      ).data
-
-      this.globalData.workoutList.forEach(item => {
-        // let note = ''
-        // if (item.todayState === 'Y') note = '（今天已训练）'
-        item.workoutName = item.name
-        item.workoutDescription = item.description
-        item.workoutId = item.id
-        item.title = item.workoutName // + note,
-        item.tags = [{ txt: '训练' }]
-        item.contents = [
-          {
-            txt: `训练时长 ${item.duration / 60}分钟`
-          },
-          {
-            txt: item.workoutDescription
-          }
-        ]
-        item.channelList.forEach(channelItem => {
-          channelItem.spliceList.forEach(obj => {
-            obj.channel = channelItem.channel
-            obj.current = '0.0'
-            obj.side = obj.spliceNum === 1 ? 'settingCHL' : 'settingCHR'
-          })
-        })
-      })
-      this.workoutList = this.globalData.workoutList
-      // 过滤多通道方案，易循环特有
-      this.workoutList = this.globalData.workoutList.filter(item =>
-        item.deviceType.split(',').includes(this.globalData.device.mode)
-      )
     },
     async toConnect (type) {
       // 从未连接设备或跳转
@@ -219,6 +198,69 @@ export default {
       if (this.device.name)
         return 'background-image: url("/static/neverLink.png")'
       return 'background-image: url("/static/unLink.png")'
+    },
+    test () {
+      let l = this.l
+      let length = 5 * 10 * l
+      let time = new Date()
+      this.libs.global.ble.BaseBleModule.writeTime = this.t
+      uni.showLoading({ title: `开始发送长度为 ${l}k 的数据` })
+      this.libs.global.ble.BaseBleModule.commandMQ(Array.apply(null, { length }).map((n, i) => 'xxxxxxxxxxxxxxxxxxxx'.replace(/x/img, String(i).slice(-1))).join(''))
+      let commandID = this.libs.global.ble.BaseBleModule.commandHistory.slice(-1)[0].id
+      this.commandCallback(commandID, () => {
+        this.libs.global.ble.BaseBleModule.writeTime = 100
+        uni.hideLoading()
+        uni.showModal({ content: `完成发送，用时 ${(new Date() - time) / 1000} 秒` })
+      })
+    },
+    testB () {
+      let length = 5 * 10
+      console.log('异步发送', length)
+      Array.apply(null, { length }).forEach((n, i) => {
+        let value = ('00000' + i).slice(-4) + ',xxxxxxxxxxxxxx'.replace(/x/img, String(i).slice(-1))
+        let buffer = new ArrayBuffer(value.length)
+        let dataView = new DataView(buffer)
+        for (let i = 0; i < value.length; i++) {
+          dataView.setUint8(i, value.charAt(i).charCodeAt())
+        }
+        value = dataView.buffer
+        uni.writeBLECharacteristicValue({
+          deviceId: 'F0:C7:7F:73:68:20',
+          serviceId: '0000FFB0-0000-1000-8000-00805F9B34FB',
+          characteristicId: '0000ffb2-0000-1000-8000-00805f9b34fb',
+          value,
+          // success: function (e) {
+          //   console.log('write characteristics success: ' + JSON.stringify(e))
+          // },
+          fail: function (e) {
+            console.log(i, '发送失败')
+          }
+        })
+      })
+    },
+    testC () {
+      let length = 5 * 10
+      let value = Array.apply(null, { length }).map((n, i) => 'xxxxxxxxxxxxxxxxxxxx'.replace(/x/img, String(i).slice(-1))).join('')
+      console.log('一次性发送', value.length)
+      let buffer = new ArrayBuffer(value.length)
+      let dataView = new DataView(buffer)
+      for (let i = 0; i < value.length; i++) {
+        dataView.setUint8(i, value.charAt(i).charCodeAt())
+      }
+      value = dataView.buffer
+
+      uni.writeBLECharacteristicValue({
+        deviceId: 'F0:C7:7F:73:68:20',
+        serviceId: '0000FFB0-0000-1000-8000-00805F9B34FB',
+        characteristicId: '0000ffb2-0000-1000-8000-00805f9b34fb',
+        value,
+        // success: function (e) {
+        //   console.log('write characteristics success: ' + JSON.stringify(e))
+        // },
+        fail: function (e) {
+          console.log('一次性发送失败' + JSON.stringify(e))
+        }
+      })
     }
   }
 }

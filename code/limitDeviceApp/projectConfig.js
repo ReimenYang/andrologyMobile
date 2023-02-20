@@ -32,7 +32,7 @@ module.exports = {
   // webDeveloper: '10.10.20.41',
   // webDeveloper: 'localhost'
   mode: 'produce', // dev 开发环境、 test 测试环境、 produce 正式环境、 demo 演示环境、 pre 预发布环境
-
+  userRole: 'hospital', // user 用户 hospital 医院
   /**  消费电子特有字段*/
 
   /** 设备类型id(deviceTypeId)

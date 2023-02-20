@@ -84,23 +84,29 @@ async function request (api, params = {}, config = {}) {
   dataRes = dataRes || {}
   let _data = {}
   try {
-    _data = JSON.parse(dataRes.data)
+    _data = JSON.parse(dataRes.data) || {}
   } catch (e) {
-    _data = dataRes.data
+    _data = dataRes.data || {}
   }
 
+  console.log(time, '请求结果', url, _data)
   let statusCode = dataRes.statusCode || dataRes.status
   let errorMessage = dataRes.errorMessage || ''
   // 一般失败请求处理
-  if (errRes) return toastBox(apiName + '请求无效' + respondseError + time, { ...api, url, data, ...config }, dataRes)
+  if (errRes) {
+    toastBox(apiName + '请求无效' + respondseError + time, { ...api, url, data, ...config }, dataRes)
+    return _data
+  }
   // 有些网络层拦截错误在返回的数据里面
-  if (!validateStatus(statusCode)) return toastBox(apiName + '请求失败，' + statusCode + errorMessage + time, { ...api, url, data, ...config }, dataRes)
+  if (!validateStatus(statusCode)) {
+    toastBox(apiName + '请求失败，' + statusCode + errorMessage + time, { ...api, url, data, ...config }, dataRes)
+    return _data
+  }
 
   // 判断业务返回的错误
   if ((_data.code && (_data.code !== 0 && _data.code !== 200)) || (_data.statuscode && _data.statuscode !== '0000')) {
     toastBox('业务提示：' + (_data.msg || _data.statusmsg || _data.errorMessage) + time, apiName + (_data.code || _data.statuscode), { ...api, url, data, ...config }, dataRes)
   }
-  console.log(time, '请求结果', url, _data)
   return _data
 }
 

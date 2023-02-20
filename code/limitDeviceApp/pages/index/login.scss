@@ -48,4 +48,13 @@
       color: var(--color-tips);
     }
   }
+
+  .toggleLoginType {
+    width: calc(100% - 120rpx);
+    height: var(--button-height);
+    position: absolute;
+    bottom: 30rpx;
+    line-height: var(--button-height);
+    text-align: center;
+  }
 }

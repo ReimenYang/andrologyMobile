@@ -34,9 +34,24 @@
       }
     },
     {
+      "path": "pages/index/loginPassword",
+      "style": {
+        "navigationBarTitleText": "",
+        "autoBackButton": false
+      }
+    },
+    {
       "path": "pages/index/contact",
       "style": {
         "navigationBarTitleText": "联系我们",
+        "navigationStyle": "custom",
+        "navigationBarTextStyle": "white"
+      }
+    },
+    {
+      "path": "pages/index/about",
+      "style": {
+        "navigationBarTitleText": "关于我们",
         "navigationStyle": "custom",
         "navigationBarTextStyle": "white"
       }
@@ -65,15 +80,27 @@
       }
     },
     {
-      "path": "pages/bluetooth/running",
+      "path": "pages/scheme/list",
       "style": {
-        "navigationBarTitleText": "训练"
+        "navigationBarTitleText": "方案管理"
+      }
+    },
+    {
+      "path": "pages/scheme/edit",
+      "style": {
+        "navigationBarTitleText": "方案编辑"
       }
     },
     {
       "path": "pages/scheme/record",
       "style": {
         "navigationBarTitleText": "训练记录"
+      }
+    },
+    {
+      "path": "pages/bluetooth/running",
+      "style": {
+        "navigationBarTitleText": "训练"
       }
     },
     {

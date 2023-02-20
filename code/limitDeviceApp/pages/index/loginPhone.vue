@@ -31,6 +31,12 @@
         @onConfirm="submit"
       />
     </view>
+    <view
+      class="toggleLoginType"
+      @click="toggleLoginType"
+    >
+      密码登录
+    </view>
   </view>
 </template>
 
@@ -53,6 +59,9 @@ export default {
       if (!_verify) return this.error = '手机号码填写不正确'
       this.libs.data.setStorage('phone', this.phone)
       uni.navigateTo({ url: '/pages/index/loginCode' })
+    },
+    toggleLoginType () {
+      uni.reLaunch({ url: '/pages/index/loginPassword' })
     }
   }
 }

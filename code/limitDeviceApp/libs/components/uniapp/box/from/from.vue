@@ -46,6 +46,7 @@
           v-else-if="item.input"
           v-bind="item.input"
           v-model="item.input.value"
+          :password="item.input.password"
           @input="(e)=>oninput('',item,e,'input')"
           @focus="(e)=>oninput('',item,e,'focus')"
           @blur="(e)=>oninput('',item,e,'blur')"

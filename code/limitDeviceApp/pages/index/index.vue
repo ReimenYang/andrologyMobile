@@ -82,6 +82,7 @@ export default {
   methods: {
     async init () {
       uni.showLoading({ title: '初始化...' })
+
       await checkReady()
       let userInfo = await login()
       if (!userInfo) return uni.showToast({ title: '登录失败', icon: 'none', duration: 2000 })
@@ -109,13 +110,15 @@ export default {
         this.setting.isForce,
         this.showUpdate
       )
+      this.globalData.imageList = (
+        await this.request(this.api.ECirculation.scheme.getImageList)
+      ).data
       uni.hideLoading()
-      if (!this.isNeed && !this.showUpdate && userInfo.statusCode !== 30002)
-        return uni.reLaunch({ url: '/pages/scheme/index' })
+      if (!this.isNeed && !this.showUpdate && userInfo.statusCode !== 30002) return this.router()
     },
     onCancel () {
       this.showUpdate = false
-      if (!this.isNeed) return uni.reLaunch({ url: '/pages/scheme/index' })
+      if (!this.isNeed) return this.router()
     },
     onConfirm () {
       this.libs.data.exit('退出并下载更新app')
@@ -131,7 +134,11 @@ export default {
         this.globalData.userInfo
       )
       if (res.code !== 200) return
-      uni.redirectTo({ url: '/pages/scheme/index' })
+      return this.router()
+    },
+    router () {
+      if (this.libs.configProject.userRole === 'hospital' && !this.globalData.userInfo) return uni.reLaunch({ url: '/pages/index/loginPassword' })
+      uni.reLaunch({ url: '/pages/scheme/index' })
     }
   }
 }

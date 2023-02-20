@@ -3,6 +3,7 @@ import App from './App'
 // import checkReady from '@/libs/uniInit'
 import libs from '@/libs'
 
+Vue.prototype.toast = (title, duration = 3000, icon = 'none') => uni.showToast({ title, duration, icon })
 Vue.prototype.libs = libs
 Vue.prototype.request = libs.request
 Vue.prototype.api = libs.api

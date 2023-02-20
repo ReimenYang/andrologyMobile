@@ -13,10 +13,32 @@ let univerifyStyle = { // 一键登录设置
     }
   }
 }
-let { mode, vision, updateTime, globalData, deviceTypeId, subName } = libs.configProject
+let { mode, vision, updateTime, globalData, deviceTypeId, userRole, subName } = libs.configProject
 let login = async () => {
   let phone = libs.data.getStorage('phone')
-  if (!phone) {
+  let accessToken = ''
+  let appid = {
+    PEuser: '8aa43396-9283-4eba-88ad-efe30d4ef2cf',
+    PEhospital: 'a283529e-4703-4381-9dba-1802349278a7',
+    periodPain: 'a4d3eb8f-bab7-49b6-a2d9-1b6e8be181d8'
+  }[subName + userRole]
+  globalData.headers = {
+    appTerminalPlatform: libs.data.systemInfo.platform,
+    appVersion: [mode, vision, updateTime].join('.'),
+    deviceInfo: {},
+    appGroup: mode,
+    accessToken,
+    deviceTypeId,
+    appid,
+    phone
+  }
+  // 已经有用户信息
+  console.log('已经有用户信息', globalData.userInfo)
+  if (globalData.userInfo) return { statusCode: 201, data: globalData.userInfo }
+  // 医院登录
+  if (userRole === 'hospital') return { statusCode: 'hospital' }
+  // 用户登录
+  if (!phone || 11 < phone.length) {
     phone = libs.data.random(7)
     // phone = 13268125215//罗
     // phone = 18924166730// 红米
@@ -36,6 +58,7 @@ let login = async () => {
     }
     // }
     libs.data.setStorage('phone', phone)
+    globalData.headers.phone = phone
   }
   // 之前ssl生成的公钥，复制的时候要小心不要有空格
   //   const publiukey = `-----BEGIN PUBLIC KEY-----
@@ -43,21 +66,6 @@ let login = async () => {
   // -----END PUBLIC KEY-----`.trim()
   // let encryptedPhone = jsencrypt.setEncrypt(publiukey, phone)  // 对内容进行加密
 
-  let accessToken = ''
-  let appid = {
-    PE: '8aa43396-9283-4eba-88ad-efe30d4ef2cf',
-    periodPain: 'a4d3eb8f-bab7-49b6-a2d9-1b6e8be181d8'
-  }[subName]
-  globalData.headers = {
-    appTerminalPlatform: libs.data.systemInfo.platform,
-    appVersion: [mode, vision, updateTime].join('.'),
-    deviceInfo: {},
-    appGroup: mode,
-    accessToken,
-    deviceTypeId,
-    appid,
-    phone
-  }
   // 请求用户信息
   // console.log('请求用户信息', phone, encryptedPhone)
   // 优E康
