@@ -214,7 +214,6 @@ export default {
       this.workoutEdit.name = baseInfo.name
       this.workoutEdit.duration = baseInfo.duration * 60
       this.workoutEdit.description = baseInfo.description
-      this.workoutEdit.useChannel = baseInfo.channel.filter(item => item.checked).map(item => item.label)
       this.channelConfig.forEach(item => {
         if (!item.show) return
         let _obj = this.workoutEdit.channelList.find(obj => obj.channel === item.channelID)
@@ -276,16 +275,14 @@ export default {
       return !_error
     },
     async saveWorkout () {
-      let { id, name, duration, description, useChannel, channelList } = this.workoutEdit
+      let { id, name, duration, description, channelList } = this.workoutEdit
       // 整理通道数据
       let validChannel = this.channelConfig.reduce((a, b) => b.show ? [...a, b.channelID] : a, [])
       let _channelList = channelList.filter(item => validChannel.includes(item.channel))
 
       _channelList.forEach(channel => channel.spliceList = this.channelConfig.find(item => channel.channel === item.channelID).splice)
-
       this.workoutEdit.channelList = this.libs.global.ble.channelBuilder.channelBuilder(_channelList)
-      let params = { id, name, duration: duration / 60, description, useChannel, channelList: _channelList.map(({ channel, position1, position2, phaseList }) => ({ channel, position1, position2, phaseList })) }
-
+      let params = { id, name, duration: duration / 60, description, channelList: _channelList.map(({ channel, position1, position2, phaseList }) => ({ channel, position1, position2, phaseList })) }
       let { code, errorMessage } = await this.request(this.api.ECirculation.scheme.updateScheme, params)
       if (code, errorMessage) return this.toast(errorMessage)
       uni.navigateBack()

@@ -106,9 +106,9 @@ const channelBuilder = {
       let _imageIds = []
       let _imageUrl = []
       spliceList.forEach(_splice => {
-        if (!_splice.checked) return
         let { id, imageName, positionPlate, imageChannel, imageUrl } = _splice.postionDetail
-        channel['position' + imageChannel] = id
+        channel['position' + imageChannel] = _splice.checked ? id : ''
+        if (!_splice.checked) return
         _position.push(imageName)
         let _spliceImg = libs.configProject.globalData.imageList.find(item => item.imageName === (labelName + imageChannel + '-' + positionPlate))
         _imageIds.push(_spliceImg.id, id)
