@@ -1,5 +1,5 @@
 module.exports = {
-  name: '易循环', // 项目名称
+  name: '易循环', // 项目名称 晨硕治疗仪 易循环
   projectName: 'ECirculation', // 项目代号
   port: 8862, // 本地运行的端口
   framework: 'uni', // 使用前端框架:vue||uni
@@ -44,8 +44,9 @@ module.exports = {
   /** 针对病症分类的app(subName)
    * periodPain 痛经
    * PE 早泄
+   * toB 送审
    */
-  subName: 'PE',
+  subName: 'toB',
   /** 是否使用多通道设备(isNewDevice)
    * Y/N 是/否
    */

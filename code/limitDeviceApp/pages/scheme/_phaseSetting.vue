@@ -34,20 +34,8 @@ export default {
       this.$emit('onCancel')
     },
     onConfirm () {
-      let hasError = []
-      this.setting.data.forEach(item => {
-        let frequency = item
-        let pulseWidth = {}
-        let needCheck = false
-        if (item.key.startsWith('frequency')) {
-          pulseWidth = this.setting.data.find(obj => obj.key === ('pulseWidth' + (item.key[9] || '')))
-          needCheck = item.key === 'frequency' || frequency.input.value || pulseWidth.input.value
-        }
-        if (!needCheck) return
-        hasError.push(frequency.input.input('', frequency))
-        hasError.push(pulseWidth.input.input('', pulseWidth))
-      })
-      if (hasError.includes(false)) return
+      let _verify = this.setting.data.map(item => item.input ? item.input.input('', item) : true)
+      if (_verify.includes(false)) return
       let params = this.$refs.phaseSetting.getFromData()
       params.waveform = params.waveform[0].value
       for (let key in params) params[key] = Number(params[key] || 0)

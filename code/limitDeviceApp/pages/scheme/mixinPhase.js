@@ -2,6 +2,7 @@ export default {
   data () {
     return {
       settingPhase: { channelName: '', channelID: '', phase: '', data: [] },
+      specialKey: ['pulseWidthB', 'frequencyB', 'pulseWidthC', 'frequencyC']
     }
   },
   methods: {
@@ -21,6 +22,8 @@ export default {
       this.settingPhase.channelName = channelName
       this.settingPhase.channelID = channelID
       this.settingPhase.phase = phase.phase
+      let isMultiple = !!frequencyB
+      let disabledStyle = isMultiple ? '' : 'opacity:.5'
       this.settingPhase.data = [{
         key: 'waveform', title: '波形类型',
         radio: {
@@ -47,28 +50,48 @@ export default {
           input: this.inputOverflow
         }
       }, {
-        key: 'frequencyB', title: '变频-B点脉冲频率(单位:hz,非必填)',
+        key: 'isMultiple', title: '启用变频',
+        switch: {
+          checked: isMultiple, style: 'transform:scale(0.9)', change: val => {
+            let _disabled = val
+            this.settingPhase.data.forEach(item => {
+              if (!this.specialKey.includes(item.key)) return
+              item.style = _disabled ? '' : 'opacity:.5'
+              if (!_disabled) {
+                item.input.value = 0
+                item.input.style = ''
+              }
+              item.input.disabled = !_disabled
+            })
+          }
+        }
+      }, {
+        key: 'frequencyB', title: 'B点脉冲频率(单位:hz)', style: disabledStyle,
         input: {
           value: frequencyB, placeholder: frequencyPlaceholder, type: 'number',
-          input: (val, item, e) => this.inputOverflow(val, item, e ? [''] : [])
+          input: this.inputOverflow,
+          disabled: !isMultiple
         }
       }, {
-        key: 'pulseWidthB', title: '变频-B点脉冲宽度(单位:us,非必填)',
+        key: 'pulseWidthB', title: 'B点脉冲宽度(单位:us)', style: disabledStyle,
         input: {
           value: pulseWidthB, placeholder: pulseWidthPlaceholder, type: 'number',
-          input: (val, item, e) => this.inputOverflow(val, item, e ? [''] : [])
+          input: this.inputOverflow,
+          disabled: !isMultiple
         }
       }, {
-        key: 'frequencyC', title: '变频-C点脉冲频率(单位:hz,非必填)',
+        key: 'frequencyC', title: 'C点脉冲频率(单位:hz)', style: disabledStyle,
         input: {
           value: frequencyC, placeholder: frequencyPlaceholder, type: 'number',
-          input: (val, item, e) => this.inputOverflow(val, item, e ? [''] : [])
+          input: this.inputOverflow,
+          disabled: !isMultiple
         }
       }, {
-        key: 'pulseWidthC', title: '变频-C点脉冲宽度(单位:us,非必填)',
+        key: 'pulseWidthC', title: 'C点脉冲宽度(单位:us)', style: disabledStyle,
         input: {
           value: pulseWidthC, placeholder: pulseWidthPlaceholder, type: 'number',
-          input: (val, item, e) => this.inputOverflow(val, item, e ? [''] : [])
+          input: this.inputOverflow,
+          disabled: !isMultiple
         }
       }, {
         key: 'rampUpTime', title: '上升时间(单位:s)',

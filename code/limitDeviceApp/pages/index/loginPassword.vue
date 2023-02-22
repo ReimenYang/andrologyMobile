@@ -10,7 +10,7 @@
           欢迎使用
         </view>
         <view class="appName">
-          {{ libs.configProject.name }}App
+          {{ globalData.config.appName }}App
         </view>
       </view>
     </view>

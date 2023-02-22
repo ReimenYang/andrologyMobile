@@ -146,6 +146,7 @@ export default {
       .title {
         font-size: inherit;
         min-height: auto;
+        font-weight: bold;
       }
 
       .tagBox {

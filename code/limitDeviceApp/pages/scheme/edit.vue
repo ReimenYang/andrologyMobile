@@ -193,14 +193,14 @@ export default {
           _config.phaseFrom = _config.phaseList.map(item => ({
             ...item,
             title: '阶段' + item.phase,
-            tags: [
-              item.frequency && { txt: `${item.frequency}hz ${item.pulseWidth}us` },
-              item.frequencyB && { txt: `${item.frequencyB}hz ${item.pulseWidthB}us` },
-              item.frequencyC && { txt: `${item.frequencyC}hz ${item.pulseWidthC}us` }
-            ].filter(obj => obj),
             contents: [
+              ...[
+                item.frequency && { txt: `${item.frequency}hz ${item.pulseWidth}us` },
+                item.frequencyB && { txt: `${item.frequencyB}hz ${item.pulseWidthB}us` },
+                item.frequencyC && { txt: `${item.frequencyC}hz ${item.pulseWidthC}us` }
+              ].filter(obj => obj),
               {
-                txt: `${this.waveform[item.waveform].name} 相对电量 ${item.relativePower} mA`
+                txt: `${this.waveform[item.waveform].name} 相对电量 ${item.relativePower} %`, style: 'color:#999'
               },
               {
                 txt: `上升${item.rampUpTime}s 平台${item.steadyTime}s 下降${item.rampDownTime}s 休息${item.restTime}s`
@@ -253,17 +253,23 @@ export default {
       this.showSetp = 'channel'
       this.settingSplice = this.postionId = ''
     },
-    inputOverflow (val, item, apply) {
+    inputOverflow (val, item, apply = []) {
+      if (item.disabled) return true
+      // 特殊频宽和频率允许值处理逻辑
+      if (this.specialKey.includes(item.key)
+        &&
+        !this.settingPhase.data.find(obj => obj.key === 'isMultiple').switch.checked
+      ) apply = ['', 0, '0']
       let _value = item.input.value
       let [min, max] = item.input.placeholder.slice(2).split('-')
-      try {
-        if (apply.length && apply.includes(_value)) return true
-      } catch (e) {
-        // TODO handle the exception
-      }
 
       let _error = _value ? '' : (item.title + '不能为空')
       if (_value && ((_value - min) < 0 || (max - _value) < 0)) _error = item.title + '超出' + item.input.placeholder
+      try {
+        if (apply.length && apply.includes(_value)) _error = ''
+      } catch (e) {
+        // TODO handle the exception
+      }
 
       item.input.style = _error ? 'border:1px solid red;' : ''
       if (_error) this.toast(_error)

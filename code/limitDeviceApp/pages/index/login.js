@@ -18,10 +18,10 @@ let login = async () => {
   let phone = libs.data.getStorage('phone')
   let accessToken = ''
   let appid = {
-    PEuser: '8aa43396-9283-4eba-88ad-efe30d4ef2cf',
-    PEhospital: 'a283529e-4703-4381-9dba-1802349278a7',
-    periodPain: 'a4d3eb8f-bab7-49b6-a2d9-1b6e8be181d8'
-  }[subName + userRole]
+    periodPain: 'a4d3eb8f-bab7-49b6-a2d9-1b6e8be181d8',
+    PE: '8aa43396-9283-4eba-88ad-efe30d4ef2cf',
+    toB: 'a283529e-4703-4381-9dba-1802349278a7',
+  }[subName]
   globalData.headers = {
     appTerminalPlatform: libs.data.systemInfo.platform,
     appVersion: [mode, vision, updateTime].join('.'),

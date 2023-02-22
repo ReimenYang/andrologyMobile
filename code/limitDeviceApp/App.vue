@@ -10,7 +10,11 @@ export default {
         theme: '#7A56EC'
       },
       PE: { // 早泄
-        appName: '易循环',
+        appName: '易循环', //
+        theme: '#127087'
+      },
+      toB: { // 送审
+        appName: '晨硕治疗仪',
         theme: '#127087'
       }
     }
