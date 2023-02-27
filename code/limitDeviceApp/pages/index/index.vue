@@ -137,7 +137,6 @@ export default {
       return this.router()
     },
     router () {
-      if (this.libs.configProject.userRole === 'hospital' && !this.globalData.userInfo) return uni.reLaunch({ url: '/pages/index/loginPassword' })
       uni.reLaunch({ url: '/pages/scheme/index' })
     }
   }

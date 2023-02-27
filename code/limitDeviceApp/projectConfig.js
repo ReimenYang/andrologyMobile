@@ -1,7 +1,7 @@
 module.exports = {
-  name: '易循环', // 项目名称 晨硕治疗仪 易循环
+  name: '易循环', // 项目名称 易循环
   projectName: 'ECirculation', // 项目代号
-  port: 8862, // 本地运行的端口
+  port: 8860, // 本地运行的端口
   framework: 'uni', // 使用前端框架:vue||uni
   appid: '__UNI__0940A4C',
   // 一键登录
@@ -32,7 +32,6 @@ module.exports = {
   // webDeveloper: '10.10.20.41',
   // webDeveloper: 'localhost'
   mode: 'produce', // dev 开发环境、 test 测试环境、 produce 正式环境、 demo 演示环境、 pre 预发布环境
-  userRole: 'hospital', // user 用户 hospital 医院
   /**  消费电子特有字段*/
 
   /** 设备类型id(deviceTypeId)
@@ -44,9 +43,8 @@ module.exports = {
   /** 针对病症分类的app(subName)
    * periodPain 痛经
    * PE 早泄
-   * toB 送审
    */
-  subName: 'toB',
+  subName: 'PE',
   /** 是否使用多通道设备(isNewDevice)
    * Y/N 是/否
    */
