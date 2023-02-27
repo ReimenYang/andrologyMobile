@@ -4,6 +4,7 @@ let globalData = {}
 let apiServers = {}, host = {}
 switch (projectName) {
   case 'ECirculation':// 易循环
+  case 'sunshine':// 晨硕治疗仪
     apiServers = {
       dev: 'http://consume.sspendi.com',
       test: 'http://consume.sspendi.com',
@@ -63,6 +64,8 @@ const setting = {
       ECirculation: '8860', // 易循环
       limitDeviceAdmin: '8861', // 消费电子管理后台
       consume: '8862', // 优E康
+      ble: '8863', // ble智康
+      sunshine: '8864', // 晨硕治疗仪
       uniApp: '8001', // uniApp模板
       demo: '8000', // vue3模板
     },
@@ -95,6 +98,8 @@ const setting = {
     uniApp: 'uniApp', // uniApp模板
     demo: 'demo', // vue3模板
     ECirculation: 'ECirculation', // 易循环
+    ble: 'ble', // ble智康
+    sunshine: 'sunshine', // 晨硕治疗仪
     limitDeviceAdmin: 'limitDeviceAdmin', // 消费电子管理后台
     consume: 'consume', // 优E康
   },
