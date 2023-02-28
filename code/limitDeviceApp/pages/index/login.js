@@ -41,19 +41,19 @@ let login = async () => {
     // phone = 18924166730// 红米
     // phone = 15914214657 //邦森
     // 检查是否应用市场审核中
-    // if (!globalData.updateAppConfig.review.includes(vision)) {
-    let { statusCode, data } = await libs.global.uniLogin.auto(univerifyStyle)
-    switch (statusCode) {
-      case 200:
-        phone = data
-        break
-      case 30002:// 点击其他方式登陆
-        return { statusCode, data }
-      default:
-        uni.showToast({ title: statusCode + data, icon: 'none', duration: 2000 })
-        break
+    if (!globalData.updateAppConfig.review.includes(vision)) {
+      let { statusCode, data } = await libs.global.uniLogin.auto(univerifyStyle)
+      switch (statusCode) {
+        case 200:
+          phone = data
+          break
+        case 30002:// 点击其他方式登陆
+          return { statusCode, data }
+        default:
+          uni.showToast({ title: statusCode + data, icon: 'none', duration: 2000 })
+          break
+      }
     }
-    // }
     libs.data.setStorage('phone', phone)
     globalData.headers.phone = phone
   }
@@ -72,7 +72,7 @@ let login = async () => {
 
   // 易循环
   let { data } = await libs.request(libs.api.ECirculation.user.login, { phone })
-  data.realname = data.userName
+  data.realname = data.userName || data.phone
   let userInfo = globalData.userInfo = data
 
   // console.log('请求用户信息', data)

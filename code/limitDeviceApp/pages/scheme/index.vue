@@ -65,34 +65,6 @@
           </xnw-item>
         </view>
       </view>
-      发送长度：<input
-        type="number"
-        v-model="l"
-      >K
-      发送间隔：<input
-        type="number"
-        v-model="t"
-      >ms
-      <view class="btnGroup">
-        <view
-          @click="test"
-          class="btn"
-        >
-          按队列同步发送
-        </view>
-        <view
-          @click="testB"
-          class="btn"
-        >
-          加序号异步发送
-        </view>
-        <view
-          @click="testC"
-          class="btn"
-        >
-          一次性发送
-        </view>
-      </view>
     </p-wrap>
     <p-menu :defaultIndex="0" />
   </view>
@@ -108,9 +80,7 @@ export default {
         post: '/static/face.png'
       },
       from: '',
-      RecordId: 0,
-      l: 100,
-      t: 10
+      RecordId: 0
     }
   },
   async onLoad (option) {
@@ -198,69 +168,6 @@ export default {
       if (this.device.name)
         return 'background-image: url("/static/neverLink.png")'
       return 'background-image: url("/static/unLink.png")'
-    },
-    test () {
-      let l = this.l
-      let length = 5 * 10 * l
-      let time = new Date()
-      this.libs.global.ble.BaseBleModule.writeTime = this.t
-      uni.showLoading({ title: `开始发送长度为 ${l}k 的数据` })
-      this.libs.global.ble.BaseBleModule.commandMQ(Array.apply(null, { length }).map((n, i) => 'xxxxxxxxxxxxxxxxxxxx'.replace(/x/img, String(i).slice(-1))).join(''))
-      let commandID = this.libs.global.ble.BaseBleModule.commandHistory.slice(-1)[0].id
-      this.commandCallback(commandID, () => {
-        this.libs.global.ble.BaseBleModule.writeTime = 100
-        uni.hideLoading()
-        uni.showModal({ content: `完成发送，用时 ${(new Date() - time) / 1000} 秒` })
-      })
-    },
-    testB () {
-      let length = 5 * 10
-      console.log('异步发送', length)
-      Array.apply(null, { length }).forEach((n, i) => {
-        let value = ('00000' + i).slice(-4) + ',xxxxxxxxxxxxxx'.replace(/x/img, String(i).slice(-1))
-        let buffer = new ArrayBuffer(value.length)
-        let dataView = new DataView(buffer)
-        for (let i = 0; i < value.length; i++) {
-          dataView.setUint8(i, value.charAt(i).charCodeAt())
-        }
-        value = dataView.buffer
-        uni.writeBLECharacteristicValue({
-          deviceId: 'F0:C7:7F:73:68:20',
-          serviceId: '0000FFB0-0000-1000-8000-00805F9B34FB',
-          characteristicId: '0000ffb2-0000-1000-8000-00805f9b34fb',
-          value,
-          // success: function (e) {
-          //   console.log('write characteristics success: ' + JSON.stringify(e))
-          // },
-          fail: function (e) {
-            console.log(i, '发送失败')
-          }
-        })
-      })
-    },
-    testC () {
-      let length = 5 * 10
-      let value = Array.apply(null, { length }).map((n, i) => 'xxxxxxxxxxxxxxxxxxxx'.replace(/x/img, String(i).slice(-1))).join('')
-      console.log('一次性发送', value.length)
-      let buffer = new ArrayBuffer(value.length)
-      let dataView = new DataView(buffer)
-      for (let i = 0; i < value.length; i++) {
-        dataView.setUint8(i, value.charAt(i).charCodeAt())
-      }
-      value = dataView.buffer
-
-      uni.writeBLECharacteristicValue({
-        deviceId: 'F0:C7:7F:73:68:20',
-        serviceId: '0000FFB0-0000-1000-8000-00805F9B34FB',
-        characteristicId: '0000ffb2-0000-1000-8000-00805f9b34fb',
-        value,
-        // success: function (e) {
-        //   console.log('write characteristics success: ' + JSON.stringify(e))
-        // },
-        fail: function (e) {
-          console.log('一次性发送失败' + JSON.stringify(e))
-        }
-      })
     }
   }
 }
