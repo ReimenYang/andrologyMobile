@@ -20,6 +20,7 @@ async function request (api, params = {}, config = {}) {
   let time = utils.data.dateNow()
   let headers = configProject.globalData.headers || {}
   let header = JSON.parse(JSON.stringify(headers))
+  console.log(config);
   if (headers && !config.important) config = { headers, ...config }
   api = JSON.parse(JSON.stringify(api))
 
@@ -29,7 +30,7 @@ async function request (api, params = {}, config = {}) {
   let _host = configProject.urlApi
   // if(this.libs.data.getStorage('proxy')) _host = this.libs.data.getStorage('proxy')
   let _group = api.group ? configProject.apiGroup[api.group] : ''
-  // let _keyValue = utils.object.paramsToKeyValue(params)
+  let _keyValue = utils.object.paramsToKeyValue(params)
   let url = _host + _group + api.url // + '?' + encodeURI(_keyValue)
   if (api.url.startsWith('http')) url = api.url
   // if (url.length > 1024) {
@@ -63,13 +64,8 @@ async function request (api, params = {}, config = {}) {
   let errRes, dataRes, respondseError
   if (configProject.framework === 'uni') {
     console.log('uni请求')
-    if (api.dataType === 'keyValue') {
-      let _params = {}
-      for (let n in params) _params[n] = encodeURIComponent(params[n])
-      let _keyValue = utils.object.paramsToKeyValue(_params)
-      url += '?' + _keyValue
-      // url += '?' + encodeURI(_keyValue)
-    }
+    if (encodeURI(_keyValue).length > 300) console.error('请求条件过长')
+    if (api.dataType === 'keyValue') url += '?' + encodeURI(_keyValue)
     toast = title => uni.showToast({ title, icon: 'none', duration: 2000 })
     let [_errRes, _dataRes] = await uni.request({ ...api, url, data, ...config, header, sslVerify: false })
     errRes = _errRes
@@ -81,6 +77,10 @@ async function request (api, params = {}, config = {}) {
     // 在vite框架下搭建的vue3项目，这里的this是指libs，因此要在mian.js定义libs.el = ElementPlus
     console.log('axios请求')
     toast = this.$alert || window.X.app.$alert
+    if (encodeURI(_keyValue).length > 300 || encodeURI(JSON.stringify(params)).length > 300) {
+      params = {}
+      console.error('请求条件过长,params被清理')
+    }
     dataRes = await axios({ ...api, url, data, params, ...config })
       // 拦截请求报错
       .catch(error => errRes = respondseError = error)
@@ -96,7 +96,7 @@ async function request (api, params = {}, config = {}) {
     _data = dataRes.data || {}
   }
 
-  console.log(time, '请求结果', url, _data)
+  // console.log(time, '请求结果', url, _data)
   let statusCode = dataRes.statusCode || dataRes.status
   let errorMessage = dataRes.errorMessage || ''
   // 一般失败请求处理
@@ -114,6 +114,7 @@ async function request (api, params = {}, config = {}) {
   if ((_data.code && (_data.code !== 0 && _data.code !== 200)) || (_data.statuscode && _data.statuscode !== '0000')) {
     toastBox('业务提示：' + (_data.msg || _data.statusmsg || _data.errorMessage) + time, apiName + (_data.code || _data.statuscode), { ...api, url, data, ...config }, dataRes)
   }
+  console.log(time, '请求结果', url, _data)
   return _data
 }
 

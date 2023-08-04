@@ -6,7 +6,9 @@ const apis = {
   getUserByOpenIdOrUnionId: { method: 'GET', url: 'coreuser/getUserByOpenIdOrUnionId', group: 'core' },
   getUserByQwcode: { method: 'GET', url: 'coreuser/getUserByQwcode', group: 'core', dataType: 'form' },
   getByPhone: { method: 'GET', url: 'coreuser/getByPhone', group: 'core', dataType: 'keyValue' },
+  checkSmsCode: { method: 'POST', url: 'coreuser/checkSmsCode', group: 'core', dataType: 'keyValue' },
   userUpdateInfo: { method: 'POST', url: 'coreuser/userUpdateInfo', group: 'core', dataType: 'form' },
+  editPassword: { method: 'POST', url: 'coreuser/editPassword', group: 'core', dataType: 'form' },
   saveUser: { method: 'POST', url: 'coreuser/saveUser', group: 'core', dataType: 'keyValue' }
 }
 

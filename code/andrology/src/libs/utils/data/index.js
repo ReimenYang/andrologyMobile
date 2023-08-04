@@ -236,6 +236,8 @@ data.listFormat = ({
     pagination: { currentPage, pageSize, total }
   }
 }
+// 制造阻塞
+data.sleep = (time = 1000) => { return new Promise(resolve => setTimeout(resolve, time)) }
 data.page = page
 data.verify = verify
 

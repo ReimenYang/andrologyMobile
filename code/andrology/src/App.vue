@@ -1,34 +1,28 @@
 <template>
-  <div>
-    <a
-      href="https://vitejs.dev"
-      target="_blank"
-    >
-      <img
-        src="/vite.svg"
-        class="logo"
-        alt="Vite logo"
-      />
-    </a>
-    <a
-      href="https://vuejs.org/"
-      target="_blank"
-    >
-      <img
-        src="./assets/vue.svg"
-        class="logo vue"
-        alt="Vue logo"
-      />
-    </a>
-  </div>
-  <!-- <HelloWorld msg="Vite + Vue" /> -->
+  <el-config-provider :locale="locale">
+    <router-view />
+  </el-config-provider>
 </template>
+
 <script>
-// import HelloWorld from './components/HelloWorld.vue'
-export default {
-  // components: { HelloWorld },
+import { defineComponent } from 'vue'
+import { ElConfigProvider } from 'element-plus'
+
+import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
+export default defineComponent({
+  name: 'App',
+  components: {
+    ElConfigProvider,
+  },
+  setup () {
+    return {
+      locale: zhCn,
+    }
+  },
   data () {
-    return {}
+    return {
+      ready: false
+    }
   },
   // 在实例初始化之后，数据观测（data observer）和event/watcher事件配置之前被调用
   beforeCreate () {
@@ -36,7 +30,7 @@ export default {
   },
   // 在实例创建完成后被立即调用。在这一步，实例已完成以下配置：数据观测（data observer）
   // 属性和方法的运算，watch/event事件回调。但是，挂载阶段还没开始，$el属性目前不可见
-  async created () {
+  created () {
     console.log('created')
   },
   // 在挂载开始之前被调用：相关的编译函数首次被调用
@@ -44,8 +38,17 @@ export default {
     console.log('beforeMount')
   },
   // el被新创建的vm.$el替换，挂载成功
-  mounted () {
+  async mounted () {
     console.log('mounted')
+    window.addEventListener("beforeunload", () => {
+      try {
+        let _userInfo = JSON.parse(this.libs.data.getStorage('userInfo'))
+        _userInfo.beforeunload = new Date()
+        this.libs.data.setStorage('userInfo', JSON.stringify(_userInfo))
+      } catch (e) {
+        console.log(e);
+      }
+    });
   },
   // 数据更新时调用
   beforeUpdate () {
@@ -56,24 +59,54 @@ export default {
     console.log('updated')
   },
   beforeUnmount () {
-    console.log('beforeDestroy')
+    console.log('beforeUnmount')
   },
   unmounted () {
-    console.log('destroy')
+    console.log('unmounted')
+  },
+  // destroyed () {
+  //   console.log('destroy')
+  // },
+  methods: {
+    async checkLogin () {
+      let _userInfo = this.libs.data.getStorage('userInfo')
+      if (!_userInfo) return this.$router.push('/admin/login')
+      this.globalData.userInfo = JSON.parse(_userInfo)
+      let { beforeunload, loginToken, projectCode } = this.globalData.userInfo
+      if ((new Date() - beforeunload > 3 * 1000) || !loginToken) return this.$router.push(`/${projectCode ? 'user' : 'admin'}/login`)
+      this.globalData.headers = { token: loginToken, projectCode: sessionStorage.projectCode || '' }
+      if (!sessionStorage.projectCode) return
+      this.globalData.orgList = (await this.request(this.api.andrology.projectMgt.getProjectOrgList)).data
+      this.globalData.groupList = (await this.request(this.api.andrology.projectMgt.getProjectGroupList)).data
+    }
   }
-}
+})
 </script>
 
-<style scoped lang="scss">
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  &:hover {
-    filter: drop-shadow(0 0 2em #646cffaa);
-  }
-  &.vue:hover {
-    filter: drop-shadow(0 0 2em #42b883aa);
-  }
+<style lang="scss">
+@import "./assets/css/reset.scss";
+@import "./assets/fonts/iconfont.css";
+@import "//at.alicdn.com/t/font_2308054_fi39pku6shj.css";
+#app {
+  height: 100%;
+}
+.btn {
+  margin: 0 10px;
+  font-size: 16px;
+  border-color: var(--theme-color);
+}
+
+.primary {
+  background-color: var(--theme-color);
+  color: var(--color-white);
+}
+.plain {
+  background-color: var(--color-plain);
+  color: var(--theme-color);
+}
+.formFooter {
+  margin: 10px;
+  display: flex;
+  justify-content: center;
 }
 </style>

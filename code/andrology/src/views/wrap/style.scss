@@ -1,0 +1,39 @@
+.wrap {
+  width: 100vw;
+  height: 100vh;
+
+  .aside {
+    max-width: 15rem;
+  }
+
+  .headerBar {
+    padding: 0;
+    background: var(--theme-color);
+  }
+
+  .mainBox {
+    padding: 0 10px 10px;
+    background-color: var(--color-background);
+
+  .tabBox {
+    width: 100%;
+    padding-top: 10px;
+    box-sizing: border-box;
+    position: sticky;
+    top: 0;
+    z-index: 900;
+    background-color: inherit;
+
+    & :deep(.el-tabs__item.is-active),
+    & :deep(.el-tabs__item:hover) {
+      border-radius: 5px 5px 0 0;
+      color: var(--theme-color);
+      background: var(--color-white);
+    }
+
+    .hideTabPage {
+      display: none;
+    }
+  }
+  }
+}

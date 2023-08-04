@@ -2,7 +2,14 @@ const Path = require('path')
 const fs = require('fs')
 const svnUltimate = require('node-svn-ultimate')
 const svn = svnUltimate.commands
-const { projectName, framework } = require('../../projectConfig.js')
+let projectConfig
+try {
+  projectConfig = require('../../projectConfig.js')
+} catch (e) {
+  projectConfig = require('../../projectConfigA.js')
+}
+const { projectName, framework } = projectConfig
+
 let buildMode = 'test'
 
 let buildPath, toPath, buildRootDir

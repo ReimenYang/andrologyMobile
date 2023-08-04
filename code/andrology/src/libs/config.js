@@ -14,6 +14,15 @@ switch (projectName) {
     host.dev = 'http://' + webDeveloper
     host.produce = 'https://health10.cn'
     break
+  case 'andrology':// 晨硕治疗仪
+    apiServers = {
+      dev: 'http://10.10.20.85:9591',
+      test: 'https://andrologia.cn',
+      produce: 'https://andrologia.cn'
+    }
+    host.dev = 'http://' + webDeveloper
+    host.produce = 'https://andrologia.cn' //todo
+    break
   default:
     apiServers = {
       // dev: 'http://10.10.20.67:9999', // 邦森局域网
@@ -63,6 +72,7 @@ const setting = {
       deviceApp: '8841', // 网约家康2.0-设备端
       managePc: '8850', // 业务管理平台PC端
       manageMobile: '8851', // 业务管理平台手机端
+      bookingManagement: '8852', // 治疗预约系统
       ECirculation: '8860', // 易循环
       limitDeviceAdmin: '8861', // 消费电子管理后台
       consume: '8862', // 优E康
@@ -104,6 +114,7 @@ const setting = {
     sunshine: 'sunshine', // 晨硕治疗仪
     limitDeviceAdmin: 'limitDeviceAdmin', // 消费电子管理后台
     consume: 'consume', // 优E康
+    bookingManagement: 'bookingManagement', // 治疗预约系统pc端
   },
   apiGroup: { // ssyypt=衫山运营平台;ssdt=衫山大唐
     cms: '/wyjk-cms/v1/api/', // 项目考试，发放 项目证书 ， 家康学院  AI  培训证书  综合健康问卷数据  ， 售卖单个课程
@@ -120,10 +131,11 @@ const setting = {
     adminPms: '/wyjk-pms/', // 商品管理
     adminUms: '/wyjk-ums/', // 单位信息管理 , 英雄大赛管理, 单位医生管理, 单位医生问卷二维码管理
     adminSms: '/wyjk-sms/', // 会议管理, 营销管理
-    adminSsyypt: '/wyjk-ssdt-bleapi/', // ble后台管理, 治疗计划日志,设备管理,病症管理,工作室设备数据统计, 设备租用统计
+    adminSsyypt: '/wyjk-ssdt-bleapi/', // ble后台管理, 治疗计划日志,设备管理,病症管理,工作室设备数据统计, 设备租用统计,预约系统密码登录
     manageApi: '/manageApi/', // 业务管理平台
     ECirculation: '/api/', // 多通道消费电子
     wyjkDevice: '/wyjkDevice/', // 单通道消费电子：consume（痛经）
+    andrology: '/api/', // 男科大数据
   }
 }
 
@@ -142,7 +154,7 @@ const config = {
   ...setting,
   ...project,
   systemInfo: framework === 'uni' && uni.getSystemInfoSync(),
-  process,//electron 项目要在main.js配置contextIsolation: false,nodeIntegration: true
+  // process,//electron 项目要在main.js配置contextIsolation: false,nodeIntegration: true
   env: process.env,
   layout: '默认框架',
   layoutVision: '0.01Bate',

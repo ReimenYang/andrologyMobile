@@ -17,7 +17,7 @@ ipcMain.handle('getGlobal', async (event, key) => event.sender.send('getGlobal',
 
 // 窗口项
 const path = require('path')
-const createWindow = async (loadFile, width = 800, height = 600, openDevTools = false) => {
+async function createWindow (loadFile, width = 800, height = 600, openDevTools = false) {
   // Create the browser window.
   const _win = new BrowserWindow({
     width,

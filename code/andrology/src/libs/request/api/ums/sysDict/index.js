@@ -38,6 +38,10 @@ const apis = {
     painPhaseStatus: { ...def, url: _path + 'questionnaire/painPhaseStatus' },
     mandetail: { ...def, url: _path + 'questionnaire/mandetail' },
   },
+  // 预约系统
+  bookingManagement: {
+    time: { ...def, url: _path + 'bookingManagement/time' },
+  },
   // App版本信息
   updateAppConfig: {
     ble: { ...def, url: _path + 'updateAppConfig/ble' },
