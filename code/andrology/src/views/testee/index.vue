@@ -41,7 +41,9 @@
       <template #footer />
     </xnw-template-list>
     <add-testee
-      title="增加受试者"
+      :title="rowData.id?'编辑受试者':'增加受试者'"
+      :type="rowData.id?'edit':'add'"
+      :data="rowData"
       @close="hideDialog"
       @refresh="getList"
       v-if="showDialog"
@@ -54,7 +56,6 @@
     />
     <screening-info
       title="筛查详情"
-      :type="screeningType"
       @close="hideDialog"
       @refresh="getList"
       :date="rowDate"
@@ -135,8 +136,8 @@ export default {
             { text: '编辑', click: row => this.onBtn(row, 'edit') },
             { text: '筛查详情', click: row => this.onBtn(row, 'filterInfo') },
             { text: '筛查', click: row => this.onBtn(row, 'filter') },
-            { text: '入组', click: row => this.onBtn(row, 'join'), condition: row => !row.groupName },
-            { text: '排除', click: row => this.onBtn(row, 'exclude'), condition: row => !!row.groupName },
+            // { text: '入组', click: row => this.onBtn(row, 'join'), condition: row => !row.groupName },
+            // { text: '排除', click: row => this.onBtn(row, 'exclude'), condition: row => !!row.groupName },
             { text: '完成', click: row => this.onBtn(row, 'finish') },
             { text: '中止', click: row => this.onBtn(row, 'stop') },
             { text: '脱落', click: row => this.onBtn(row, 'falloff') },
@@ -153,7 +154,8 @@ export default {
       resultList: [],
       uploadFileDialog: false,
       screeningDialog: false,
-      screeningType: 'join',
+      // screeningType: 'join',
+      rowData: {}
     }
   },
   async created () {
@@ -162,12 +164,14 @@ export default {
   methods: {
     async getList () {
       this.list = (await this.request(this.api.andrology.patient.getPatientList)).data
+      this.list.forEach(item => item.patientId = item.id);
       this.pagination = { ...this.globalData.pagination, total: this.list.length, }
       this.onPage({})
       this.ready = true
     },
     hideDialog () {
       this.showDialog = this.uploadFileDialog = this.screeningDialog = false
+      this.rowData = {}
     },
     async onBtn (row, type) {
       this.rowDate = row
@@ -176,11 +180,15 @@ export default {
           this.$router.push('/crf?patientId=' + row.id)
           break;
         case 'edit':
+          this.rowData = row
           console.log(row, type);
+          this.showDialog = true
           break;
         case 'join':
         case 'exclude':
-          this.screeningType = type
+        case 'filter':
+        case 'filterInfo':
+          // this.screeningType = type
           this.screeningDialog = true
           console.log(row, type);
           break;

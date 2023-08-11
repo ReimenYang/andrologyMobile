@@ -5,6 +5,7 @@ import patient from './patient'
 import user from './user'
 import file from './file'
 import crf from './crf'
+import data from './data'
 
 export default {
   project,
@@ -12,5 +13,6 @@ export default {
   patient,
   user,
   file,
-  crf
+  crf,
+  data
 }

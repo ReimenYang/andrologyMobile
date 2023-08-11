@@ -29,7 +29,9 @@
       <template #default />
     </xnw-template-list>
     <add-testee-group
-      title="增加分组"
+      :title="rowData.id?'编辑分组':'增加分组'"
+      :type="rowData.id?'edit':'add'"
+      :data="rowData"
       @close="hideDialog"
       @refresh="getList"
       v-if="showDialog"
@@ -56,6 +58,7 @@ export default {
           ]
         }
       ],
+      rowData: {},
       showDialog: false
     }
   },
@@ -69,11 +72,14 @@ export default {
     },
     hideDialog () {
       this.showDialog = false
+      this.rowData = {}
     },
     async onBtn (row, type) {
       switch (type) {
         case 'edit':
+          this.rowData = row
           console.log(row, type);
+          this.showDialog = true
           break;
         case 'del':
           await this.request(this.api.andrology.projectMgt.deleteProjectGroup, row)

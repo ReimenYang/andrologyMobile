@@ -13,7 +13,6 @@
         :question="question"
         :index="i+1+'. '"
         ref="question"
-        @change="onChange"
       />
     </div>
     <div
@@ -63,23 +62,10 @@ export default {
       default: () => ({})
     }
   },
-  async created () {
-    window.paper = this
-    console.log('paper', this.paper);
-  },
-  methods: {
-    update () {
-      let _target = this.$refs.question
-      if (!_target) return
-      let _isObject = this.libs.object.isObject(_target)
-      if (_isObject) _target.update()
-      else _target.forEach(item => { item.update() })
-    },
-    onChange (question) {
-      // this.testTarget().questionChange(question)
-      // this.update()
-    }
-  }
+  // async created () {
+  //   window.paper = this
+  //   console.log('paper', this.paper);
+  // }
 }
 </script>
 <style lang="scss" scoped>

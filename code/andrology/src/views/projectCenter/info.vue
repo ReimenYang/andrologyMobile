@@ -14,9 +14,13 @@ export default {
     }
   },
   async created () {
-    let projectCode = this.$route.query.projectCode
+    let { projectCode, projectName } = this.$route.query
     if (!projectCode) return
     sessionStorage.projectCode = this.globalData.headers.projectCode = projectCode
+    sessionStorage.projectName = projectName
+
+    this.globalData.orgList = (await this.request(this.api.andrology.projectMgt.getProjectOrgList)).data
+    this.globalData.groupList = (await this.request(this.api.andrology.projectMgt.getProjectGroupList)).data
   },
 
   methods: {

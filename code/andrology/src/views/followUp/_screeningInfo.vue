@@ -5,22 +5,18 @@
     v-model="showDialog"
     :width="width"
   >
-    <div style="display: flex;">
-      <el-descriptions
-        :column="1"
-        border
-        v-for="(list,i) in screeningInfo"
-        :key="i"
+    <el-descriptions
+      :column="1"
+      border
+    >
+      <el-descriptions-item
+        :label="col.criteria"
+        v-for="col in screeningInfo"
+        :key="col.criteria"
       >
-        <el-descriptions-item
-          :label="col.criteria"
-          v-for="col in list"
-          :key="col.criteria"
-        >
-          {{ col.result }}
-        </el-descriptions-item>
-      </el-descriptions>
-    </div>
+        {{ col.result }}
+      </el-descriptions-item>
+    </el-descriptions>
     <div class="formFooter">
       <button
         class="btn"
@@ -28,12 +24,8 @@
       >取消</button>
       <button
         class="btn primary"
-        @click="confirm('join')"
-      >入组</button>
-      <button
-        class="btn primary"
         @click="confirm"
-      >排除</button>
+      >{{type === 'join'?'入组':'排除'}}</button>
     </div>
     <join-group
       title="入组"
@@ -76,15 +68,15 @@ export default {
     }
   },
   async created () {
-    this.screeningInfo = (await this.request(this.api.andrology.patient.getPatientScreeningInfo, { patientId: this.date.id })).data
+    this.screeningInfo = (await this.request(this.api.andrology.patient.getPatientScreeningInfo, { patientId: this.date.id })).data[this.type === 'join' ? 'inclusionCriteriaList' : 'exclusionCriteriaList']
   },
   methods: {
     async finish () {
       this.$emit('refresh')
       this.$emit('close')
     },
-    async confirm (type) {
-      if (type === 'join') return this.joinDialog = true
+    async confirm () {
+      if (this.type === 'join') return this.joinDialog = true
       let res = await this.request(this.api.andrology.patient.exclude, { patientId: this.date.id })
       if (res.code !== 200) return this.finish()
     },

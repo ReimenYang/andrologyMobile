@@ -19,7 +19,6 @@
     <el-main class="main">
       <el-collapse
         v-model="activeStage"
-        @change="collapseChange(i)"
         accordion
         v-if="ready"
       >
@@ -29,27 +28,15 @@
           :title="stage.stageName"
           :name="stage.stageId"
         >
-          <el-tabs
-            v-model="activeQuestionnaire[i]"
-            @tab-click="tabClick"
-          >
-            <el-tab-pane
-              v-for="{questionnaireTypeId,questionnaireTypeName,paper} in stage.questionnaireList"
-              :key="questionnaireTypeId"
-              :label="questionnaireTypeName"
-              :name="questionnaireTypeId"
-            >
-              <div v-if="activeQuestionnaire[i] === questionnaireTypeId && activeStage === stage.stageId">
-                <!-- 卡片式问卷 -->
-                <paper-by-card
-                  ref="paper"
-                  v-for="questionGroup in paper"
-                  :key="questionGroup.groupId"
-                  :paper="questionGroup"
-                />
-              </div>
-            </el-tab-pane>
-          </el-tabs>
+
+          <paper
+            v-if="activeStage === stage.stageId"
+            :activeQuestionnaire="activeQuestionnaire"
+            :stageIndex="i"
+            :stage="stage"
+            :activeStage="activeStage"
+            :patientInfo="patientInfo"
+          />
         </el-collapse-item>
       </el-collapse>
       <el-button
@@ -84,12 +71,25 @@
       </div>
     </el-aside>
   </el-container>
+  <add-testee
+    :title="rowData.patientId?'编辑受试者':'增加受试者'"
+    :type="rowData.patientId?'edit':'add'"
+    :data="rowData"
+    @close="hideDialog"
+    v-if="showDialog"
+  />
 </template>
 
 <script>
-import paperByCard from './_paperByCard.vue'
+import paper from './_paper.vue'
+import addTestee from '../testee/_addTestee.vue'
 export default {
-  components: { paperByCard },
+  components: { paper, addTestee },
+  provide () {
+    return {
+      testTarget: () => this
+    }
+  },
   data () {
     return {
       ready: false,
@@ -122,8 +122,8 @@ export default {
       }],
       btnList: [
         { text: '编辑', click: row => this.onBtn(row, 'edit') },
-        { text: '入组', click: row => this.onBtn(row, 'join'), condition: row => !row.groupName },
-        { text: '排除', click: row => this.onBtn(row, 'exclude'), condition: row => !!row.groupName },
+        // { text: '入组', click: row => this.onBtn(row, 'join'), condition: row => !row.groupName },
+        // { text: '排除', click: row => this.onBtn(row, 'exclude'), condition: row => !!row.groupName },
         { text: '完成', click: row => this.onBtn(row, 'finish') },
         { text: '中止', click: row => this.onBtn(row, 'stop') },
         { text: '脱落', click: row => this.onBtn(row, 'falloff') },
@@ -131,23 +131,19 @@ export default {
         { text: '上传文件', click: row => this.onBtn(row, 'upload') }
       ],
       activeStage: '',
-      activeQuestionnaire: []
+      activeQuestionnaire: [],
+      rowData: {},
+      showDialog: false
     }
   },
-  // watch: {
-  //   filterText: function () {
-  //     if (this.filterText) this.$refs.treeRef.filter(this.filterText)
-  //   }
-  // },
   async created () {
-    window.W = this
+    window.Y = this
     await this.init()
   },
   methods: {
     async init () {
       let patient = await this.getList(this.$route.query.patientId)
       await this.getPatientInfo(patient)
-      await this.getQuestionnaire()
     },
     async getList (patientId) {
       let list = (await this.request(this.api.andrology.crf.getPatientList)).data
@@ -162,148 +158,52 @@ export default {
       }))
       return list.find(patient => patient.patientId === patientId - 0)
     },
+    async onBtn (row, type) {
+      this.rowDate = row
+      switch (type) {
+        case 'CRF':
+          this.$router.push('/crf?patientId=' + row.id)
+          break;
+        case 'edit':
+          this.rowData = row
+          console.log(row, type);
+          this.showDialog = true
+          break;
+        // case 'join':
+        // case 'exclude':
+        case 'filter':
+        case 'filterInfo':
+          this.screeningType = type
+          this.screeningDialog = true
+          console.log(row, type);
+          break;
+        case 'signature':
+        case 'finish':
+        case 'stop':
+        case 'falloff':
+          await this.request(this.api.andrology.patient[type], row)
+          break;
+        case 'upload':
+          this.uploadFileDialog = true
+          break;
+        case 'del':
+          await this.request(this.api.andrology.patient.deletePatient, row)
+          await this.getList()
+          break;
+      }
+    },
     async getPatientInfo (params = this.patientList[0].children[0]) {
-      this.patientId = params.patientId
       this.ready = false
+      this.patientId = params.patientId
       this.patientInfo = (await this.request(this.api.andrology.crf.getPatientInfo, params)).data
       this.activeStage = this.patientInfo.stageList[0].stageId
       this.activeQuestionnaire = this.patientInfo.stageList.map(({ questionnaireList }) => questionnaireList[0].questionnaireTypeId)
-    },
-    async getQuestionnaire () {
-      let i = this.patientInfo.stageList.findIndex(stage => stage.stageId === this.activeStage)
-      let questionnaireTypeId = this.activeQuestionnaire[i]
-      let _questionnaire
-        = this.patientInfo.stageList
-          .find(stage => stage.stageId === this.activeStage).questionnaireList
-          .find(questionnaire => questionnaire.questionnaireTypeId === questionnaireTypeId)
-
-      if (_questionnaire.paper) return this.ready = true
-
-      _questionnaire.paper = (await this.request(
-        this.api.andrology.crf.getQuestionnaire,
-        { ...this.patientInfo, stageId: this.activeStage, questionnaireTypeId }
-      )).data.groupList
-      _questionnaire.paper.forEach(group => {
-        group.patientId = this.patientId
-        group.stageId = this.activeStage
-        group.questionnaireTypeId = questionnaireTypeId
-        group.questionnaireName = _questionnaire.questionnaireTypeName
-        group.table = {
-          tableHeader: [
-            { prop: 'questionTitle', label: '检查项目' },
-            {
-              prop: 'questionAnswer', label: group.examineAnswerTitle, type: 'input',
-              repeat: [
-                { prop: 'questionAnswer' }
-              ]
-            },
-            {
-              prop: 'examineSence', label: group.examineSenceTitle, type: 'select',
-              repeat: [
-                {
-                  options: [
-                    { value: '正常' },
-                    { value: '异常无临床意义' },
-                    { value: '异常有临床意义' },
-                    { value: '未查' },
-                    { value: '不适用' }
-                  ]
-                }
-              ]
-            },
-            { prop: 'examineNormalValue', label: group.examineNormalValueTitle },
-            { prop: 'examineRemark', label: group.examineRemarkTitle },
-          ]
-        }
-        group.questionList.forEach(question => {
-          if (!question.askOperationList) question.askOperationList = []
-          switch (question.questionType) {
-            case '计算':
-              question.uiStyle = 'computer'
-              break;
-            case '日期':
-              question.uiStyle = 'dateTimePicker'
-              // question.uiStyle = 'date'
-
-              question.col = {
-                label: question.questionTitle,
-                prop: 'questionAnswer',
-                type: question.uiStyle
-              }
-              break;
-            case '上传图片':
-              question.uiStyle = 'uploadImg'
-              break;
-            case '数字':
-              question.uiStyle = 'num'
-              break;
-            case '单行文本':
-              question.uiStyle = 'input'
-
-              question.col = {
-                label: question.questionTitle,
-                prop: 'questionAnswer',
-                type: question.uiStyle,
-                repeat: [
-                  { prop: 'questionAnswer' }
-                ]
-              }
-              break;
-            case '多行文本':
-              question.uiStyle = 'textarea'
-              question.col = {
-                label: question.questionTitle,
-                prop: 'questionAnswer',
-                type: question.uiStyle
-              }
-              break;
-            case '单选':
-              question.uiStyle = 'radio'
-              question.checked = (question.optionList.find(option => option.checked) || {}).optionText
-              question.col = {
-                label: question.questionTitle,
-                prop: 'checked',
-                type: question.uiStyle,
-                repeat: question.optionList.map(({ optionText: label }) => ({ label }))
-              }
-              break;
-            case '多选':
-              question.uiStyle = 'checkbox'
-              question.checked = question.optionList.reduce((a, b) => b.checked ? [...a, b.optionText] : a, [])
-              question.col = {
-                label: question.questionTitle,
-                prop: 'checked',
-                type: question.uiStyle,
-                repeat: question.optionList.map(({ optionText: label }) => ({ label }))
-              }
-              break;
-            case '检查项目':
-              group.uiStyle = 'table'
-              return;
-          }
-          if (!question.col) question.col = {
-            label: question.questionTitle,
-            prop: 'questionAnswer',
-            type: question.uiStyle
-          }
-        });
-      });
       this.ready = true
     },
-    // getPaper (groupId) {
-    //   return this.paper.questionList.find(paper => paper.groupId === groupId)
-    // },
-    async collapseChange () {
-      return await this.getQuestionnaire()
-    },
-    async tabClick (tab) {
-      let i = this.patientInfo.stageList.findIndex(stage => stage.stageId === this.activeStage)
-      this.activeQuestionnaire[i] = tab.paneName
-      return await this.getQuestionnaire()
-    },
-    async cancelShowDialog () {
+    async hideDialog () {
+      if (this.rowData.patientId) await this.getPatientInfo(this.rowData)
+      this.rowData = {}
       this.showDialog = false
-      await this.getList({})
     },
     setActiveNodeClass (object) {
       return this.patientId === object.patientId ? 'active' : ''
@@ -316,8 +216,6 @@ export default {
     async clickTree (object) {
       if (!object.patientId) return
       await this.getPatientInfo(object)
-
-      await this.getQuestionnaire()
     },
     async save () {
       let paperList = this.patientInfo.stageList.map(stage => stage.questionnaireList.map(questionnaire => questionnaire.paper))
@@ -349,7 +247,7 @@ export default {
         questionnaireList:
           paperList.filter(item => item.stageId === stageId)
             .map(({ questionnaireTypeId, questionnaireName, groupId }) => ({
-              questionnaireTypeId: stageId === 110 ? questionnaireTypeId : '',
+              questionnaireTypeId,
               questionnaireName,
               entryUser: this.globalData.userInfo.userName,
               entryDate: new Date(),
@@ -361,6 +259,7 @@ export default {
         return { stageId: stage.stageId, ..._res }
       }))
       console.log(saveList, res);
+      return await this.init()
     }
   }
 }

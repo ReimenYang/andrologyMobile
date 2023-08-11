@@ -25,15 +25,25 @@
         :form="question"
       />
     </div>
+    <aboutAsk
+      title="相关质疑"
+      @close="hideDialog"
+      :hasAsk="hasAsk"
+      :form="params"
+      :askList="question.askList"
+      v-if="showDialog"
+    />
   </div>
 </template>
 <script>
+import aboutAsk from './_aboutAsk.vue'
 export default {
-  inject: ['testPaper'],
+  components: { aboutAsk },
+  inject: ['testStage', 'testPaper'],
   props: {
     question: {
       type: Object,
-      default: () => { return { error: true } }
+      default: () => ({ error: true })
     },
     index: {
       type: String,
@@ -42,7 +52,8 @@ export default {
   },
   data () {
     return {
-      // question: { error: true, ...this.testTarget().getQuestion(this.question.questionId) },
+      params: {},
+      showDialog: false
     }
   },
   watch: {
@@ -56,16 +67,19 @@ export default {
   },
   computed: {
     hasAsk () {
-      return this.question.askType.endsWith('质疑')
+      return this.question.verificationState === 'Q'
     },
     passAsk () {
-      return this.question.askType === '通过'
+      return this.question.verificationState === 'SDV'
     }
   },
-  // async created () {
-  //   window.question = this
-  //   console.log('question', this.question);
-  // },
+  async created () {
+    let { patientId, stageId, questionnaireTypeId } = this.testPaper().paper
+    let { questionId, questionTitle, questionAnswer } = this.question
+    this.params = { patientId, stageId, questionnaireTypeId, questionId, questionTitle, questionAnswer }
+    // window.question = this
+    // console.log('question', this.question);
+  },
   methods: {
     hasError () {
       return this.question.error && this.question.error !== true
@@ -90,12 +104,18 @@ export default {
       this.onChange()
     },
     setAsk () {
+      if (this.passAsk) return this.$message.warning('质疑前请先取消验证')
+      this.showDialog = true
     },
     async handlerSDV () {
-      let { patientId, stageId, questionnaireTypeId } = this.testPaper().paper
-      await this.request(this.api.andrology.crf.questionSDV, { patientId, stageId, questionnaireTypeId, questionId: this.question.id })
+      if (this.hasAsk) return this.$message.warning('验证前请先关闭质疑')
+      if (this.passAsk) await this.request(this.api.andrology.crf.cancelQuestionSDV, this.params)
+      else await this.request(this.api.andrology.crf.questionSDV, this.params)
       console.log(this.question);
-    }
+      await this.testStage().getQuestionnaire(true)
+    },
+    hideDialog () { this.showDialog = false },
+
   }
 }
 </script>

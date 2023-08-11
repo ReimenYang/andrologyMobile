@@ -90,7 +90,6 @@ export default {
     }
   },
   async created () {
-    window.W = this
     this.form = (await this.request(this.api.andrology.user.getUserInfo)).data
     this.showDialog = true
   },

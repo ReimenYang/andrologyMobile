@@ -77,6 +77,7 @@ export default {
     }
   },
   async created () {
+    sessionStorage.clear()
     this.globalData.headers.projectCode = ''
     await this.getList()
   },
@@ -86,8 +87,8 @@ export default {
       this.ready = true
     },
     hideDialog () { this.showDialog = false },
-    goPage ({ projectCode }, path) {
-      let routeData = this.$router.resolve({ path, query: { projectCode } })
+    goPage ({ projectCode, projectName }, path) {
+      let routeData = this.$router.resolve({ path, query: { projectCode, projectName } })
       window.open(routeData.href, '_blank')
     },
     async switchState ({ projectState, projectCode }) {

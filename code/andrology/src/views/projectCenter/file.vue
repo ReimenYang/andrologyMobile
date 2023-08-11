@@ -97,7 +97,7 @@ export default {
         {
           prop: 'btnList', label: '操作', btnList: [
             { text: '查看', click: row => this.fileBtn(row, 'open') },
-            { text: '编辑', click: row => this.fileBtn(row, 'edit') },
+            // { text: '编辑', click: row => this.fileBtn(row, 'edit') },
             { text: '下载', click: row => this.fileBtn(row, 'download') },
             { text: '删除', click: row => this.fileBtn(row, 'del') },
           ]
@@ -114,7 +114,7 @@ export default {
         {
           prop: 'btnList', label: '操作', btnList: [
             { text: '播放', click: row => this.videoBtn(row, 'play') },
-            { text: '编辑', click: row => this.videoBtn(row, 'edit') },
+            // { text: '编辑', click: row => this.videoBtn(row, 'edit') },
             { text: '下载', click: row => this.videoBtn(row, 'download') },
             { text: '删除', click: row => this.videoBtn(row, 'del') },
           ]

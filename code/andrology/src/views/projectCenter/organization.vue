@@ -41,7 +41,9 @@
       <template #footer />
     </xnw-template-list>
     <add-organization
-      title="增加机构"
+      :title="rowData.organizationId?'编辑机构':'增加机构'"
+      :type="rowData.organizationId?'edit':'add'"
+      :data="rowData"
       @close="hideDialog"
       @refresh="getList"
       v-if="showDialog"
@@ -97,13 +99,13 @@ export default {
           ]
         }
       ],
-      pagination: { ...this.globalData.pagination, pageSizes: [1, 2, 10, 20], pageSize: 2, currentPage: 1 },
+      pagination: { ...this.globalData.pagination },
       showDialog: false,
-      resultList: []
+      resultList: [],
+      rowData: {}
     }
   },
   async created () {
-    window.Y = this
     await this.getList()
   },
   methods: {
@@ -116,11 +118,14 @@ export default {
     },
     hideDialog () {
       this.showDialog = false
+      this.rowData = {}
     },
     async onBtn (row, type) {
       switch (type) {
         case 'edit':
+          this.rowData = row
           console.log(row, type);
+          this.showDialog = true
           break;
         case 'del':
           await this.request(this.api.andrology.projectMgt.deleteProjectOrg, row)

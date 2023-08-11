@@ -41,6 +41,10 @@ export default {
       type: String,
       default: () => '新增'
     },
+    data: {
+      type: Object,
+      default: () => ({})
+    },
     type: {
       type: String,
       default: () => 'add'
@@ -69,6 +73,9 @@ export default {
         patientIdentity: ''
       }
     }
+  },
+  created () {
+    this.form = { ...this.form, ...this.data }
   },
   methods: {
     async confirm () {

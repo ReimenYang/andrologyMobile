@@ -15,5 +15,6 @@ const apis = {
   getFollowupList: { method: 'POST', url: 'crf/getFollowupList', group: 'andrology', dataType: 'json' },//获取随访列表
   getQuestionnaireTypeListByStageId: { method: 'POST', url: 'crf/getQuestionnaireTypeListByStageId', group: 'andrology', dataType: 'json' },//根据随访阶段Id获取问卷类型列表
   modifyPatientFollowupRemark: { method: 'POST', url: 'crf/modifyPatientFollowupRemark', group: 'andrology', dataType: 'json' },//修改受试者随访备注
+  exportAskReport: { method: 'POST', url: 'crf/exportAskReport', group: 'andrology', dataType: 'json' },//导出质疑报告
 }
 export default apis

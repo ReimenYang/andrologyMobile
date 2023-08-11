@@ -14,7 +14,7 @@
     <el-col
       :span="19"
       class="selectStudio"
-    >
+    >{{ projectName }}
       <!-- 
         当前工作室
         <el-select
@@ -70,13 +70,15 @@ export default {
       // nowSystem: this.system(),
       studioList: [],
       studioId: '',
-      headers: {}
+      headers: {},
+      projectName: ''
     }
   },
   async created () {
     await this.$root.checkLogin()
     this.userInfo = this.globalData.userInfo
     this.$emit('init')
+    this.projectName = this.$route.query.projectName || sessionStorage.projectName
   },
   methods: {
     studioSelect (studioId) {
@@ -86,6 +88,7 @@ export default {
     logout () {
       this.userInfo.beforeunload = ''
       this.userInfo.loginToken = ''
+      sessionStorage.clear()
       this.libs.data.setStorage('userInfo', JSON.stringify(this.userInfo))
       // 根据用户角色判断跳转路径 todo
       let url = location.href.split('#')[0] + `#/${this.userInfo.projectCode ? 'user' : 'admin'}/login`

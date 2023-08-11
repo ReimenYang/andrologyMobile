@@ -28,5 +28,8 @@ const apis = {
   modifyProjectUser: { method: 'POST', url: 'projectMgt/modifyProjectUser', group: 'andrology', dataType: 'json' },//修改项目用户
   deleteProjectUser: { method: 'POST', url: 'projectMgt/deleteProjectUser', group: 'andrology', dataType: 'json' },//删除项目用户
   sendProjectSMS: { method: 'POST', url: 'projectMgt/sendProjectSMS', group: 'andrology', dataType: 'json' },//群发验证码
+  disableProjectUser: { method: 'POST', url: 'projectMgt/disableProjectUser', group: 'andrology', dataType: 'json' },//停用项目用户
+  enableProjectUser: { method: 'POST', url: 'projectMgt/enableProjectUser', group: 'andrology', dataType: 'json' },//启用项目用户
+  searchUser: { method: 'POST', url: 'projectMgt/searchUser', group: 'andrology', dataType: 'json' },// 搜索用户
 }
 export default apis
