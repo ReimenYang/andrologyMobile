@@ -15,6 +15,7 @@
         我的项目
       </el-col>
       <el-col
+        v-if="globalData.userInfo.canCreateProject==='Y'"
         :span="4"
         class="btnGroup"
       ><button
@@ -43,7 +44,10 @@
             @click="goPage(item,'/index')"
           >进入项目</el-button>
           <template v-if="item.canManage">
-            <el-button size="large">删除项目</el-button>
+            <el-button
+              size="large"
+              @click="delProject(item)"
+            >删除项目</el-button>
             <el-button
               size="large"
               @click="switchState(item)"
@@ -87,9 +91,15 @@ export default {
       this.ready = true
     },
     hideDialog () { this.showDialog = false },
-    goPage ({ projectCode, projectName }, path) {
-      let routeData = this.$router.resolve({ path, query: { projectCode, projectName } })
+    goPage ({ projectCode, projectName, projectState }, path) {
+      let routeData = this.$router.resolve({ path, query: { projectCode, projectName, projectState } })
+      this.globalData.userInfo.beforeunload = new Date() - 0
+      this.libs.data.setStorage('userInfo', JSON.stringify(this.globalData.userInfo))
       window.open(routeData.href, '_blank')
+    },
+    async delProject ({ projectCode }) {
+      await this.request(this.api.andrology.projectMgt.deleteProject, {}, { headers: { ...this.globalData.headers, projectCode } })
+      await this.getList()
     },
     async switchState ({ projectState, projectCode }) {
       await this.request(this.api.andrology.projectMgt[projectState === '暂停' ? 'startProject' : 'stopProject'], {}, { headers: { ...this.globalData.headers, projectCode } })

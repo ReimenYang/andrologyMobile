@@ -42,9 +42,8 @@ export default defineComponent({
     console.log('mounted')
     window.addEventListener("beforeunload", () => {
       try {
-        let _userInfo = JSON.parse(this.libs.data.getStorage('userInfo'))
-        _userInfo.beforeunload = new Date()
-        this.libs.data.setStorage('userInfo', JSON.stringify(_userInfo))
+        this.globalData.userInfo.beforeunload = new Date() - 0
+        this.libs.data.setStorage('userInfo', JSON.stringify(this.globalData.userInfo))
       } catch (e) {
         console.log(e);
       }
@@ -73,6 +72,7 @@ export default defineComponent({
       if (!_userInfo) return this.$router.push('/admin/login')
       this.globalData.userInfo = JSON.parse(_userInfo)
       let { beforeunload, loginToken, projectCode } = this.globalData.userInfo
+      console.log(new Date() - beforeunload, (new Date() - beforeunload > 3 * 1000), !loginToken);
       if ((new Date() - beforeunload > 3 * 1000) || !loginToken) return this.$router.push(`/${projectCode ? 'user' : 'admin'}/login`)
       this.globalData.headers = { token: loginToken, projectCode: sessionStorage.projectCode || '' }
       if (!sessionStorage.projectCode) return

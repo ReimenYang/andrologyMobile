@@ -13,8 +13,8 @@
             class="content"
             :value="projectDesc"
             disabled
-            autosize
             type="textarea"
+            :rows="Math.ceil(projectDesc/47)"
           /></dd>
       </dl>
       <div id="myChart" />
@@ -56,33 +56,36 @@
         >{{ videoName }}</dd>
       </dl>
     </div>
-    <video-player
+    <video-play
       v-bind="player"
+      @close="hideDialog"
       v-if="videoPlayerDialog"
     />
   </div>
 </template>
 
-
 <script>
-import videoPlayer from '../projectCenter/_videoPlayer.vue'
+import videoPlay from '../projectCenter/_videoPlayer.vue'
 export default {
-  components: { videoPlayer },
+  components: { videoPlay },
   data () {
     return {
+      ready: 0,
       projectDesc: '',
       standard: [],
       fileList: [],
       videoList: [],
       player: { title: '', playUrl: '' },
       videoPlayerDialog: false,
+      groupList: []
     }
   },
   async created () {
-    let { projectCode, projectName } = this.$route.query
+    let { projectCode, projectName, projectState } = this.$route.query
     if (projectCode) {
       sessionStorage.projectCode = this.globalData.headers.projectCode = projectCode
       sessionStorage.projectName = projectName
+      sessionStorage.projectState = projectState
       this.globalData.orgList = (await this.request(this.api.andrology.projectMgt.getProjectOrgList)).data
       this.globalData.groupList = (await this.request(this.api.andrology.projectMgt.getProjectGroupList)).data
     }
@@ -91,61 +94,16 @@ export default {
     this.videoList = intro.videoList
     this.projectDesc = intro.projectDesc
     this.standard = intro.criteriaList
+    this.groupList = intro.groupList
+    this.ready++
+  },
+  watch: {
+    ready: function () {
+      if (this.ready === 2) this.setChart()
+    }
   },
   mounted () {
-    // this.$root => app
-    let myChart = this.$root.echarts.init(document.getElementById('myChart'))
-    // 绘制图表
-    myChart.setOption({
-      tooltip: {
-        trigger: 'axis',
-        // formatter: '{b}<br/>{a}:{c}<br/>{a1}:{c1}'
-        formatter: ([a, b]) => `${a.name}<br/>${a.marker} ${a.seriesName}: <b>${a.value}</b><br/>${b.marker} ${b.seriesName}: <b>${b.value}</b>`
-      },
-      legend: {
-        y: 'bottom',
-        data: ['完成人数', '入组人数']
-      },
-      grid: { x: 60 },
-      xAxis: [
-        {
-          axisLabel: { textStyle: { fontSize: 16 } },
-          data: ['对照组', '试验组', 'xx组']
-        },
-        {
-          axisLine: { show: false },
-          axisTick: { show: false },
-          data: ['', '', '']
-        }
-      ],
-      yAxis: {
-        type: 'value',
-        axisLabel: { formatter: '{value}' },
-        splitLine: { show: false },
-        splitArea: {
-          show: true,
-          areaStyle: { color: ['#f8f8f8', '#fff'] }
-        }
-      },
-      series: [
-        {
-          name: '完成人数',
-          type: 'bar',
-          itemStyle: { normal: { color: 'rgba(252,206,16,1)', label: { show: true, textStyle: { fontSize: 16, color: '#E87C25' } } } },
-          data: [90, 91, 90]
-        },
-        {
-          name: '入组人数',
-          type: 'bar',
-          xAxisIndex: 1,
-          itemStyle: {
-            normal: { color: 'rgba(252,206,16,0.5)', label: { show: true, textStyle: { fontSize: 16, color: '#E87C25' }, position: 'top' } }
-          },
-          data: [150, 300, 281]
-        }
-      ]
-    })
-
+    this.ready++
     setTimeout(() => {
       let infoMain = document.getElementById('infoMain')
       let intro = document.getElementById('intro')
@@ -154,9 +112,64 @@ export default {
     }, 300)
   },
   methods: {
+    setChart () {
+      // this.$root => app
+      let myChart = this.$root.echarts.init(document.getElementById('myChart'))
+      // 绘制图表
+      myChart.setOption({
+        tooltip: {
+          trigger: 'axis',
+          // formatter: '{b}<br/>{a}:{c}<br/>{a1}:{c1}'
+          formatter: ([a, b]) => `${a.name}<br/>${a.marker} ${a.seriesName}: <b>${a.value}</b><br/>${b.marker} ${b.seriesName}: <b>${b.value}</b>`
+        },
+        legend: {
+          y: 'bottom',
+          data: ['完成人数', '入组人数']
+        },
+        grid: { x: 60 },
+        xAxis: [
+          {
+            axisLabel: { textStyle: { fontSize: 16 } },
+            data: this.groupList.map(({ name }) => name)//['对照组', '试验组', 'xx组']
+          },
+          {
+            axisLine: { show: false },
+            axisTick: { show: false },
+            data: ['', '', '']
+          }
+        ],
+        yAxis: {
+          type: 'value',
+          axisLabel: { formatter: '{value}' },
+          splitLine: { show: false },
+          splitArea: {
+            show: true,
+            areaStyle: { color: ['#f8f8f8', '#fff'] }
+          }
+        },
+        series: [
+          {
+            name: '完成人数',
+            type: 'bar',
+            itemStyle: { normal: { color: 'rgba(67, 167, 255,1)', label: { show: true, textStyle: { fontSize: 16, color: '#0058a3' } } } },
+            data: this.groupList.map(({ finishNums }) => finishNums)// [90, 91, 90]
+          },
+          {
+            name: '入组人数',
+            type: 'bar',
+            xAxisIndex: 1,
+            itemStyle: { normal: { color: 'rgba(67, 167, 255,0.5)', label: { show: true, textStyle: { fontSize: 16, color: '#0058a3' }, position: 'top' } } },
+            data: this.groupList.map(({ joinNums }) => joinNums)// [150, 300, 281]
+          }
+        ]
+      })
+
+    },
     async downloadFile (url) {
-      let res = await this.request({ method: 'GET', url, dataType: 'json' }, {}, { headers: this.globalData.headers, responseType: 'blob' })
-      location.href = window.URL.createObjectURL(new Blob([res], { type: res.type }))
+      window.open(url, '_blank')
+    },
+    hideDialog () {
+      this.videoPlayerDialog = false
     },
     async onPlay (title, url) {
       this.player.title = title
@@ -190,6 +203,9 @@ export default {
       font-size: var(--font-h4);
       line-height: 1.8;
       color: var(--color-normal);
+    }
+    :deep(textarea) {
+      resize: none;
     }
     &#intro {
       align-self: start;

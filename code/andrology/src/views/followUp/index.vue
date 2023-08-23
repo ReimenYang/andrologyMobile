@@ -38,7 +38,9 @@
 <script>
 import followupRecord from './_followupRecord.vue'
 import followupRemark from './_followupRemark.vue'
+import paginationMixin from '@/views/index/paginationMixin.js'
 export default {
+  mixins: [paginationMixin],
   components: { followupRecord, followupRemark },
   provide () {
     return {
@@ -47,9 +49,6 @@ export default {
   },
   data () {
     return {
-      list: [],
-      filterShow: true,
-      fromProp: { labelWidth: '130px' },
       filterForm: {
         patientCode: '',
         questionTitle: '',
@@ -95,10 +94,8 @@ export default {
           ]
         }
       ],
-      pagination: {},
       showDialog: false,
       rowDate: {},
-      resultList: [],
       remarkDialog: false
     }
   },
@@ -109,7 +106,6 @@ export default {
     async getList () {
       this.ready = false
       this.list = (await this.request(this.api.andrology.crf.getFollowupList)).data
-      this.pagination = { ...this.globalData.pagination, total: this.list.length, }
       this.onPage({})
       this.ready = true
     },
@@ -128,43 +124,6 @@ export default {
           console.log(row, type);
           break;
       }
-    },
-    onPage ({ current = this.pagination.currentPage || 1, size = this.pagination.pageSize }, list = this.list) {
-      this.resultList = list.slice((current - 1) * size, current * size)
-      this.pagination.currentPage = current
-      this.pagination.pageSize = size
-    },
-    async onFilter () {
-      await this.getList()
-      this.list = this.list.filter(item => {
-        let _boolen = true
-        let _createDate = ''
-        for (let { prop, type } of this.filterRepeat.flat()) {
-          let _value = this.filterForm[prop]
-          if (!_value) continue
-          switch (type) {
-            case 'input':
-              _boolen = item[prop].includes(_value)
-              break;
-            case 'dateTimePicker':
-              if (_value.length) {
-                _createDate = new Date(item.createDate.replace(/-/img, '/'))
-                _boolen = _value[0] < _createDate && _createDate < (_value[1] - 0 + 1000 * 60 * 60 * 24)
-              }
-              break;
-            case 'checkbox':
-              if (_value.length) _boolen = _value.includes(item[prop])
-              break;
-            default:
-              _boolen = item[prop] === _value
-              break;
-          }
-          if (!_boolen) break
-        }
-        return _boolen
-      })
-      this.pagination.total = this.list.length
-      return this.onPage({})
     }
   }
 }

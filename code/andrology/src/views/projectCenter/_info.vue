@@ -13,14 +13,18 @@
         :key="col.prop"
         v-bind="col.config"
       >
-        <xnwFromComponent
-          :col="col"
-          :form="form"
-        />
-
+        <div class="box">
+          <xnwFromComponent
+            :col="col"
+            :form="form"
+          />
+          <span
+            class="red"
+            v-if="col.required"
+          >*</span>
+        </div>
       </el-descriptions-item>
     </el-descriptions>
-
     <div class="formFooter">
       <button
         class="btn"
@@ -45,7 +49,7 @@ export default {
     return {
       width: '1300px',
       infoKeys: [
-        { prop: 'projectName', label: '项目名称', type: 'input', repeat: [{ prop: 'projectName' }] },
+        { prop: 'projectName', label: '项目名称', required: true, type: 'input', repeat: [{ prop: 'projectName' }] },
         {
           prop: 'patientOptional', label: '受试者选填项', type: 'checkbox', repeat: [
             { label: '姓名', value: '姓名' },
@@ -84,8 +88,8 @@ export default {
         },
         { prop: 'planStartDate', label: '预计开始时间', type: 'dateTimePicker', repeat: [{ prop: 'planStartDate', type: 'date' }] },
         { prop: 'planEndDate', label: '预计结束时间', type: 'dateTimePicker', repeat: [{ prop: 'planEndDate', type: 'date' }] },
-        { prop: 'patientCodePrefix', label: '受试者编号前缀', type: 'input', repeat: [{ prop: 'patientCodePrefix' }] },
-        { prop: 'patientCodeLength', label: '受试者编号位数', type: 'input', repeat: [{ prop: 'patientCodeLength' }] },
+        { prop: 'patientCodePrefix', label: '受试者编号前缀', required: true, type: 'input', repeat: [{ prop: 'patientCodePrefix' }] },
+        { prop: 'patientCodeLength', label: '受试者编号位数', required: true, type: 'input', repeat: [{ prop: 'patientCodeLength' }] },
         { prop: 'inclusionCriteria', label: '纳入标准', type: 'input', config: { span: 2 }, repeat: [{ prop: 'inclusionCriteria', type: 'textarea', rows: 4 }] },
         { prop: 'exclusionCriteria', label: '排除标准', type: 'input', config: { span: 2 }, repeat: [{ prop: 'exclusionCriteria', type: 'textarea', rows: 4 }] },
         { prop: 'falloffCriteria', label: '脱落标准', type: 'input', config: { span: 2 }, repeat: [{ prop: 'falloffCriteria', type: 'textarea', rows: 4 }] },
@@ -122,6 +126,9 @@ export default {
   },
   methods: {
     async confirm () {
+      let _required = this.infoKeys.filter(item => item.required && !this.form[item.prop]).map(item => item.label)
+      if (_required.length) return this.$message.error(_required.join() + '不能为空')
+
       let res = { code: 200 }
       let parmes = { ...this.form, patientOptional: this.form.patientOptional.join(), projectCode: this.globalData.headers.projectCode }
       switch (this.type) {
@@ -133,6 +140,7 @@ export default {
           break;
       }
       if (res.code !== 200) return
+      this.$message.success('保存成功')
       this.$emit('confirm')
       this.$emit('close')
     }
@@ -144,6 +152,15 @@ export default {
   &.edit {
     padding: 30px;
     background: #fff;
+  }
+  .box {
+    display: flex;
+    align-items: center;
+  }
+  .red {
+    margin: 0 10px;
+    color: red;
+    font-size: 24px;
   }
   .footer {
     margin: 10px;

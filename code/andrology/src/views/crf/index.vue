@@ -40,6 +40,7 @@
         </el-collapse-item>
       </el-collapse>
       <el-button
+        v-if="projectState"
         class="submitBtn"
         type="primary"
         @click="save"
@@ -72,19 +73,27 @@
     </el-aside>
   </el-container>
   <add-testee
-    :title="rowData.patientId?'编辑受试者':'增加受试者'"
-    :type="rowData.patientId?'edit':'add'"
-    :data="rowData"
+    title="编辑受试者"
+    type="edit"
+    :data="patientInfo"
     @close="hideDialog"
     v-if="showDialog"
+  />
+  <upload-file
+    title="上传文件"
+    @close="hideDialog"
+    :date="patientInfo"
+    v-if="uploadFileDialog"
   />
 </template>
 
 <script>
 import paper from './_paper.vue'
-import addTestee from '../testee/_addTestee.vue'
+import questionMixin from '@/views/crf/questionMixin.js'
+import testeeMixin from '../testee/testeeMixin'
 export default {
-  components: { paper, addTestee },
+  mixins: [questionMixin, testeeMixin],
+  components: { paper },
   provide () {
     return {
       testTarget: () => this
@@ -93,6 +102,7 @@ export default {
   data () {
     return {
       ready: false,
+      projectState: sessionStorage.projectState === '已开始',
       filterText: '',
       defaultProps: {
         label: 'label',
@@ -120,29 +130,20 @@ export default {
       }, {
         prop: 'consentState', label: '知情同意书'
       }],
-      btnList: [
-        { text: '编辑', click: row => this.onBtn(row, 'edit') },
-        // { text: '入组', click: row => this.onBtn(row, 'join'), condition: row => !row.groupName },
-        // { text: '排除', click: row => this.onBtn(row, 'exclude'), condition: row => !!row.groupName },
-        { text: '完成', click: row => this.onBtn(row, 'finish') },
-        { text: '中止', click: row => this.onBtn(row, 'stop') },
-        { text: '脱落', click: row => this.onBtn(row, 'falloff') },
-        { text: '签名', click: row => this.onBtn(row, 'signature') },
-        { text: '上传文件', click: row => this.onBtn(row, 'upload') }
-      ],
+      btnList: [],
       activeStage: '',
       activeQuestionnaire: [],
-      rowData: {},
-      showDialog: false
     }
   },
   async created () {
     window.Y = this
+    this.btnList = this.btnListJson.btnList
     await this.init()
   },
   methods: {
     async init () {
-      let patient = await this.getList(this.$route.query.patientId)
+      let patient = await this.getList(this.$route.query.patientId || this.patientId)
+      console.log(patient);
       await this.getPatientInfo(patient)
     },
     async getList (patientId) {
@@ -156,54 +157,15 @@ export default {
           return item.organizationId === organizationId
         })
       }))
-      return list.find(patient => patient.patientId === patientId - 0)
+      return list.find(patient => patient.patientId === patientId - 0) || this.patientList[0].children[0]
     },
-    async onBtn (row, type) {
-      this.rowDate = row
-      switch (type) {
-        case 'CRF':
-          this.$router.push('/crf?patientId=' + row.id)
-          break;
-        case 'edit':
-          this.rowData = row
-          console.log(row, type);
-          this.showDialog = true
-          break;
-        // case 'join':
-        // case 'exclude':
-        case 'filter':
-        case 'filterInfo':
-          this.screeningType = type
-          this.screeningDialog = true
-          console.log(row, type);
-          break;
-        case 'signature':
-        case 'finish':
-        case 'stop':
-        case 'falloff':
-          await this.request(this.api.andrology.patient[type], row)
-          break;
-        case 'upload':
-          this.uploadFileDialog = true
-          break;
-        case 'del':
-          await this.request(this.api.andrology.patient.deletePatient, row)
-          await this.getList()
-          break;
-      }
-    },
-    async getPatientInfo (params = this.patientList[0].children[0]) {
+    async getPatientInfo (params) {
       this.ready = false
       this.patientId = params.patientId
       this.patientInfo = (await this.request(this.api.andrology.crf.getPatientInfo, params)).data
       this.activeStage = this.patientInfo.stageList[0].stageId
       this.activeQuestionnaire = this.patientInfo.stageList.map(({ questionnaireList }) => questionnaireList[0].questionnaireTypeId)
       this.ready = true
-    },
-    async hideDialog () {
-      if (this.rowData.patientId) await this.getPatientInfo(this.rowData)
-      this.rowData = {}
-      this.showDialog = false
     },
     setActiveNodeClass (object) {
       return this.patientId === object.patientId ? 'active' : ''
@@ -223,7 +185,13 @@ export default {
         .filter(paper => paper)
         .flat()
         .filter(paper => paper && paper.hasChanged)
-      if (!paperList.length) this.$message.warning({ duration: 3000, message: '没有问卷被修改，无需提交' })
+      if (!paperList.length) return this.$message.warning({ duration: 3000, message: '没有问卷被修改，无需提交' })
+
+      for (let paper of paperList) {
+        for (let question of paper.questionList) {
+          await this.setOption(question)
+        }
+      }
 
       // 按问卷提交
       // let saveList = paperList.map(paper => ({
@@ -254,6 +222,7 @@ export default {
               groupList: paperList.filter(item => item.stageId === stageId && item.groupId === groupId)
             }))
       }))
+
       let res = await Promise.all(saveList.map(async stage => {
         let _res = await this.request(this.api.andrology.crf.submitQuestionnaire, stage)
         return { stageId: stage.stageId, ..._res }

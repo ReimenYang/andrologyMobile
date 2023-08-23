@@ -30,7 +30,13 @@
         >
           <template
             #default="scope"
-            v-if="item.type"
+            v-if="item.isSDV"
+          >
+            <sdv :question="scope.row" />
+          </template>
+          <template
+            #default="scope"
+            v-else-if="item.type"
           >
             <xnwFromComponent
               :col="item"
@@ -49,8 +55,9 @@
 </template>
 <script>
 import question from './_question.vue'
+import sdv from './_SDV.vue'
 export default {
-  components: { question },
+  components: { sdv, question },
   provide () {
     return {
       testPaper: () => this
@@ -62,10 +69,20 @@ export default {
       default: () => ({})
     }
   },
-  // async created () {
-  //   window.paper = this
-  //   console.log('paper', this.paper);
-  // }
+  watch: {
+    paper: {
+      handler: function () {
+        console.log('hasChanged')
+        this.paper.hasChanged = true
+        // if (this.question.uiStyle === 'dateTimePicker') this.question.questionAnswer = this.libs.data.dateNow(this.question.questionAnswer, 'xxxx-xx-xx')
+      },
+      deep: true
+    }
+  },
+  async created () {
+    window.paper = this
+    console.log('paper', this.paper);
+  }
 }
 </script>
 <style lang="scss" scoped>

@@ -4,6 +4,7 @@
     :title="title"
     v-model="showDialog"
     :width="width"
+    :append-to-body='true'
   >
     <xnw-template-list
       style="height: 300px;margin-bottom: 20px;"
@@ -12,7 +13,7 @@
     >
       <template #default />
     </xnw-template-list>
-    <template v-if="!hasAsk">
+    <template v-if="projectState&&!hasAsk">
       <el-descriptions
         :column="1"
         border
@@ -37,7 +38,7 @@
         <button
           class="btn primary"
           @click="confirm"
-        >保存</button>
+        >{{askList.length?'保存':'新增质疑'}}</button>
       </div>
     </template>
 
@@ -76,6 +77,7 @@ export default {
   data () {
     return {
       showDialog: true,
+      projectState: sessionStorage.projectState === '已开始',
       width: '800px',
       infoKeys: [
         { prop: 'questionTitle', label: '问题', type: 'input', repeat: [{ prop: 'questionTitle', disabled: true }] },
@@ -104,6 +106,7 @@ export default {
       this.showInfoDialog = true
     },
     async confirm () {
+      if (!this.form.askContent) return this.$message.warning('请填写质疑意见')
       let res = await this.request(this.api.andrology.crf.newQuestionAsk, this.form)
       if (res.code !== 200) return
       await this.testStage().getQuestionnaire(true)

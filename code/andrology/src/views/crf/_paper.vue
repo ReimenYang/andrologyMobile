@@ -24,7 +24,9 @@
 </template>
 <script>
 import paperByCard from './_paperByCard.vue'
+import questionMixin from '@/views/crf/questionMixin.js'
 export default {
+  mixins: [questionMixin],
   components: { paperByCard },
   provide () {
     return {
@@ -84,13 +86,15 @@ export default {
         this.api.andrology.crf.getQuestionnaire,
         { ...this.patientInfo, stageId: this.activeStage, questionnaireTypeId }
       )).data.groupList
-      _questionnaire.paper.forEach(group => {
+
+      for (let group of _questionnaire.paper) {
         group.patientId = this.patientInfo.patientId
         group.stageId = this.activeStage
         group.questionnaireTypeId = questionnaireTypeId
         group.questionnaireName = _questionnaire.questionnaireTypeName
         group.table = {
           tableHeader: [
+            { isSDV: true, width: 80 },
             { prop: 'questionTitle', label: '检查项目' },
             {
               prop: 'questionAnswer', label: group.examineAnswerTitle, type: 'input',
@@ -116,79 +120,11 @@ export default {
             { prop: 'examineRemark', label: group.examineRemarkTitle },
           ]
         }
-        group.questionList.forEach(question => {
+        for (let question of group.questionList) {
           if (!question.askOperationList) question.askOperationList = []
-          switch (question.questionType) {
-            case '计算':
-              question.uiStyle = 'computer'
-              break;
-            case '日期':
-              question.uiStyle = 'dateTimePicker'
-              // question.uiStyle = 'date'
-
-              question.col = {
-                label: question.questionTitle,
-                prop: 'questionAnswer',
-                type: question.uiStyle
-              }
-              break;
-            case '上传图片':
-              question.uiStyle = 'uploadImg'
-              break;
-            case '数字':
-              question.uiStyle = 'num'
-              break;
-            case '单行文本':
-              question.uiStyle = 'input'
-
-              question.col = {
-                label: question.questionTitle,
-                prop: 'questionAnswer',
-                type: question.uiStyle,
-                repeat: [
-                  { prop: 'questionAnswer' }
-                ]
-              }
-              break;
-            case '多行文本':
-              question.uiStyle = 'textarea'
-              question.col = {
-                label: question.questionTitle,
-                prop: 'questionAnswer',
-                type: question.uiStyle
-              }
-              break;
-            case '单选':
-              question.uiStyle = 'radio'
-              question.checked = (question.optionList.find(option => option.checked) || {}).optionText
-              question.col = {
-                label: question.questionTitle,
-                prop: 'checked',
-                type: question.uiStyle,
-                repeat: question.optionList.map(({ optionText: label }) => ({ label }))
-              }
-              break;
-            case '多选':
-              question.uiStyle = 'checkbox'
-              question.checked = question.optionList.reduce((a, b) => b.checked ? [...a, b.optionText] : a, [])
-              question.col = {
-                label: question.questionTitle,
-                prop: 'checked',
-                type: question.uiStyle,
-                repeat: question.optionList.map(({ optionText: label }) => ({ label }))
-              }
-              break;
-            case '检查项目':
-              group.uiStyle = 'table'
-              return;
-          }
-          if (!question.col) question.col = {
-            label: question.questionTitle,
-            prop: 'questionAnswer',
-            type: question.uiStyle
-          }
-        });
-      });
+          await this.questionFormat(question, group)
+        }
+      };
       this.ready = true
     },
   }

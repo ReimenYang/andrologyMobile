@@ -11,13 +11,22 @@
         border
         v-for="(list,i) in screeningInfo"
         :key="i"
+        style="flex: 1;margin:0 10px;"
       >
+        <el-descriptions-item
+          :label="{inclusionCriteriaList:'入组标准',exclusionCriteriaList:'排除标准'}[i]"
+          labelClassName="labelClass"
+        >
+          筛查结果
+        </el-descriptions-item>
+
         <el-descriptions-item
           :label="col.criteria"
           v-for="col in list"
           :key="col.criteria"
+          labelClassName="labelClass"
         >
-          {{ col.result }}
+          <span :style="{color:col.result==='请医师判断'?'blue':((col.result==='符合'||col.result==='否')?'':'red')}">{{ col.result }}</span>
         </el-descriptions-item>
       </el-descriptions>
     </div>
@@ -27,10 +36,12 @@
         @click="$emit('close')"
       >取消</button>
       <button
+        v-if="title==='筛查'"
         class="btn primary"
         @click="confirm('join')"
       >入组</button>
       <button
+        v-if="title==='筛查'"
         class="btn primary"
         @click="confirm"
       >排除</button>
@@ -65,7 +76,7 @@ export default {
   data () {
     return {
       showDialog: true,
-      width: '800px',
+      width: '1200px',
       screeningInfo: [],
       joinDialog: false
     }
@@ -94,3 +105,8 @@ export default {
   }
 }
 </script>
+<style lang="scss" scoped>
+:deep(.labelClass) {
+  width: 450px;
+}
+</style>

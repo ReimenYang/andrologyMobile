@@ -43,7 +43,6 @@
           <el-dropdown-menu>
             <el-dropdown-item @click="showDialog=true">个人信息</el-dropdown-item>
             <el-dropdown-item>修改密码</el-dropdown-item>
-            <el-dropdown-item>上传签名</el-dropdown-item>
             <el-dropdown-item @click="logout">退出</el-dropdown-item>
           </el-dropdown-menu>
         </template>

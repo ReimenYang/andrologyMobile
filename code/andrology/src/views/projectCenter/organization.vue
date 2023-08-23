@@ -54,13 +54,12 @@
 
 <script>
 import addOrganization from './_addOrganization.vue'
+import paginationMixin from '@/views/index/paginationMixin.js'
 export default {
+  mixins: [paginationMixin],
   components: { addOrganization },
   data () {
     return {
-      list: [],
-      filterShow: true,
-      fromProp: { labelWidth: '130px' },
       filterForm: {
         orgType: '',
         orgClassify: '',
@@ -69,19 +68,21 @@ export default {
       filterRepeat: [
         [
           {
-            prop: 'orgType', label: '机构类型', type: 'radio', span: 5, repeat: [
+            prop: 'orgType', label: '机构类型', type: 'radio', span: 6, repeat: [
+              { label: '全部', value: '' },
               { label: '医疗中心', value: '医疗中心' },
               { label: '其他', value: '其他' }
             ]
           },
           {
-            prop: 'orgClassify', label: '机构分类', type: 'radio', span: 8, repeat: [
+            prop: 'orgClassify', label: '机构分类', type: 'radio', span: 9, repeat: [
+              { label: '全部', value: '' },
               { label: '医疗机构', value: '医疗机构' },
               { label: '健医', value: '健医' },
               { label: '企业', value: '企业' },
               { label: '保险公司', value: '保险公司' }
             ]
-          }, { prop: 'orgName', label: '机构名称', type: 'input', span: 11, repeat: [{ prop: 'orgName' }] }]
+          }, { prop: 'orgName', label: '机构名称', type: 'input', span: 9, repeat: [{ prop: 'orgName' }] }]
       ],
       fileTableHeader: [
         { prop: 'index', label: '序号', width: 100, type: 'index' },
@@ -99,9 +100,7 @@ export default {
           ]
         }
       ],
-      pagination: { ...this.globalData.pagination },
       showDialog: false,
-      resultList: [],
       rowData: {}
     }
   },
@@ -132,33 +131,6 @@ export default {
           await this.getList()
           break;
       }
-    },
-    onPage ({ current = this.pagination.currentPage || 1, size = this.pagination.pageSize }) {
-      this.resultList = this.list.slice((current - 1) * size, current * size)
-      this.pagination.currentPage = current
-      this.pagination.pageSize = size
-    },
-    async onFilter () {
-      await this.getList()
-      this.list = this.list.filter(item => {
-        let _boolen = true
-        for (let { prop, type } of this.filterRepeat.flat()) {
-          let _value = this.filterForm[prop]
-          if (!_value) continue
-          switch (type) {
-            case 'input':
-              _boolen = item[prop].includes(_value)
-              break;
-            default:
-              _boolen = item[prop] === _value
-              break;
-          }
-          if (!_boolen) break
-        }
-        return _boolen
-      })
-      this.pagination.total = this.list.length
-      return this.onPage({})
     }
   }
 }

@@ -76,13 +76,12 @@
 <script>
 import joinUser from './_joinUser.vue'
 import addUser from './_addUser.vue'
+import paginationMixin from '@/views/index/paginationMixin.js'
 export default {
+  mixins: [paginationMixin],
   components: { joinUser, addUser },
   data () {
     return {
-      list: [],
-      filterShow: true,
-      fromProp: { labelWidth: '130px' },
       filterForm: {
         projectRole: '',
         roleName: '',
@@ -137,16 +136,13 @@ export default {
           ]
         }
       ],
-      pagination: { ...this.globalData.pagination },
       showDialog: false,
       addUserDialog: false,
       rowData: {},
-      roleList: [],
-      resultList: []
+      roleList: []
     }
   },
   async created () {
-    window.Y = this
     await this.getList()
   },
   methods: {
@@ -158,8 +154,6 @@ export default {
         item.roleName = item.role.roleName
         item.enableLabel = { N: '停用', Y: '启用' }[item.enable]
       })
-      this.pagination.currentPage = 1
-      this.pagination.total = this.list.length
       this.onPage({})
       this.ready = true
     },
@@ -193,33 +187,6 @@ export default {
     async sandMsg () {
       let userIdList = this.resultList.map(item => item.userId).join()
       await this.request(this.api.andrology.projectMgt.sendProjectSMS, { userIdList })
-    },
-    onPage ({ current = this.pagination.currentPage || 1, size = this.pagination.pageSize }) {
-      this.resultList = this.list.slice((current - 1) * size, current * size)
-      this.pagination.currentPage = current
-      this.pagination.pageSize = size
-    },
-    async onFilter () {
-      await this.getList()
-      this.list = this.list.filter(item => {
-        let _boolen = true
-        for (let { prop, type } of this.filterRepeat.flat()) {
-          let _value = this.filterForm[prop]
-          if (!_value) continue
-          switch (type) {
-            case 'input':
-              _boolen = item[prop].includes(_value)
-              break;
-            default:
-              _boolen = item[prop] === _value
-              break;
-          }
-          if (!_boolen) break
-        }
-        return _boolen
-      })
-      this.pagination.total = this.list.length
-      return this.onPage({})
     }
   }
 }

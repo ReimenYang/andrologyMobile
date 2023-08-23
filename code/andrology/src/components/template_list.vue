@@ -52,7 +52,7 @@
               搜索
             </el-button>
             <el-button @click="onReset">
-              清空
+              重置
             </el-button>
             <el-button @click="showParams=!showParams">
               {{ showParamsBtnText }}

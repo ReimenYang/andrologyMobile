@@ -35,6 +35,11 @@ export default {
       params: {}
     }
   },
+  watch: {
+    showDialog: function () {
+      if (!this.showDialog) this.$emit('close')
+    }
+  },
   async created () {
     await this.getInfo()
   },
@@ -96,6 +101,7 @@ export default {
         return { stageId: stage.stageId, ..._res }
       }))
       console.log(saveList, res);
+      this.showDialog = false
       await this.testTarget().hideDialog()
       return await this.testTarget().getList()
     }

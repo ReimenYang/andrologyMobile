@@ -35,7 +35,7 @@ export default {
       filterForm: {
         organizationName: '',
         userName: '',
-        userPhone: '123456'
+        userPhone: ''
       },
       filterRepeat: [[
         { prop: 'organizationName', label: '机构名称', type: 'input', span: 8, repeat: [{ prop: 'organizationName' }] },

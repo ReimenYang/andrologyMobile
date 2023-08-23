@@ -62,7 +62,7 @@ export default {
   methods: {
     async getList () {
       this.ready = false
-      let _data = (await this.request(this.api.andrology.patient.getPatientFileInfo, { patientId: this.date.id })).data
+      let _data = (await this.request(this.api.andrology.patient.getPatientFileInfo, { patientId: this.date.id || this.date.patientId })).data
       Object.keys(_data).forEach(key => {
         let _item = _data[key]
 

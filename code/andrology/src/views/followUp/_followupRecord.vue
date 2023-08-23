@@ -24,7 +24,9 @@
       </button>
     </div>
     <followup-questionnaire
+      title="随访问卷"
       v-if="showQuestionnaire"
+      @close="hideDialog"
       :stage="stage"
     />
   </el-dialog>
@@ -55,6 +57,9 @@ export default {
     async getInfo (stage) {
       this.stage = stage
       this.showQuestionnaire = true
+    },
+    hideDialog () {
+      this.showQuestionnaire = false
     }
   }
 }

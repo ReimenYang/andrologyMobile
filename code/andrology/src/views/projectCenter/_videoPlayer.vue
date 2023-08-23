@@ -20,10 +20,15 @@ export default {
       default: () => ''
     }
   },
+  watch: {
+    showDialog: function () {
+      if (!this.showDialog) this.$emit('close')
+    }
+  },
   data () {
     return {
       showDialog: true,
-      width: '600px'
+      width: '1440px'
     }
   }
 }

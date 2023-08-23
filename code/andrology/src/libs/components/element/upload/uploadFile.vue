@@ -123,7 +123,7 @@ export default {
       },
       onPreview: (file) => {
         console.log(file.url);
-        this.dialogImageUrl = file.url
+        this.dialogImageUrl = file.url || file.response.data.fileUrl
         this.dialogVisible = true
       },
       onRemove: (file, fileList) => {

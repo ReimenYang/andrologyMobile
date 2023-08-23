@@ -25,7 +25,7 @@
         label="当前值"
         labelClassName="labelClass"
       >
-        {{ askInfo.question.questionAnswer }}
+        {{ askInfo.question.nowAsnwer }}
       </el-descriptions-item>
       <el-descriptions-item
         label="状态"
@@ -53,10 +53,11 @@
           />
         </el-descriptions-item>
         <el-descriptions-item label="修正值">
-          <el-input
-            placeholder="选填，如您认为当前值有误，可在此处填上正确的值"
-            v-model.trim="form.newAsnwer"
+          <xnwFromComponent
+            :col="askInfo.question.col"
+            :form="askInfo.question"
           />
+          <span class="tips">（选填，如您认为当前值有误，可在此处填上正确的值）</span>
         </el-descriptions-item>
       </el-descriptions>
       <div class="formFooter">
@@ -71,13 +72,15 @@
         <button
           class="btn primary"
           @click="confirm"
-        >提交意见</button>
+        >回复</button>
       </div>
     </template>
   </el-dialog>
 </template>
 <script>
+import questionMixin from '@/views/crf/questionMixin.js'
 export default {
+  mixins: [questionMixin],
   props: {
     title: {
       type: String,
@@ -112,23 +115,33 @@ export default {
     },
     date: {
       handler: async function () {
-        console.log(12213132);
-        this.askInfo = (await this.request(this.api.andrology.crf.getAskInfo, this.date)).data
+        await this.getAskInfo()
       },
       deep: true
     }
   },
 
   async created () {
-    this.askInfo = (await this.request(this.api.andrology.crf.getAskInfo, this.date)).data
+    window.ask = this
     this.form.askId = this.date.askId
+    await this.getAskInfo()
     this.showDialog = true
   },
   methods: {
+    async getAskInfo () {
+      this.askInfo = (await this.request(this.api.andrology.crf.getAskInfo, this.date)).data
+      let question = this.askInfo.question
+      await this.questionFormat(question)
+      question.nowAsnwer = await this.getAnswer(question)
+      await this.resetQuestion(question)
+    },
     async finish () {
       this.$emit('refresh')
     },
     async confirm () {
+      await this.setOption(this.askInfo.question)
+      this.form.newAsnwer = this.askInfo.question
+
       let res = await this.request(this.api.andrology.crf.replyQuestionAsk, this.form)
       if (res.code === 200) return this.finish()
     },
@@ -140,6 +153,9 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
+.tips {
+  color: var(--color-tips);
+}
 :deep(.labelClass) {
   width: 150px;
 }

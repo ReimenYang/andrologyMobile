@@ -77,6 +77,7 @@ export default {
     }
   },
   created () {
+    sessionStorage.clear()
     let _userInfo = this.libs.data.getStorage('userInfo')
     if (!_userInfo) return
     this.globalData.userInfo = JSON.parse(_userInfo)

@@ -67,7 +67,7 @@ export default {
             { options: this.globalData.orgList.map(({ orgName, organizationId }) => ({ label: orgName, value: organizationId })), placeholder: '请选择' }
           ]
         }, {
-          prop: 'roleName', label: '权限角色', type: 'select', repeat: [
+          prop: 'roleName', label: '权限角色', type: 'select', required: true, repeat: [
             { options: this.roleList.map(({ roleName, id }) => ({ label: roleName, value: id })), placeholder: '请选择' }
           ]
         }, {
@@ -77,13 +77,13 @@ export default {
           }]
         },
         {
-          prop: 'dataPrivilege', label: '数据权限', type: 'select', repeat: [{
+          prop: 'dataPrivilege', label: '数据权限', type: 'select', required: true, repeat: [{
             options: [{ label: '全部机构', value: '全部机构' }, { label: '本机构', value: '本机构' }],
             placeholder: '请选择'
           }]
         },
         {
-          prop: 'enableLabel', label: '患者状态', type: 'radio', repeat: [
+          prop: 'enableLabel', label: '状态', type: 'radio', repeat: [
             { label: '启用', value: 'Y' },
             { label: '禁用', value: 'N' },
           ]
@@ -108,6 +108,9 @@ export default {
   },
   methods: {
     async confirm () {
+      let _required = this.infoKeys.filter(item => item.required && !this.form[item.prop]).map(item => item.label)
+      if (_required.length) return this.$message.error(_required.join() + '不能为空')
+
       this.form.enable = this.form.enableLabel === '启用' ? 'Y' : 'N'
       this.form.organization = this.globalData.orgList.find(item => item.organizationId === this.form.organizationId)
       this.form.role = this.roleList.find(item => item.roleName)

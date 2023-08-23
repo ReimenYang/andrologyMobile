@@ -5,6 +5,7 @@ const apis = {
   modifyProjectBaseInfo: { method: 'POST', url: 'projectMgt/modifyProjectBaseInfo', group: 'andrology', dataType: 'json' },//修改项目基本信息
   startProject: { method: 'POST', url: 'projectMgt/startProject', group: 'andrology', dataType: 'json' },//启用项目
   stopProject: { method: 'POST', url: 'projectMgt/stopProject', group: 'andrology', dataType: 'json' },//暂停项目
+  deleteProject: { method: 'POST', url: 'projectMgt/deleteProject', group: 'andrology', dataType: 'json' },//删除项目
   getProjectFileList: { method: 'POST', url: 'projectMgt/getProjectFileList', group: 'andrology', dataType: 'json' },//项目文件列表
   addProjectFile: { method: 'POST', url: 'projectMgt/addProjectFile', group: 'andrology', dataType: 'json' },//增加项目文件
   deleteProjectFile: { method: 'POST', url: 'projectMgt/deleteProjectFile', group: 'andrology', dataType: 'json' },//删除项目文件
