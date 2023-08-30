@@ -3,6 +3,11 @@
     <div class="preface">
       {{ paper.groupName }}
     </div>
+    <div>
+      <text class="desc">
+        {{ paper.groupDesc }}
+      </text>
+    </div>
     <div
       class="content"
       v-if="paper.uiStyle !== 'table'"
@@ -46,17 +51,13 @@
         </el-table-column>
       </el-table>
     </div>
-    <div>
-      <text class="desc">
-        {{ paper.groupDesc }}
-      </text>
-    </div>
   </div>
 </template>
 <script>
 import question from './_question.vue'
 import sdv from './_SDV.vue'
 export default {
+  inject: ['testStage'],
   components: { sdv, question },
   provide () {
     return {
@@ -72,9 +73,8 @@ export default {
   watch: {
     paper: {
       handler: function () {
-        console.log('hasChanged')
-        this.paper.hasChanged = true
-        // if (this.question.uiStyle === 'dateTimePicker') this.question.questionAnswer = this.libs.data.dateNow(this.question.questionAnswer, 'xxxx-xx-xx')
+        this.testStage().stage.hasChanged = this.paper.hasChanged = true
+        if (this.$route.path.startsWith('/crf')) this.globalData.confirmMsg = '当前页面有信息未保存，确定仍要关闭页面？'
       },
       deep: true
     }
@@ -87,21 +87,24 @@ export default {
 </script>
 <style lang="scss" scoped>
 .preface {
-  margin: 20rpx 0;
+  font-size: var(--font-h4);
 }
 .desc {
   color: var(--color-tips);
   font-size: var(--font-h4);
-  margin: 20rpx 0;
 }
-.content :deep(.question) {
-  // border: var(--border-normal);
-  // background-color: #fff;
-  // .title {
-  //   border-bottom: var(--border-normal);
-  // }
-  .content {
-    padding: 0 20rpx;
+.content {
+  margin: 20px 0 0;
+  :deep(.question) {
+    // border: var(--border-normal);
+    // background-color: #fff;
+    // .title {
+    //   border-bottom: var(--border-normal);
+    // }
+    .content {
+      margin: 20px 0 0;
+      padding: 0 20px;
+    }
   }
 }
 </style>

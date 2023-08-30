@@ -6,13 +6,13 @@
       class="topbar"
     >
       <el-col
-        :span="18"
+        :span="22"
         class="topbarTitle"
       >
         受试者管理
       </el-col>
       <el-col
-        :span="6"
+        :span="2"
         class="btnGroup"
       ><button
           class="primary"
@@ -120,7 +120,7 @@ export default {
         { prop: 'index', label: '序号', width: 55, type: 'index' },
         { prop: 'patientCode', label: '编号', width: 110 },
         { prop: 'patientState', label: '状态', width: 70 },
-        { prop: 'patientName', label: '姓名', width: 80 },
+        { prop: 'patientName', label: '姓名', width: 100 },
         { prop: 'patientPhone', label: '手机号', width: 110 },
         { prop: 'patientIdentity', label: '身份证', width: 170 },
         { prop: 'patientAdmission', label: '住院号', width: 100 },

@@ -6,6 +6,7 @@ import user from './user'
 import file from './file'
 import crf from './crf'
 import data from './data'
+import bi from './bi'
 
 export default {
   project,
@@ -14,5 +15,6 @@ export default {
   user,
   file,
   crf,
-  data
+  data,
+  bi
 }

@@ -15,8 +15,8 @@ import xnwTemplateList from '@/components/template_list.vue'
 import xnwTemplateForm from '@/components/template_form.vue'
 import xnwFromComponent from '@/components/from_component.vue'
 import uploadFile from '@/libs/components/element/upload/uploadFile.vue'
-import uploadVideo from '@/libs/components/aliyun/uploadVideo/uploadVideo.vue'
-import videoPlayer from '@/libs/components/aliyun/videoPlayer/videoPlayer.vue'
+import uploadVideo from '@/libs/components/element/upload/aliyun/uploadVideo.vue'
+import videoPlayer from '@/libs/components/element/upload/aliyun/videoPlayer.vue'
 // import projectConfig from '@/projectConfig.js'
 libs.el = el
 libs["$alert"] = el.ElMessage

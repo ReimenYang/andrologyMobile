@@ -67,9 +67,9 @@ export default {
       } else {
         this.menuList.push(...menu)
         this.systems[0] = {
-          title: '项目信息',
-          name: '项目信息',
-          path: '/index',
+          title: '项目运行情况',
+          name: '项目运行情况',
+          path: '/index/operationInfo',
           theme: '#43a7ff',
           menuId: '01'
         }
@@ -101,8 +101,15 @@ export default {
 
       this.ready = true
     },
-    tabClick (tab) {
-      this.$router.push(this.tabList[tab.index].path)
+    async tabClick (tab) {
+      let activeTab = this.activeTab
+      if (!this.globalData.confirmMsg) return this.$router.push(this.tabList[tab.index].path)
+      let _confirm = await this.$confirm(this.globalData.confirmMsg).catch(() => '')
+      if (_confirm) {
+        this.$router.push(this.tabList[tab.index].path)
+        delete this.globalData.confirmMsg
+      }
+      else this.activeTab = activeTab
     },
     tabRemove (name) {
       let delTabIndex = this.tabList.findIndex(item => item.name === name)

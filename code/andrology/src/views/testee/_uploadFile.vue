@@ -82,7 +82,7 @@ export default {
       // 上传结果做得不够细致
       console.log(fileList)
       let list = fileList.filter(item => item.response).map(item => item.response.data)
-      let res = await this.request(this.api.andrology.patient.addPatientFile, { patientId: this.date.id, fileType: this.activeName, list })
+      let res = await this.request(this.api.andrology.patient.addPatientFile, { patientId: this.date.id || this.date.patientId, fileType: this.activeName, list })
       if (res.code !== 200) return
 
       this.$emit('refresh')

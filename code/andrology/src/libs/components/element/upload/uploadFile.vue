@@ -14,7 +14,7 @@
         v-if="upload.listType !== 'picture-card'"
       >
         <button class="btn plain">
-          选取文件
+          上传文件
         </button>
       </slot>
     </el-upload>
@@ -91,6 +91,7 @@ export default {
     // if (url.startsWith('http')) action = url
     this.upload = {
       // accept: ".mp4,.flv,.mov,.mp3",
+      // accept: ".jpg,.gif,.png",
       // 上传的地址
       data: {},
       action,
@@ -124,7 +125,8 @@ export default {
       onPreview: (file) => {
         console.log(file.url);
         this.dialogImageUrl = file.url || file.response.data.fileUrl
-        this.dialogVisible = true
+        if (['jpg', 'gif', 'png'].includes(this.dialogImageUrl.split('.').slice(-1))) return this.dialogVisible = true
+        window.open(this.dialogImageUrl, '_blank')
       },
       onRemove: (file, fileList) => {
         console.log('onRemove', file, fileList)

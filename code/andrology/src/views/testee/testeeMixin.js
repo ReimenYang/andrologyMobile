@@ -1,6 +1,6 @@
 
-import addTestee from './_addTestee.vue'
-import uploadFile from './_uploadFile.vue'
+import addTestee from '@/views/testee/_addTestee.vue'
+import uploadFile from '@/views/testee/_uploadFile.vue'
 export default {
   components: { addTestee, uploadFile },
   data () {
@@ -36,6 +36,7 @@ export default {
         finish: '完成',
         stop: '中止',
         falloff: '脱落',
+        del: '删除',
       }[type]
       this.screeningTitle = ''
       let _confirm
@@ -59,7 +60,7 @@ export default {
         case 'finish':
         case 'stop':
         case 'falloff':
-          _confirm = await this.$confirm(`确认${typeLabel}？`).catch(() => '')
+          _confirm = await this.$confirm(`确认${typeLabel + row.patientName}？`).catch(() => '')
           if (_confirm) {
             await this.request(this.api.andrology.patient[type], row)
             await this.getList()
@@ -69,7 +70,7 @@ export default {
           this.uploadFileDialog = true
           break;
         case 'del':
-          _confirm = await this.$confirm(`确认${typeLabel}？`).catch(() => '')
+          _confirm = await this.$confirm(`确认${typeLabel + row.patientName}？`).catch(() => '')
           if (_confirm) {
             await this.request(this.api.andrology.patient.deletePatient, row)
             await this.getList()

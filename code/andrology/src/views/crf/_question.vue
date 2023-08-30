@@ -5,17 +5,17 @@
 
     <sdv :question="question" />
     <div>
-      <div
-        v-if="question.uiStyle !== 'computer'"
-        :class="['title',question.required==='Y'&&'required']"
-      >
+      <div :class="['title',question.required==='Y'&&'required']">
         <text>{{ index }}</text>
         <text>{{ question.col.label }}</text>
       </div>
-      <xnwFromComponent
-        :col="question.col"
-        :form="question"
-      />
+      <div style="display: flex;">
+        <xnwFromComponent
+          :col="question.col"
+          :form="question"
+        />
+        <div>{{ question.questionSuffix }}</div>
+      </div>
     </div>
   </div>
 </template>
@@ -43,7 +43,7 @@ export default {
   },
   async created () {
     window.question = this
-    console.log('question', this.question);
+    // console.log('question', this.question);
   },
   methods: {
     hasError () {

@@ -41,7 +41,7 @@
           <el-button
             size="large"
             class="plain"
-            @click="goPage(item,'/index')"
+            @click="goPage(item,'/index/operationInfo')"
           >进入项目</el-button>
           <template v-if="item.canManage">
             <el-button

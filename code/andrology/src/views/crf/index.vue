@@ -1,6 +1,14 @@
 <template>
   <el-container class="crf">
     <el-aside class="aside">
+      <div style="padding: 10px 20px;">
+        <div
+          v-for="item in patientState"
+          :key="item.alt"
+          v-bind="item"
+          style="width: 50%;display: inline-block;"
+        >{{ item.alt }}</div>
+      </div>
       <!-- <el-input
       v-model="filterText"
       placeholder="Filter keyword"
@@ -10,10 +18,18 @@
         class="filter-tree"
         :data="patientList"
         :default-expanded-keys="[patientId]"
+        node-key="patientId"
         :props="{...defaultProps,class:setActiveNodeClass}"
         :filter-node-method="filterNode"
         @node-click="clickTree"
-      />
+      >
+        <template #default="{ node, data }">
+          <span class="custom-tree-node">
+            <span v-bind="data.icon" />
+            <span>{{ node.label }}</span>
+          </span>
+        </template>
+      </el-tree>
     </el-aside>
 
     <el-main class="main">
@@ -43,7 +59,7 @@
         v-if="projectState"
         class="submitBtn"
         type="primary"
-        @click="save"
+        @click="onSave"
       >保存问卷</el-button>
     </el-main>
     <el-aside class="aside patientInfo">
@@ -110,6 +126,14 @@ export default {
       },
       patientList: [],
       patientId: '',
+      patientState: [
+        { class: 'iconfont icon-smile', style: 'color: #209cdd', alt: '未入组' },
+        { class: 'iconfont icon-smile', style: 'color: #df6b66', alt: '排除' },
+        { class: 'iconfont icon-smile-fill', style: 'color: #209cdd', alt: '已入组' },
+        { class: 'iconfont icon-smile-fill', style: 'color: #5bb75b', alt: '完成' },
+        { class: 'iconfont icon-smile-fill', style: 'color: #df6b66', alt: '脱落' },
+        { class: 'iconfont icon-smile-fill', alt: '中止' },
+      ],
       patientInfo: {},
       infoKeys: [{
         prop: 'patientCode', label: '编号'
@@ -154,6 +178,7 @@ export default {
         label: organization,
         children: list.filter(item => {
           item.label = item.patientCode
+          item.icon = this.patientState.find(({ alt }) => alt === item.patientState)
           return item.organizationId === organizationId
         })
       }))
@@ -163,7 +188,7 @@ export default {
       this.ready = false
       this.patientId = params.patientId
       this.patientInfo = (await this.request(this.api.andrology.crf.getPatientInfo, params)).data
-      this.activeStage = this.patientInfo.stageList[0].stageId
+      if (!this.activeStage) this.activeStage = this.patientInfo.stageList[0].stageId
       this.activeQuestionnaire = this.patientInfo.stageList.map(({ questionnaireList }) => questionnaireList[0].questionnaireTypeId)
       this.ready = true
     },
@@ -179,55 +204,8 @@ export default {
       if (!object.patientId) return
       await this.getPatientInfo(object)
     },
-    async save () {
-      let paperList = this.patientInfo.stageList.map(stage => stage.questionnaireList.map(questionnaire => questionnaire.paper))
-        .flat()
-        .filter(paper => paper)
-        .flat()
-        .filter(paper => paper && paper.hasChanged)
-      if (!paperList.length) return this.$message.warning({ duration: 3000, message: '没有问卷被修改，无需提交' })
-
-      for (let paper of paperList) {
-        for (let question of paper.questionList) {
-          await this.setOption(question)
-        }
-      }
-
-      // 按问卷提交
-      // let saveList = paperList.map(paper => ({
-      //   patientId: paper.patientId,
-      //   stageId: paper.stageId,
-      //   questionnaireList: [{
-      //     questionnaireTypeId: paper.questionnaireTypeId,
-      //     questionnaireName: paper.questionnaireName,
-      //     entryUser: this.globalData.userInfo.userName,
-      //     entryDate: new Date(),
-      //     groupList: [paper]
-      //   }]
-      // }))
-
-      // 按阶段提交
-      let stageList = this.libs.array.unique(paperList, a => a.stageId)
-
-      let saveList = stageList.map(({ patientId, stageId }) => ({
-        patientId,
-        stageId,
-        questionnaireList:
-          paperList.filter(item => item.stageId === stageId)
-            .map(({ questionnaireTypeId, questionnaireName, groupId }) => ({
-              questionnaireTypeId,
-              questionnaireName,
-              entryUser: this.globalData.userInfo.userName,
-              entryDate: new Date(),
-              groupList: paperList.filter(item => item.stageId === stageId && item.groupId === groupId)
-            }))
-      }))
-
-      let res = await Promise.all(saveList.map(async stage => {
-        let _res = await this.request(this.api.andrology.crf.submitQuestionnaire, stage)
-        return { stageId: stage.stageId, ..._res }
-      }))
-      console.log(saveList, res);
+    async onSave () {
+      await this.save(this.patientInfo)
       return await this.init()
     }
   }
@@ -240,6 +218,11 @@ export default {
 .aside {
   width: var(--nav-width);
   background-color: #fff;
+}
+.iconfont::before {
+  margin-right: 5px;
+  font-size: 20px;
+  vertical-align: middle;
 }
 .main {
   margin: 0 10px;

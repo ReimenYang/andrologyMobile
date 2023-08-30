@@ -81,15 +81,7 @@ export default {
     }
   },
   async created () {
-    let { projectCode, projectName, projectState } = this.$route.query
-    if (projectCode) {
-      sessionStorage.projectCode = this.globalData.headers.projectCode = projectCode
-      sessionStorage.projectName = projectName
-      sessionStorage.projectState = projectState
-      this.globalData.orgList = (await this.request(this.api.andrology.projectMgt.getProjectOrgList)).data
-      this.globalData.groupList = (await this.request(this.api.andrology.projectMgt.getProjectGroupList)).data
-    }
-    let intro = (await this.request(this.api.andrology.project.getProjectInfo)).data
+    let intro = this.globalData.projectInfo
     this.fileList = intro.fileList
     this.videoList = intro.videoList
     this.projectDesc = intro.projectDesc
@@ -135,7 +127,7 @@ export default {
           {
             axisLine: { show: false },
             axisTick: { show: false },
-            data: ['', '', '']
+            data: this.groupList.map(() => '')// ['', '', '']
           }
         ],
         yAxis: {

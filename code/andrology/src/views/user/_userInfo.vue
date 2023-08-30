@@ -27,7 +27,7 @@
           :uploadApi="api.andrology.file.updateFile"
           @finish="finish"
           :config="uploadConfig"
-          :dataList="[{url:form.userSignatureUrl}]"
+          :dataList="form.userSignatureUrl?[{url:form.userSignatureUrl}]:[]"
         />
       </el-descriptions-item>
     </el-descriptions>

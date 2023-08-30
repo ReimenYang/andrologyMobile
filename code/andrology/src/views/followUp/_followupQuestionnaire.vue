@@ -9,13 +9,15 @@
     <el-button
       class="submitBtn"
       type="primary"
-      @click="save"
+      @click="onSave"
     >保存问卷</el-button>
   </el-dialog>
 </template>
 <script>
 import paper from '../crf/_paper.vue'
+import questionMixin from '@/views/crf/questionMixin.js'
 export default {
+  mixins: [questionMixin],
   components: { paper },
   inject: ['testTarget'],
   props: {
@@ -59,48 +61,8 @@ export default {
       }
       this.showDialog = true
     },
-    async save () {
-      let paperList = this.params.patientInfo.stageList.map(stage => stage.questionnaireList.map(questionnaire => questionnaire.paper))
-        .flat()
-        .filter(paper => paper)
-        .flat()
-        .filter(paper => paper && paper.hasChanged)
-      if (!paperList.length) this.$message.warning({ duration: 3000, message: '没有问卷被修改，无需提交' })
-
-      // 按问卷提交
-      // let saveList = paperList.map(paper => ({
-      //   patientId: paper.patientId,
-      //   stageId: paper.stageId,
-      //   questionnaireList: [{
-      //     questionnaireTypeId: paper.questionnaireTypeId,
-      //     questionnaireName: paper.questionnaireName,
-      //     entryUser: this.globalData.userInfo.userName,
-      //     entryDate: new Date(),
-      //     groupList: [paper]
-      //   }]
-      // }))
-
-      // 按阶段提交
-      let stageList = this.libs.array.unique(paperList, a => a.stageId)
-
-      let saveList = stageList.map(({ patientId, stageId }) => ({
-        patientId,
-        stageId,
-        questionnaireList:
-          paperList.filter(item => item.stageId === stageId)
-            .map(({ questionnaireTypeId, questionnaireName, groupId }) => ({
-              questionnaireTypeId,
-              questionnaireName,
-              entryUser: this.globalData.userInfo.userName,
-              entryDate: new Date(),
-              groupList: paperList.filter(item => item.stageId === stageId && item.groupId === groupId)
-            }))
-      }))
-      let res = await Promise.all(saveList.map(async stage => {
-        let _res = await this.request(this.api.andrology.crf.submitQuestionnaire, stage)
-        return { stageId: stage.stageId, ..._res }
-      }))
-      console.log(saveList, res);
+    async onSave () {
+      await this.save(this.params.patientInfo)
       this.showDialog = false
       await this.testTarget().hideDialog()
       return await this.testTarget().getList()

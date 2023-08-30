@@ -26,7 +26,7 @@
         type="primary"
         v-if="listType !== 'picture-card'"
       >
-        选取文件
+        上传文件
       </el-button>
       <el-button
         style="margin-left: 10px"

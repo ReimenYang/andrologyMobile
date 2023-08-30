@@ -3,14 +3,23 @@ export default [
     id: '01',
     menuId: '01',
     type: 'menu',
-    title: '项目信息',
-    name: '项目信息',
-    path: '/index',
+    title: '项目运行情况',
+    name: '项目运行情况',
+    path: '/index/operationInfo',
     icon: 'el-icon-s-home',
     children: [],
   },
   {
     id: '02',
+    menuId: '01',
+    type: 'menu',
+    title: '项目信息',
+    name: '项目信息',
+    path: '/index',
+    icon: ''
+  },
+  {
+    id: '03',
     menuId: '01',
     type: 'menu',
     title: '受试者管理',
@@ -19,7 +28,7 @@ export default [
     icon: ''
   },
   {
-    id: '03',
+    id: '04',
     menuId: '01',
     type: 'menu',
     title: '受试者CRF',
@@ -29,7 +38,7 @@ export default [
     children: []
   },
   {
-    id: '03',
+    id: '05',
     menuId: '01',
     type: 'menu',
     title: '质疑管理',
@@ -39,7 +48,7 @@ export default [
     children: []
   },
   {
-    id: '03',
+    id: '06',
     menuId: '01',
     type: 'menu',
     title: '质疑报告',
@@ -49,7 +58,7 @@ export default [
     children: []
   },
   {
-    id: '03',
+    id: '07',
     menuId: '01',
     type: 'menu',
     title: '数据管理',
@@ -59,7 +68,7 @@ export default [
     children: []
   },
   {
-    id: '04',
+    id: '08',
     menuId: '01',
     type: 'menu',
     title: '随访',
@@ -67,14 +76,14 @@ export default [
     path: '/followUp',
     icon: '',
     children: []
-    // }, {
-    //   id: '05',
-    //   menuId: '01',
-    //   type: 'menu',
-    //   title: '消息与随访',
-    //   name: '消息与随访',
-    //   path: '/message',
-    //   icon: '',
+  }, {
+    id: '09',
+    menuId: '01',
+    type: 'menu',
+    title: '科研数据分析',
+    name: '科研数据分析',
+    path: '/statistics',
+    icon: '',
     // }, {
     //   id: '06',
     //   menuId: '01',

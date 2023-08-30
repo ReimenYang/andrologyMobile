@@ -14,7 +14,7 @@
         v-if="upload.listType !== 'picture-card'"
       >
         <button class="btn plain">
-          选取文件
+          上传文件
         </button>
       </slot>
     </el-upload>
@@ -181,15 +181,16 @@ export default {
         this.finishUpload()
       },
       //文件上传进度，单位：字节
-      'onUploadProgress': function (uploadInfo, totalSize, loadedPercent) {
+      'onUploadProgress': (uploadInfo, totalSize, loadedPercent) => {
+        this.$messageBox({ message: '文件上传处理中...' + loadedPercent, showClose: false, showConfirmButton: false, closeOnClickModal: false, closeOnPressEscape: false })
         console.log('onUploadProgress', uploadInfo, totalSize, loadedPercent);
       },
       //上传凭证或STS token超时
-      'onUploadTokenExpired': function (uploadInfo) {
+      'onUploadTokenExpired': uploadInfo => {
         console.log('onUploadTokenExpired', uploadInfo);
       },
       //全部文件上传结束
-      'onUploadEnd': function (uploadInfo) {
+      'onUploadEnd': uploadInfo => {
         console.log('onUploadEnd', uploadInfo);
       }
     });
@@ -216,7 +217,7 @@ export default {
       let readyList = this.upload.fileList.filter(item => item.status === "ready")
       console.log(this.upload.fileList, readyList, readyList.length);
       if (readyList.length) return
-
+      this.$messageBox.close()
       this.$emit('finish', this.upload.fileList)
     }
   }

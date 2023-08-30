@@ -98,9 +98,7 @@ export default {
             { prop: 'questionTitle', label: '检查项目' },
             {
               prop: 'questionAnswer', label: group.examineAnswerTitle, type: 'input',
-              repeat: [
-                { prop: 'questionAnswer' }
-              ]
+              repeat: [{ prop: 'questionAnswer' }]
             },
             {
               prop: 'examineSence', label: group.examineSenceTitle, type: 'select',
@@ -117,7 +115,10 @@ export default {
               ]
             },
             { prop: 'examineNormalValue', label: group.examineNormalValueTitle },
-            { prop: 'examineRemark', label: group.examineRemarkTitle },
+            {
+              prop: 'examineRemark', label: group.examineRemarkTitle, type: 'input',
+              repeat: [{ prop: 'examineRemark' }]
+            },
           ]
         }
         for (let question of group.questionList) {
@@ -130,23 +131,3 @@ export default {
   }
 }
 </script>
-<style lang="scss" scoped>
-.preface {
-  margin: 20rpx 0;
-}
-.desc {
-  color: var(--color-tips);
-  font-size: var(--font-h4);
-  margin: 20rpx 0;
-}
-.content :deep(.question) {
-  // border: var(--border-normal);
-  // background-color: #fff;
-  // .title {
-  //   border-bottom: var(--border-normal);
-  // }
-  .content {
-    padding: 0 20rpx;
-  }
-}
-</style>

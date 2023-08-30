@@ -65,14 +65,15 @@
     >
       <template #default />
     </xnw-template-list>
-    <upload-video
+    <upload-videos
       title="上传视频"
       @close="hideDialog"
       @finish="getList"
       v-if="uploadVideoDialog"
     />
-    <video-player
+    <vplayer
       v-bind="player"
+      @close="hideDialog"
       v-if="videoPlayerDialog"
     />
   </div>
@@ -81,10 +82,10 @@
 
 <script>
 import uploadFile from './_uploadFile.vue'
-import uploadVideo from './_uploadVideo.vue'
-import videoPlayer from './_videoPlayer.vue'
+import uploadVideos from './_uploadVideo.vue'
+import vplayer from './_videoPlayer.vue'
 export default {
-  components: { uploadFile, uploadVideo, videoPlayer },
+  components: { uploadFile, uploadVideos, vplayer },
   data () {
     return {
       fileList: [],

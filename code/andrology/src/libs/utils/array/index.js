@@ -1,4 +1,8 @@
 let array = {}
+// 判断是否数组
+array.isArray = data => {
+  return typeof data === 'object' && !isNaN(data.length)
+}
 // 数组去重
 array.unique = (arr, func = a => a) => {
   let rt = []

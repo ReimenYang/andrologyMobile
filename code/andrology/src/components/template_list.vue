@@ -397,7 +397,11 @@ export default {
       this.$emit('getList', {})
     },
     onReset () {
-      Object.keys(this.form).forEach(key => this.form[key] = '')
+      Object.keys(this.form).forEach(key => {
+        if (this.libs.array.isArray(this.form[key])) this.form[key] = []
+        else if (this.libs.object.isObject(this.form[key])) this.form[key] = {}
+        else this.form[key] = ''
+      })
     },
     viewerClose () {
       this.$emit('viewerClose', {})

@@ -29,14 +29,14 @@ export default {
       default: () => ({})
     }
   },
-  watch: {
-    question: {
-      handler: function () {
-        console.log('hasChangedquestion')
-      },
-      deep: true
-    }
-  },
+  // watch: {
+  //   question: {
+  //     handler: function () {
+  //       this.params.questionAnswer =this.question.questionAnswer
+  //     },
+  //     deep: true
+  //   }
+  // },
   computed: {
     hasAsk () {
       return this.question.verificationState === 'Q'

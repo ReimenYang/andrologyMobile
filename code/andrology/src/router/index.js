@@ -8,6 +8,7 @@ const routes = [
     children: [
       { path: '', redirect: '/admin' },
       { path: '/index', component: () => import('@/views/index/index.vue') },
+      { path: '/index/operationInfo', component: () => import('@/views/index/operationInfo.vue') },
       { path: '/testee', component: () => import('@/views/testee/index.vue') },
       { path: '/crf', component: () => import('@/views/crf/index.vue') },
       { path: '/ask', component: () => import('@/views/ask/index.vue') },

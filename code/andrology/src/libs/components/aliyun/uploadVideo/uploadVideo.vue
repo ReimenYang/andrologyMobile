@@ -14,7 +14,7 @@
         v-if="upload.listType !== 'picture-card'"
       >
         <button class="btn plain">
-          选取文件
+          上传文件
         </button>
       </slot>
     </el-upload>
