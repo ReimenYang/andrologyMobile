@@ -67,7 +67,7 @@ export default {
   background-color: var(--theme-color);
 }
 :deep(.el-menu-item) {
-  --el-menu-hover-bg-color: var(--color-plain) !important;
+  --el-menu-hover-bg-color: var(--color-tips) !important;
   font-size: var(--font-h4);
   color: var(--color-white) !important;
   &.is-active {
