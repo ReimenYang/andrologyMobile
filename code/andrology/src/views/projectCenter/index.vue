@@ -7,6 +7,7 @@
       type="flex"
       align="middle"
       class="topbar"
+      style="padding-top: 10px"
     >
       <el-col
         :span="20"
@@ -113,16 +114,6 @@ export default {
   width: 90%;
   margin: auto;
   box-sizing: border-box;
-  .topbar {
-    padding: 10px 0;
-    .topbarTitle {
-      font-size: 18px;
-    }
-    .btnGroup {
-      display: block;
-      text-align: right;
-    }
-  }
   .list {
     display: grid;
     justify-content: space-between;

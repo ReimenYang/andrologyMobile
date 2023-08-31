@@ -6,7 +6,7 @@ export default [
     title: '项目运行情况',
     name: '项目运行情况',
     path: '/index/operationInfo',
-    icon: 'el-icon-s-home',
+    icon: 'iconfont icon-linechart',
     children: [],
   },
   {
@@ -16,7 +16,7 @@ export default [
     title: '项目信息',
     name: '项目信息',
     path: '/index',
-    icon: ''
+    icon: 'iconfont icon-info-circle'
   },
   {
     id: '03',
@@ -25,7 +25,7 @@ export default [
     title: '受试者管理',
     name: '受试者管理',
     path: '/testee',
-    icon: ''
+    icon: 'iconfont icon-team'
   },
   {
     id: '04',
@@ -34,7 +34,7 @@ export default [
     title: '受试者CRF',
     name: '受试者CRF',
     path: '/crf',
-    icon: '',
+    icon: 'iconfont icon-solution',
     children: []
   },
   {
@@ -44,7 +44,7 @@ export default [
     title: '质疑管理',
     name: '质疑管理',
     path: '/ask',
-    icon: '',
+    icon: 'iconfont icon-file-exception',
     children: []
   },
   {
@@ -54,7 +54,7 @@ export default [
     title: '质疑报告',
     name: '质疑报告',
     path: '/ask/report',
-    icon: '',
+    icon: 'iconfont icon-fileprotect',
     children: []
   },
   {
@@ -64,7 +64,7 @@ export default [
     title: '数据管理',
     name: '数据管理',
     path: '/data',
-    icon: '',
+    icon: 'iconfont icon-table',
     children: []
   },
   {
@@ -74,7 +74,7 @@ export default [
     title: '随访',
     name: '随访',
     path: '/followUp',
-    icon: '',
+    icon: 'iconfont icon-phone',
     children: []
   }, {
     id: '09',
@@ -83,7 +83,7 @@ export default [
     title: '科研数据分析',
     name: '科研数据分析',
     path: '/statistics',
-    icon: '',
+    icon: 'iconfont icon-reddit',
     // }, {
     //   id: '06',
     //   menuId: '01',

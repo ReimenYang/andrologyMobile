@@ -1,10 +1,13 @@
 export default {
   methods: {
-    async questionFormat (question, group) {
+    async questionFormat (question, paper) {
       switch (question.questionType) {
         case '计算':
-          this.questionComputer(question, 'questionAnswer', { question: group.questionList }, 'questionId')
-          console.log(group, question);
+          if (paper) {
+            paper.question = paper.questionList
+            this.questionComputer(question, 'questionAnswer', paper, 'questionId')
+          }
+          console.log(paper, question);
           question.uiStyle = 'computer'
           question.col = {
             label: question.questionTitle,
@@ -79,7 +82,7 @@ export default {
           break;
         case '检查项目':
           // 质疑详情
-          if (!group) {
+          if (!paper) {
             question.uiStyle = 'input'
             question.hasAnswer = !!String(question.questionAnswer)
             question.col = {
@@ -95,8 +98,8 @@ export default {
           }
 
           // 问卷
-          group.uiStyle = 'table'
-          for (let _question of group.questionList) {
+          paper.uiStyle = 'table'
+          for (let _question of paper.questionList) {
             _question.questionType = '单行文本'
             this.questionFormat(_question)
           }
@@ -144,7 +147,7 @@ export default {
       }
     },
     // 编译公式 参数示例：('{question[2]}/(({question[1]}/100)**2)', 'optionValue')
-    buileComputer (computeRule, getKey, _data, matchKey) {
+    buileComputer (computerQuestion, getKey, paper, matchKey) {
       // 设置基础计算数据
       // 年龄用出生计算 必须使用填空题 optionValue字段
       // let _age = (this.computerBaseData.question.find(item => item.remark === 'age') || {}).optionValue
@@ -164,21 +167,22 @@ export default {
       // }
 
       // 数据源  病症和问题有两个表保存，意味着有可能一个id存在两条记录，也许存在取值错误的问题
-      // let _data = this.computerBaseData
+      // let paper = this.computerBaseData
       // 术式
-      let _computeRule = computeRule
+      let _computeRule = computerQuestion.questionFormula
       // 提取变量关键字
-      let keyArr = computeRule.match(/\{(.+?)\}/img)
+      let keyArr = computerQuestion.questionFormula.match(/\{(.+?)\}/img)
       // 变量去除括号
       let objKeyArr = keyArr.map(key => key.slice(1, -1))
       // 提取对象
-      let objTargetArr = objKeyArr.map(key => this.libs.object.getValue(key.split('[')[0], _data))
+      let objTargetArr = objKeyArr.map(key => this.libs.object.getValue(key.split('[')[0], paper))
       // 提取id
       let objIdArr = objKeyArr.map(key => key.match(/\[(.+?)\]/img) || ['[]']).reduce((a, b) => [...a, ...b]).map(key => key.slice(1, -1))
-
       // 获取变量值
       let objValueArr = objIdArr.map((id, i) => {
         if (!id) return objTargetArr[i]
+        // 记录监听问题和计算题的关联id
+        paper.watchIds[id] = computerQuestion[matchKey]
         let target = objTargetArr[i].find(obj => String(obj[matchKey]) === (id))
         if (!target) console.error(objTargetArr[i], `找不到${matchKey}为${id}的对象`)
         return target ? this.libs.object.getValue(getKey, target) : ''
@@ -197,9 +201,9 @@ export default {
       if (ready) return _computeRule
     },
     // 根据其他问题混算出结果，如：BMI
-    questionComputer (computerQuestion, getKey, data, matchKey) {
+    questionComputer (computerQuestion, getKey, paper, matchKey) {
       // TODO 暂时所有计算都是精确到小数点后一位
-      let result = eval(this.buileComputer(computerQuestion.questionFormula, getKey, data, matchKey))
+      let result = eval(this.buileComputer(computerQuestion, getKey, paper, matchKey))
       result = result === Infinity ? 0 : result
       computerQuestion[getKey] = isNaN(result) ? 0 : result.toFixed(1)
     },

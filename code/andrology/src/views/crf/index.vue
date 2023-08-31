@@ -1,35 +1,42 @@
 <template>
   <el-container class="crf">
     <el-aside class="aside">
-      <div style="padding: 10px 20px;">
-        <div
-          v-for="item in patientState"
-          :key="item.alt"
-          v-bind="item"
-          style="width: 50%;display: inline-block;"
-        >{{ item.alt }}</div>
+      <div style="padding: 10px 20px;border-bottom: var(--border-normal);">
+        <el-input
+          v-model="filterText"
+          placeholder="请输入姓名或编号"
+        />
+        <el-checkbox-group v-model="stateFilter">
+          <el-checkbox
+            v-for="item in patientState"
+            :key="item.label"
+            :label="item.label"
+            style="width: 50%;margin-right: 0;padding-right: 10px;box-sizing: border-box;"
+          >
+            <div :style="{fontSize: 'var(--font-h5)',color:item.color}">{{ item.label }}</div>
+          </el-checkbox>
+        </el-checkbox-group>
       </div>
-      <!-- <el-input
-      v-model="filterText"
-      placeholder="Filter keyword"
-      /> -->
-      <el-tree
-        ref="treeRef"
-        class="filter-tree"
-        :data="patientList"
-        :default-expanded-keys="[patientId]"
-        node-key="patientId"
-        :props="{...defaultProps,class:setActiveNodeClass}"
-        :filter-node-method="filterNode"
-        @node-click="clickTree"
-      >
-        <template #default="{ node, data }">
-          <span class="custom-tree-node">
-            <span v-bind="data.icon" />
-            <span>{{ node.label }}</span>
-          </span>
-        </template>
-      </el-tree>
+      <div style="height: calc(100% - 150px); overflow-y:scroll;">
+        <el-tree
+          ref="treeRef"
+          class="filter-tree"
+          :data="patientList"
+          :default-expanded-keys="[patientId]"
+          node-key="patientId"
+          :props="{...defaultProps,class:setActiveNodeClass}"
+          :filter-node-method="filterNode"
+          @node-click="clickTree"
+        >
+          <template #default="{ node, data }">
+            <span class="custom-tree-node">
+              <span v-bind="data.icon">{{ data.patientState }}</span>
+              <span>{{ node.label }}</span>
+            </span>
+          </template>
+        </el-tree>
+      </div>
+
     </el-aside>
 
     <el-main class="main">
@@ -120,6 +127,7 @@ export default {
       ready: false,
       projectState: sessionStorage.projectState === '已开始',
       filterText: '',
+      stateFilter: [],
       defaultProps: {
         label: 'label',
         children: 'children'
@@ -127,12 +135,12 @@ export default {
       patientList: [],
       patientId: '',
       patientState: [
-        { class: 'iconfont icon-smile', style: 'color: #209cdd', alt: '未入组' },
-        { class: 'iconfont icon-smile', style: 'color: #df6b66', alt: '排除' },
-        { class: 'iconfont icon-smile-fill', style: 'color: #209cdd', alt: '已入组' },
-        { class: 'iconfont icon-smile-fill', style: 'color: #5bb75b', alt: '完成' },
-        { class: 'iconfont icon-smile-fill', style: 'color: #df6b66', alt: '脱落' },
-        { class: 'iconfont icon-smile-fill', alt: '中止' },
+        { color: '#df6b66', label: '未入组' },
+        { color: '#209cdd', label: '已入组' },
+        { color: '#5bb75b', label: '完成' },
+        { label: '排除' },
+        { label: '脱落' },
+        { label: '中止' },
       ],
       patientInfo: {},
       infoKeys: [{
@@ -159,6 +167,14 @@ export default {
       activeQuestionnaire: [],
     }
   },
+  watch: {
+    filterText: function () {
+      this.$refs.treeRef.filter(this.filterText)
+    },
+    stateFilter: function () {
+      this.$refs.treeRef.filter(this.stateFilter)
+    }
+  },
   async created () {
     window.Y = this
     this.btnList = this.btnListJson.btnList
@@ -178,7 +194,7 @@ export default {
         label: organization,
         children: list.filter(item => {
           item.label = item.patientCode
-          item.icon = this.patientState.find(({ alt }) => alt === item.patientState)
+          item.icon = this.patientState.find(({ label }) => label === item.patientState)
           return item.organizationId === organizationId
         })
       }))
@@ -197,8 +213,14 @@ export default {
     },
     filterNode (value, data) {
       console.log(value, data);
-      // if (!value) return true
-      // return value.includes(data.label)
+      if (!value.length) return true
+      let { patientState, label, patientCode } = data
+      switch (typeof value) {
+        case 'object':
+          return value.includes(patientState)
+        case 'string':
+          return [label, patientCode].includes(value)
+      }
     },
     async clickTree (object) {
       if (!object.patientId) return
@@ -220,9 +242,23 @@ export default {
   background-color: #fff;
 }
 .iconfont::before {
-  margin-right: 5px;
-  font-size: 20px;
-  vertical-align: middle;
+  margin-right: 3px;
+}
+.el-tree {
+  .iconfont {
+    width: 50px;
+    margin-right: 5px;
+    line-height: 20px;
+    display: inline-block;
+    border: 1px solid;
+    border-radius: 5px;
+    font-size: 12px;
+    text-align: center;
+    &::before {
+      font-size: 16px;
+      vertical-align: middle;
+    }
+  }
 }
 .main {
   margin: 0 10px;
@@ -245,7 +281,7 @@ export default {
   line-height: 2;
 }
 :deep(.active) {
-  background-color: var(--color-plain);
+  background-color: var(--color-placeholder);
   border-color: var(--theme-color);
   color: var(--theme-color);
   font-weight: bold;

@@ -47,6 +47,14 @@ import mixin from './_mixin.js'
 export default {
   name: 'Index',
   mixins: [mixin],
+  async beforeRouteUpdate (to, from, next) {
+    if (!this.globalData.confirmMsg) return next()
+    let _confirm = await this.$confirm(this.globalData.confirmMsg).catch(() => '')
+    if (_confirm === 'confirm') {
+      delete this.globalData.confirmMsg
+      next()
+    }
+  },
   data () {
     return {
     }

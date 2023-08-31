@@ -19,7 +19,7 @@ export default {
           { text: 'CRF显示', click: row => this.onBtn(row, 'CRFInfo'), condition: () => !this.patientInfo && sessionStorage.projectState === '暂停' },
           { text: '上传文件', click: row => this.onBtn(row, 'upload'), condition: () => sessionStorage.projectState === '已开始' },
           { text: '签名', click: row => this.onBtn(row, 'signature'), condition: row => !row.signatureDate && sessionStorage.projectState === '已开始' },
-          { text: '删除', click: row => this.onBtn(row, 'del'), condition: () => !this.patientInfo && sessionStorage.projectState === '已开始' },
+          { text: '删除', click: row => this.onBtn(row, 'deletePatient'), condition: () => !this.patientInfo && sessionStorage.projectState === '已开始' },
         ]
       }
     }
@@ -36,7 +36,7 @@ export default {
         finish: '完成',
         stop: '中止',
         falloff: '脱落',
-        del: '删除',
+        deletePatient: '删除',
       }[type]
       this.screeningTitle = ''
       let _confirm
@@ -60,21 +60,15 @@ export default {
         case 'finish':
         case 'stop':
         case 'falloff':
-          _confirm = await this.$confirm(`确认${typeLabel + row.patientName}？`).catch(() => '')
-          if (_confirm) {
-            await this.request(this.api.andrology.patient[type], row)
-            await this.getList()
-          }
+        case 'deletePatient':
+          _confirm = await this.$confirm(`确认${typeLabel + row.patientName}？`).catch(() => this.rowData = {})
+          if (_confirm !== '_confirm') return
+          await this.request(this.api.andrology.patient[type], row)
+          await this.getList()
+          this.rowData = {}
           break;
         case 'upload':
           this.uploadFileDialog = true
-          break;
-        case 'del':
-          _confirm = await this.$confirm(`确认${typeLabel + row.patientName}？`).catch(() => '')
-          if (_confirm) {
-            await this.request(this.api.andrology.patient.deletePatient, row)
-            await this.getList()
-          }
           break;
       }
     }

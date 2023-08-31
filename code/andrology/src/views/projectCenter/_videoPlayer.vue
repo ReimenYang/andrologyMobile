@@ -5,7 +5,10 @@
     v-model="showDialog"
     :width="width"
   >
-    <video-player :playUrl="playUrl" />
+    <video-player
+      :playUrl="playUrl"
+      :setStyle="{width: '800px', height: '600px',margin:'auto'}"
+    />
   </el-dialog>
 </template>
 <script>

@@ -64,5 +64,9 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss" scoped>
+:deep(.iconfont) {
+  font-size: var(--font-h2);
+  margin-right: 10px;
+}
 </style>

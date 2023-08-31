@@ -52,7 +52,7 @@ export default {
     }
   },
   async created () {
-    window.sdv = this
+    // window.sdv = this
     let { patientId, stageId, questionnaireTypeId } = this.testPaper().paper
     let { questionId, questionTitle, questionAnswer } = this.question
     this.params = { patientId, stageId, questionnaireTypeId, questionId, questionTitle, questionAnswer }

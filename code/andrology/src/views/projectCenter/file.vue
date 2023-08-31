@@ -41,6 +41,7 @@
       type="flex"
       align="middle"
       class="topbar"
+      style="padding-top: 10px"
     >
       <el-col
         :span="18"
@@ -169,11 +170,6 @@ export default {
       switch (type) {
         case 'download':
           window.open(url, '_blank')
-          // res = await this.request({ method: 'GET', url, dataType: 'json' }, {}, { headers: this.globalData.headers, responseType: 'blob' })
-          // qq = window.URL.createObjectURL(new Blob([res], {
-          //   type: 'video/mp4'
-          // }))
-          // window.open(qq, '_blank')
           break;
         case 'edit':
           console.log(row, type);
@@ -197,15 +193,5 @@ export default {
 .file {
   display: flex;
   flex-direction: column;
-}
-.topbar {
-  padding: 10px 0;
-  .topbarTitle {
-    font-size: 18px;
-  }
-  .btnGroup {
-    display: block;
-    text-align: right;
-  }
 }
 </style>

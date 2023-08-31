@@ -109,4 +109,21 @@ export default defineComponent({
   display: flex;
   justify-content: center;
 }
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 0 10px;
+  .topbarTitle {
+    font-size: 18px;
+  }
+  .btnGroup {
+    display: block;
+    text-align: right;
+    button {
+      margin: 0 0 0 10px;
+    }
+  }
+}
 </style>

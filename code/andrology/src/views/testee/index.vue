@@ -112,8 +112,8 @@ export default {
               { label: '脱落', value: '脱落' },
               { label: '中止', value: '中止' },
             ]
-          }], [{
-            prop: 'createDate', label: '创建日期', type: 'dateTimePicker', span: 6, config: { type: 'daterange' }
+          }, {
+            prop: 'createDate', label: '创建日期', type: 'dateTimePicker', span: 12, config: { type: 'daterange' }
           }]
       ],
       fileTableHeader: [
@@ -135,6 +135,7 @@ export default {
     }
   },
   async created () {
+    window.Y = this
     this.fileTableHeader.push(this.btnListJson)
     await this.getList()
   },

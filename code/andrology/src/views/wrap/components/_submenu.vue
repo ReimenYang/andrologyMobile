@@ -54,8 +54,8 @@ export default {
       let menuId = '01'
       this.systemMenu = this.menuList.filter(item => item.menuId === menuId)
     },
-    updateTabList (path) {
-      this.$emit('tabAdd', path)
+    async updateTabList (path) {
+      if (!this.globalData.confirmMsg) return this.$emit('tabAdd', path)
     }
   }
 }
@@ -64,6 +64,17 @@ export default {
 <style scoped lang="scss">
 ._submenu .el-menu {
   min-height: calc(100vh - 3.6rem);
+  background-color: var(--theme-color);
+}
+:deep(.el-menu-item) {
+  --el-menu-hover-bg-color: var(--color-plain) !important;
+  font-size: var(--font-h4);
+  color: var(--color-white) !important;
+  &.is-active {
+    margin-right: -1px;
+    background-color: var(--color-background);
+    color: var(--theme-color) !important;
+  }
 }
 .menuTitle {
   position: sticky;

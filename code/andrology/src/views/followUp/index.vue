@@ -56,29 +56,29 @@ export default {
         patientState: ['未入组', '已入组', '排除', '完成', '脱落', '中止']
       },
       filterRepeat: [
-        [
-          {
-            prop: 'organization', label: '所属机构', type: 'select', span: 5, repeat: [{ options: this.globalData.orgList.map(({ orgName }) => ({ label: orgName, value: orgName })) }]
-          }, {
-            prop: 'questionTitle', label: '随访次数', type: 'input', span: 5, repeat: [{ prop: 'questionTitle' }]
-          }], [{
-            prop: 'askState', label: '随访状态', type: 'checkbox', span: 6, repeat: [
-              { label: '未开始', value: '未开始' },
-              { label: '进行中', value: '进行中' },
-              { label: '已完成', value: '已完成' }
-            ]
-          }, {
-            prop: 'patientState', label: '状态', type: 'checkbox', span: 12, repeat: [
-              { label: '未入组', value: '未入组' },
-              { label: '排除', value: '排除' },
-              { label: '完成', value: '完成' },
-              { label: '脱落', value: '脱落' },
-              { label: '中止', value: '中止' }
-            ]
-          }]
+        [{
+          prop: 'patientCode', label: '编号', type: 'input', span: 6, repeat: [{ prop: 'patientCode' }]
+        }, {
+          prop: 'patientName', label: '姓名', type: 'input', span: 6, repeat: [{ prop: 'patientName' }]
+        }, {
+          prop: 'patientPhone', label: '手机号', type: 'input', span: 6, repeat: [{ prop: 'patientPhone' }]
+        }, {
+          prop: 'patientWeixin', label: '微信号', type: 'input', span: 6, repeat: [{ prop: 'patientWeixin' }]
+        }], [{
+          prop: 'followupRemark', label: '备注', type: 'input', span: 6, repeat: [{ prop: 'followupRemark' }]
+        }, {
+          prop: 'organizationName', label: '所属机构', type: 'select', span: 6, repeat: [{ options: this.globalData.orgList.map(({ orgName }) => ({ label: orgName, value: orgName })) }]
+        }, {
+          prop: 'askState', label: '随访状态', type: 'checkbox', span: 6, repeat: [
+            { label: '未开始', value: '未开始' },
+            { label: '进行中', value: '进行中' },
+            { label: '已完成', value: '已完成' }
+          ]
+        }]
       ],
       fileTableHeader: [
         { prop: 'index', label: '序号', width: 55, type: 'index' },
+        { prop: 'organizationName', label: '所属机构' },
         { prop: 'followupState', label: '随访状态' },
         { prop: 'patientCode', label: '编号' },
         { prop: 'patientName', label: '姓名' },
@@ -106,6 +106,10 @@ export default {
     async getList () {
       this.ready = false
       this.list = (await this.request(this.api.andrology.crf.getFollowupList)).data
+      this.list.forEach(item => {
+        item.askState = item.followupState.startsWith('第') ? '进行中' : item.followupState
+      });
+
       this.onPage({})
       this.ready = true
     },
@@ -130,13 +134,6 @@ export default {
 </script>
 <style lang="scss" scoped>
 .topbar {
-  padding: 10px 0;
-  .topbarTitle {
-    font-size: 18px;
-  }
-  .btnGroup {
-    display: block;
-    text-align: right;
-  }
+  padding-top: 0;
 }
 </style>

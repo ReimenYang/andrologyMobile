@@ -8,7 +8,10 @@
         v-if="showInfo"
         class="bg"
       >
-        <div class="topbar">
+        <div
+          class="topbar"
+          style="padding-top: 10px;"
+        >
           <div class="topbarTitle">{{ info.organizationName }}</div>
           <div lass="btnGroup">
             <button
@@ -55,15 +58,9 @@
     </div>
     <div class="pieBox">
       <div
-        id="joinChart"
-        :style="{width:'30%',height:'300px'}"
-      />
-      <div
-        id="tableDataChart"
-        :style="{width:'30%',height:'300px'}"
-      />
-      <div
-        id="finishChart"
+        v-for="id in ['joinChart','finishChart','tableDataChart']"
+        :key="id"
+        :id="id"
         :style="{width:'30%',height:'300px'}"
       />
     </div>
@@ -101,7 +98,6 @@ export default {
     }
   },
   async created () {
-    window.Y = this
     await this.getList()
     this.ready++
   },
@@ -164,8 +160,6 @@ export default {
       }
       this.monthList = this.info.monthList
       this.groupList = this.info.groupList
-
-
     },
     setChart () {
       let myChart = this.$root.echarts.init(document.getElementById('myChart'))
@@ -201,17 +195,12 @@ export default {
           axisTick: { show: false },
           data: this.monthList.map(() => '')// ['', '', '']
         }],
-        yAxis: [{
+        yAxis: [joinNumsInterval, totalJoinNumsInterval].map(interval => ({
           type: 'value',
-          max: joinNumsInterval * 5,
-          interval: joinNumsInterval,
+          max: interval * 5,
+          interval,
           axisLabel: { formatter: '{value} 人' }
-        }, {
-          type: 'value',
-          max: totalJoinNumsInterval * 5,
-          interval: totalJoinNumsInterval,
-          axisLabel: { formatter: '{value} 人' }
-        }],
+        })),
         series: [
           { ...barOption, name: '入组人数', stack: '', xAxisIndex: 0, data: joinNums },
           { ...barOption, name: '完成人数', data: this.monthList.map(({ finishNums }) => finishNums) },
@@ -225,6 +214,7 @@ export default {
             data: totalJoinNums
           }]
       })
+
       let joinOption = {
         title: {
           text: '受试者分组情况统计',
@@ -233,10 +223,10 @@ export default {
         tooltip: {
           trigger: 'item'
         },
-        legend: {
-          orient: 'vertical',
-          bottom: 'bottom'
-        },
+        // legend: {
+        //   orient: 'vertical',
+        //   bottom: 'bottom'
+        // },
         // color: ['#5470c6', '#91cc75'],
         series: [
           {
@@ -294,18 +284,5 @@ export default {
   height: 290px;
   padding: 0 10px 10px;
   background-color: #fff;
-}
-.topbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 0;
-  .topbarTitle {
-    font-size: 18px;
-  }
-  .btnGroup {
-    display: block;
-    text-align: right;
-  }
 }
 </style>

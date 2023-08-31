@@ -96,7 +96,6 @@ export default {
     }
   },
   async created () {
-    window.Y = this
     await this.getList()
   },
   methods: {

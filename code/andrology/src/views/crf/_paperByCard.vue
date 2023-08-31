@@ -57,7 +57,7 @@
 import question from './_question.vue'
 import sdv from './_SDV.vue'
 export default {
-  inject: ['testStage'],
+  // inject: ['testStage'],
   components: { sdv, question },
   provide () {
     return {
@@ -70,19 +70,20 @@ export default {
       default: () => ({})
     }
   },
-  watch: {
-    paper: {
-      handler: function () {
-        this.testStage().stage.hasChanged = this.paper.hasChanged = true
-        if (this.$route.path.startsWith('/crf')) this.globalData.confirmMsg = '当前页面有信息未保存，确定仍要关闭页面？'
-      },
-      deep: true
-    }
-  },
-  async created () {
-    window.paper = this
-    console.log('paper', this.paper);
-  }
+  // watch: {
+  //   paper: {
+  //     handler: function () {
+  //       console.log(this.paper, 55555);
+  //       if (!this.paper.hasChanged) this.testStage().stage.hasChanged = this.paper.hasChanged = true
+  //       if (this.$route.path.startsWith('/crf')) this.globalData.confirmMsg = '当前页面有信息未保存，确定仍要关闭页面？'
+  //     },
+  //     deep: true
+  //   }
+  // },
+  // async created () {
+  // window.paper = this
+  // console.log('paper', this.paper);
+  // }
 }
 </script>
 <style lang="scss" scoped>

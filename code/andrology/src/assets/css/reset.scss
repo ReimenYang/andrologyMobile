@@ -19,9 +19,9 @@ html {
   --color-white: #fff;
   /* 反白、按钮文字 */
 
-  --theme-color: #43a7ff;
+  --theme-color: #333743;
   /*主题颜色*/
-  --color-plain:#f0f8ff;
+  --color-plain:#999;//#eaecf3
 
 
   --font-h1: 2rem;
@@ -65,6 +65,13 @@ html {
 
   height: 100%;
   --font-normal: 16px;
+
+  /* 重置element主题样式 */
+  --el-color-primary:var(--theme-color) !important;
+  --el-color-primary-light-3:var(--color-plain) !important;
+  --el-color-primary-light-5:var(--color-disabled) !important;
+  --el-color-primary-light-7:var(--color-disabled) !important;
+  --el-color-primary-light-9:var(--color-background) !important;
 }
 
 body {

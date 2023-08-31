@@ -191,15 +191,3 @@ export default {
   }
 }
 </script>
-<style lang="scss" scoped>
-.topbar {
-  padding: 10px 0;
-  .topbarTitle {
-    font-size: 18px;
-  }
-  .btnGroup {
-    display: block;
-    text-align: right;
-  }
-}
-</style>

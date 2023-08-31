@@ -23,6 +23,7 @@
 import sdv from './_SDV.vue'
 export default {
   components: { sdv },
+  inject: ['testStage', 'testPaper'],
   props: {
     question: {
       type: Object,
@@ -35,16 +36,24 @@ export default {
   },
   watch: {
     question: {
-      handler: function () {
+      handler: async function () {
+        let paper = this.testPaper().paper
+        let computerQuestionId = paper.watchIds[this.question.questionId]
+        let computerQuestion
+        if (computerQuestionId) computerQuestion = paper.questionList.find(item => item.questionId === computerQuestionId)
+        if (computerQuestion) await this.testStage().questionComputer(computerQuestion, 'questionAnswer', paper, 'questionId')
+
+        if (this.$route.path.startsWith('/crf')) this.globalData.confirmMsg = '当前页面有信息未保存，确定仍要关闭页面？'
+        if (!paper.hasChanged) this.testStage().stage.hasChanged = paper.hasChanged = true
         if (this.question.uiStyle === 'dateTimePicker') this.question.questionAnswer = this.libs.data.dateNow(this.question.questionAnswer, 'xxxx-xx-xx')
       },
       deep: true
     }
   },
-  async created () {
-    window.question = this
-    // console.log('question', this.question);
-  },
+  // async created () {
+  // window.question = this
+  // console.log('question', this.question);
+  // },
   methods: {
     hasError () {
       return this.question.error && this.question.error !== true

@@ -61,7 +61,7 @@ export default {
     }
   },
   async created () {
-    window.paper = this
+    // window.paper = this
     await this.getQuestionnaire()
     // console.log('paper', this.paper);
   },
@@ -87,21 +87,22 @@ export default {
         { ...this.patientInfo, stageId: this.activeStage, questionnaireTypeId }
       )).data.groupList
 
-      for (let group of _questionnaire.paper) {
-        group.patientId = this.patientInfo.patientId
-        group.stageId = this.activeStage
-        group.questionnaireTypeId = questionnaireTypeId
-        group.questionnaireName = _questionnaire.questionnaireTypeName
-        group.table = {
+      for (let paper of _questionnaire.paper) {
+        paper.patientId = this.patientInfo.patientId
+        paper.stageId = this.activeStage
+        paper.questionnaireTypeId = questionnaireTypeId
+        paper.questionnaireName = _questionnaire.questionnaireTypeName
+        paper.watchIds = {}
+        paper.table = {
           tableHeader: [
             { isSDV: true, width: 80 },
             { prop: 'questionTitle', label: '检查项目' },
             {
-              prop: 'questionAnswer', label: group.examineAnswerTitle, type: 'input',
+              prop: 'questionAnswer', label: paper.examineAnswerTitle, type: 'input',
               repeat: [{ prop: 'questionAnswer' }]
             },
             {
-              prop: 'examineSence', label: group.examineSenceTitle, type: 'select',
+              prop: 'examineSence', label: paper.examineSenceTitle, type: 'select',
               repeat: [
                 {
                   options: [
@@ -114,16 +115,16 @@ export default {
                 }
               ]
             },
-            { prop: 'examineNormalValue', label: group.examineNormalValueTitle },
+            { prop: 'examineNormalValue', label: paper.examineNormalValueTitle },
             {
-              prop: 'examineRemark', label: group.examineRemarkTitle, type: 'input',
+              prop: 'examineRemark', label: paper.examineRemarkTitle, type: 'input',
               repeat: [{ prop: 'examineRemark' }]
             },
           ]
         }
-        for (let question of group.questionList) {
+        for (let question of paper.questionList) {
           if (!question.askOperationList) question.askOperationList = []
-          await this.questionFormat(question, group)
+          await this.questionFormat(question, paper)
         }
       };
       this.ready = true

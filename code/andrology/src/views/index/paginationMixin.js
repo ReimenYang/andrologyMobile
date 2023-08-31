@@ -8,6 +8,14 @@ export default {
       pagination: { ...this.globalData.pagination },
     }
   },
+  watch: {
+    filterForm: {
+      handler: function () {
+        this.onFilter()
+      },
+      deep: true
+    }
+  },
   methods: {
     onPage ({ current = this.pagination.currentPage || 1, size = this.pagination.pageSize, total = this.list.length }, list = this.list) {
       this.resultList = list.slice((current - 1) * size, current * size)
