@@ -116,6 +116,7 @@ export default {
         sessionStorage.projectCode = this.globalData.headers.projectCode = projectCode
         sessionStorage.projectName = projectName
         sessionStorage.projectState = projectState
+        document.title = projectName
         this.globalData.orgList = (await this.request(this.api.andrology.projectMgt.getProjectOrgList)).data
         this.globalData.groupList = (await this.request(this.api.andrology.projectMgt.getProjectGroupList)).data
       }
