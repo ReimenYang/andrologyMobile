@@ -78,6 +78,8 @@ const setting = {
       consume: '8862', // 优E康
       ble: '8863', // ble智康
       sunshine: '8864', // 晨硕治疗仪
+      andrology: '8865', // 男科大数据平台
+      andrologyMobile: '8866', // 男科大数据平台web
       uniApp: '8001', // uniApp模板
       demo: '8000', // vue3模板
     },
@@ -115,6 +117,8 @@ const setting = {
     limitDeviceAdmin: 'limitDeviceAdmin', // 消费电子管理后台
     consume: 'consume', // 优E康
     bookingManagement: 'bookingManagement', // 治疗预约系统pc端
+    andrology: 'andrology', // 男科大数据平台
+    andrologyMobile: 'andrologyMobile', // 男科大数据平台web
   },
   apiGroup: { // ssyypt=衫山运营平台;ssdt=衫山大唐
     cms: '/wyjk-cms/v1/api/', // 项目考试，发放 项目证书 ， 家康学院  AI  培训证书  综合健康问卷数据  ， 售卖单个课程
