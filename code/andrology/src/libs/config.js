@@ -14,7 +14,7 @@ switch (projectName) {
     host.dev = 'http://' + webDeveloper
     host.produce = 'https://health10.cn'
     break
-  case 'andrology':// 晨硕治疗仪
+  case 'andrology':// 男科大数据
     apiServers = {
       dev: 'http://10.10.20.85:9591',
       test: 'https://andrologia.cn',

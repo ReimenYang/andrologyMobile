@@ -20,7 +20,7 @@ async function request (api, params = {}, config = {}) {
   let time = utils.data.dateNow()
   let headers = configProject.globalData.headers || {}
   let header = JSON.parse(JSON.stringify(headers))
-  console.log(config);
+  // console.log(config);
   if (headers && !config.important) config = { headers, ...config }
   api = JSON.parse(JSON.stringify(api))
 
@@ -114,7 +114,7 @@ async function request (api, params = {}, config = {}) {
   if ((_data.code && (_data.code !== 0 && _data.code !== 200)) || (_data.statuscode && _data.statuscode !== '0000')) {
     toastBox('业务提示：' + (_data.msg || _data.statusmsg || _data.errorMessage) + time, apiName + (_data.code || _data.statuscode), { ...api, url, data, ...config }, dataRes)
   }
-  console.log(time, '请求结果', url, _data)
+  // console.log(time, '请求结果', url, _data)
   return _data
 }
 
