@@ -6,7 +6,7 @@ const routes = [
     component: () => import('@/views/wrap/index.vue'),
     meta: { title: '治疗预约系统' },
     children: [
-      { path: '', redirect: '/admin' },
+      { path: '', redirect: '/user' },
       { path: '/index', component: () => import('@/views/index/index.vue') },
       { path: '/index/operationInfo', component: () => import('@/views/index/operationInfo.vue') },
       { path: '/testee', component: () => import('@/views/testee/index.vue') },

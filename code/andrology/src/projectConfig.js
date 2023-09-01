@@ -9,7 +9,7 @@ export default {
     app: false
   }, // 项目要运行的环境
   vision: '0.01Bate', // 项目版本
-  updateTime: '20230608', // 版本升级时间
+  updateTime: '20230901', // 版本升级时间
   // webDeveloper: '127.0.0.1', // 前端开发本地路径
   // webDeveloper: '10.10.20.123', 	// Vincent
   webDeveloper: '10.10.20.101', 	// Reimen

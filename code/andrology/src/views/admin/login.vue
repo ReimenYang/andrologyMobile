@@ -49,8 +49,9 @@
       class="toggleType"
       @click="changeLoginType"
     >{{btnList[1].btnStatus?'短信登录':'密码登录'}}</div>
-    <div class="vision">{{ `&copy; ${libs.data.dateNow('', 'xxxx')} 壹零 ${libs.configProject.vision}
-          ${libs.configProject.updateTime}` }}</div>
+    <div class="vision">
+      {{ `&copy; ${libs.data.dateNow('', 'xxxx')} 北京迈博蓝管理咨询有限公司 ${libs.configProject.vision} ${libs.configProject.updateTime}` }}
+    </div>
   </div>
 </template>
 
@@ -144,6 +145,7 @@ export default {
   .title {
     margin-bottom: 20px;
     font-size: var(--font-h2);
+    color: #fff;
   }
 
   .fieldForm {
@@ -260,6 +262,7 @@ export default {
     margin-bottom: 28vh;
     text-decoration: underline;
     cursor: pointer;
+    color: #fff;
   }
   .vision {
     padding: 1em;

@@ -121,7 +121,7 @@ export default {
         this.globalData.groupList = (await this.request(this.api.andrology.projectMgt.getProjectGroupList)).data
       }
 
-      this.globalData.projectInfo = (await this.request(this.api.andrology.project.getProjectInfo)).data
+      if (!this.globalData.projectInfo) this.globalData.projectInfo = (await this.request(this.api.andrology.project.getProjectInfo)).data
       switch (this.globalData.projectInfo.dataPrivilege) {
         case '本机构':
           this.showInfo = true
