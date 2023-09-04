@@ -30,7 +30,11 @@
         >
           <template #default="{ node, data }">
             <span class="custom-tree-node">
-              <span v-bind="data.icon">{{ data.patientState }}</span>
+              <span
+                v-if="data.patientState"
+                class="tag"
+                :style="{color:data.color}"
+              >{{ data.patientState }}</span>
               <span>{{ node.label }}</span>
             </span>
           </template>
@@ -51,7 +55,9 @@
           :title="stage.stageName"
           :name="stage.stageId"
         >
-
+          <template #title>
+            <span style="font-size: var(--font-h4);">{{ stage.stageName }}</span>
+          </template>
           <paper
             v-if="activeStage === stage.stageId"
             :activeQuestionnaire="activeQuestionnaire"
@@ -194,7 +200,7 @@ export default {
         label: organization,
         children: list.filter(item => {
           item.label = item.patientCode
-          item.icon = this.patientState.find(({ label }) => label === item.patientState)
+          item.color = this.patientState.find(({ label }) => label === item.patientState).color
           return item.organizationId === organizationId
         })
       }))
@@ -241,23 +247,18 @@ export default {
   width: var(--nav-width);
   background-color: #fff;
 }
-.iconfont::before {
-  margin-right: 3px;
-}
-.el-tree {
-  .iconfont {
-    width: 50px;
-    margin-right: 5px;
-    line-height: 20px;
-    display: inline-block;
-    border: 1px solid;
-    border-radius: 5px;
-    font-size: 12px;
-    text-align: center;
-    &::before {
-      font-size: 16px;
-      vertical-align: middle;
-    }
+.tag {
+  width: 50px;
+  margin-right: 5px;
+  line-height: 20px;
+  display: inline-block;
+  border: 1px solid;
+  border-radius: 5px;
+  font-size: 12px;
+  text-align: center;
+  &::before {
+    font-size: 16px;
+    vertical-align: middle;
   }
 }
 .main {

@@ -62,7 +62,7 @@ export default {
         case 'falloff':
         case 'deletePatient':
           _confirm = await this.$confirm(`确认${typeLabel + row.patientName}？`).catch(() => this.rowData = {})
-          if (_confirm !== '_confirm') return
+          if (_confirm !== 'confirm') return
           await this.request(this.api.andrology.patient[type], row)
           await this.getList()
           this.rowData = {}

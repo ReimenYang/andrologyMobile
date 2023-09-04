@@ -30,7 +30,10 @@
         </el-descriptions-item>
       </el-descriptions>
     </div>
-    <div class="formFooter">
+    <div
+      class="formFooter"
+      v-if="ready"
+    >
       <button
         class="btn"
         @click="$emit('close')"
@@ -75,6 +78,7 @@ export default {
   },
   data () {
     return {
+      ready: false,
       showDialog: true,
       width: '1200px',
       screeningInfo: [],
@@ -88,6 +92,7 @@ export default {
   },
   async created () {
     this.screeningInfo = (await this.request(this.api.andrology.patient.getPatientScreeningInfo, { patientId: this.date.id })).data
+    this.ready = true
   },
   methods: {
     async finish () {

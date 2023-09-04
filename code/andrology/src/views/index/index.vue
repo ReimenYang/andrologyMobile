@@ -81,6 +81,7 @@ export default {
     }
   },
   async created () {
+    if (!this.globalData.projectInfo) this.globalData.projectInfo = (await this.request(this.api.andrology.project.getProjectInfo)).data
     let intro = this.globalData.projectInfo
     this.fileList = intro.fileList
     this.videoList = intro.videoList

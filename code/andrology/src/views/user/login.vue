@@ -1,58 +1,70 @@
 <template>
   <div class="bg">
-    <div class="title">{{ $route.query.projectName||libs.configProject.name }}</div>
-    <div class="fieldForm">
-      <div
-        class="fieldBox"
-        v-for="item in btnList"
-        :key="item.name"
-        v-show="item.btnStatus"
-      >
-        <span
-          class="label"
-          :class="{ smallLabel: item.smallLabel }"
-        >{{ item.label }}</span>
-        <el-input
-          class="input"
-          v-model="form[item.name]"
-          v-bind="item.config"
-          @blur="item.smallLabel = !!form[item.name]"
-          @focus="item.smallLabel = true"
-          @input="item.onInput && item.onInput(item)"
-          @keyup.enter="item.click && item.click()"
-        />
-        <el-input
-          v-if="item.name === 'verifyCode'"
-          type="image"
-          :src="imgCodeUrl"
-          class="imgCode"
-          @click="getImgCodeUrl"
-        />
-        <span
-          class="getCode"
-          :class="{ disabled: smsLocker }"
-          v-if="item.name === 'smsCode'"
-          @click="getCode"
-        >{{
+    <div
+      v-if="!$route.query.projectCode"
+      class="fieldForm"
+    >
+      非法请求路径
+    </div>
+    <div v-else>
+      <div class="title">{{ $route.query.projectName||libs.configProject.name }}</div>
+      <div class="fieldForm">
+        <div
+          class="fieldBox"
+          v-for="item in btnList"
+          :key="item.name"
+          v-show="item.btnStatus"
+        >
+          <span
+            class="label"
+            :class="{ smallLabel: item.smallLabel }"
+          >{{ item.label }}</span>
+          <el-input
+            class="input"
+            v-model="form[item.name]"
+            v-bind="item.config"
+            @blur="item.smallLabel = !!form[item.name]"
+            @focus="item.smallLabel = true"
+            @input="item.onInput && item.onInput(item)"
+            @keyup.enter="item.click && item.click()"
+          />
+          <el-input
+            v-if="item.name === 'verifyCode'"
+            type="image"
+            :src="imgCodeUrl"
+            class="imgCode"
+            @click="getImgCodeUrl"
+          />
+          <span
+            class="getCode"
+            :class="{ disabled: smsLocker }"
+            v-if="item.name === 'smsCode'"
+            @click="getCode"
+          >{{
           item.text
         }}</span>
-      </div>
+        </div>
 
-      <el-button
-        type="primary"
-        class="submit"
-        size="large"
-        @click="submit"
-      >确定提交</el-button>
+        <el-button
+          type="primary"
+          class="submit"
+          size="large"
+          @click="submit"
+        >确定提交</el-button>
+      </div>
+      <div
+        class="toggleType"
+        @click="changeLoginType"
+      >{{btnList[1].btnStatus?'短信登录':'密码登录'}}</div>
     </div>
     <div
-      class="toggleType"
-      @click="changeLoginType"
-    >{{btnList[1].btnStatus?'短信登录':'密码登录'}}</div>
-    <div class="vision">
+      class="vision"
+      v-if="$route.query.projectCode"
+    >
       {{ `&copy; ${libs.data.dateNow('', 'xxxx')} 北京迈博蓝管理咨询有限公司 ${libs.configProject.vision} ${libs.configProject.updateTime}` }}
       <a href="/#/admin">管理员登录</a>
     </div>
+
   </div>
 </template>
 
@@ -79,10 +91,6 @@ export default {
     }
   },
   created () {
-    this.$route.query = {
-      projectCode: '548045f4-9e79-482c-b4c2-061fd389d9af',
-      projectName: '男科患者应用重组人生长激素治疗的真实世界研究'
-    }
     sessionStorage.clear()
     let _userInfo = this.libs.data.getStorage('userInfo')
     if (!_userInfo) return
@@ -136,7 +144,8 @@ export default {
       this.globalData.headers = { token: res.data.loginToken, projectCode }
 
       this.globalData.projectInfo = (await this.request(this.api.andrology.project.getProjectInfo)).data
-      this.$router.push('/index/operationInfo?' + this.libs.object.paramsToKeyValue({ projectCode, projectName: this.globalData.projectInfo.projectName, projectState: '已开始' }))
+      let { projectName, projectState } = this.globalData.projectInfo
+      this.$router.push('/index/operationInfo?' + this.libs.object.paramsToKeyValue({ projectCode, projectName, projectState }))
     }
   }
 }
@@ -150,6 +159,7 @@ export default {
   justify-content: center;
   align-items: center;
   background: url("@/assets/images/bg.jpg") no-repeat center/cover;
+  text-align: center;
 
   .title {
     margin-bottom: 20px;
@@ -158,8 +168,9 @@ export default {
   }
 
   .fieldForm {
+    width: 310px;
     padding: 10px;
-    margin-bottom: 30px;
+    margin: 0 auto 30px;
     border-radius: 15px;
     border: var(--border-normal);
     background: #fff;
