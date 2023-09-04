@@ -90,7 +90,7 @@ export default {
       sessionStorage.clear()
       this.libs.data.setStorage('userInfo', JSON.stringify(this.userInfo))
       // 根据用户角色判断跳转路径 todo
-      let url = location.href.split('#')[0] + `#/${this.userInfo.projectCode ? 'user' : 'admin'}/login`
+      let url = location.href.split('#')[0] + `#/${this.userInfo.projectCode ? ('user/login?projectCode=' + this.userInfo.projectCode) : 'admin/login'}`
       history.pushState(null, null, url);
       window.addEventListener('popstate', function () {
         history.pushState(null, null, url);

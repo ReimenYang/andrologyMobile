@@ -10,8 +10,8 @@ export default {
       btnListJson: {
         prop: 'btnList', label: '操作', btnList: [
           { text: '编辑', click: row => this.onBtn(row, 'edit'), condition: () => sessionStorage.projectState === '已开始' },
-          { text: '筛查', click: row => this.onBtn(row, 'filter'), condition: row => !this.patientInfo && row.patientState === '未入组' },
-          { text: '筛查详情', click: row => this.onBtn(row, 'filterInfo'), condition: row => !this.patientInfo && row.patientState !== '未入组' },
+          { text: '筛查', click: row => this.onBtn(row, 'filter'), condition: row => row.patientState === '未入组' },
+          { text: '筛查详情', click: row => this.onBtn(row, 'filterInfo'), condition: row => row.patientState !== '未入组' },
           { text: '完成', click: row => this.onBtn(row, 'finish'), condition: row => row.patientState === '已入组' },
           { text: '中止', click: row => this.onBtn(row, 'stop'), condition: row => row.patientState === '已入组' },
           { text: '脱落', click: row => this.onBtn(row, 'falloff'), condition: row => row.patientState === '已入组' },
@@ -19,7 +19,7 @@ export default {
           { text: 'CRF显示', click: row => this.onBtn(row, 'CRFInfo'), condition: () => !this.patientInfo && sessionStorage.projectState === '暂停' },
           { text: '上传文件', click: row => this.onBtn(row, 'upload'), condition: () => sessionStorage.projectState === '已开始' },
           { text: '签名', click: row => this.onBtn(row, 'signature'), condition: row => !row.signatureDate && sessionStorage.projectState === '已开始' },
-          { text: '删除', click: row => this.onBtn(row, 'deletePatient'), condition: () => !this.patientInfo && sessionStorage.projectState === '已开始' },
+          { text: '删除', click: row => this.onBtn(row, 'deletePatient'), condition: row => !this.patientInfo && sessionStorage.projectState === '已开始' && row.patientState === '未入组' },
         ]
       }
     }

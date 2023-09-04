@@ -76,7 +76,7 @@ export default {
       this.ready = true
     },
     async delFile (file) {
-      await this.request(this.api.andrology.patient.deletePatientFile, { fileId: file.id })
+      if (file.id) await this.request(this.api.andrology.patient.deletePatientFile, { fileId: file.id })
     },
     async finish (fileList) {
       // 上传结果做得不够细致

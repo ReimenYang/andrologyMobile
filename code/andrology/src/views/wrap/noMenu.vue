@@ -33,6 +33,7 @@ export default {
   name: 'NoMenu',
   components: { headerBar },
   async created () {
+    document.documentElement.style.setProperty('--theme-color', '')
   }
 }
 </script>

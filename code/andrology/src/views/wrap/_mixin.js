@@ -61,7 +61,7 @@ export default {
           name: '基础信息',
           path: '/projectCenter/info',
           icon: 'el-icon-s-home',
-          theme: '#43a7ff',
+          theme: '#2d1e02',
           menuId: '01'
         }
       } else {
@@ -70,7 +70,7 @@ export default {
           title: '项目运行情况',
           name: '项目运行情况',
           path: '/index/operationInfo',
-          theme: '#43a7ff',
+          // theme: '#43a7ff',
           menuId: '01'
         }
       }
@@ -89,9 +89,9 @@ export default {
       this.$store.commit('changeSystem', path)
 
       // 设置当前系统主题颜色
-      // let nowSystem = this.systems.find(item => path.indexOf(item.path) === 0)
-      // this.system = nowSystem.path
-      // document.documentElement.style.setProperty('--theme-color', nowSystem.theme)
+      let nowSystem = this.systems.find(item => path.indexOf(item.path) === 0)
+      this.system = nowSystem.path
+      if (nowSystem.theme) document.documentElement.style.setProperty('--theme-color', nowSystem.theme)
 
       // 设置tabList
       this.tabAdd(path)

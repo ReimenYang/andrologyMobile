@@ -17,11 +17,6 @@
     <div>
       <button
         class="btn primary"
-        @click="importDialog=true"
-      >
-        查看导入结果
-      </button><button
-        class="btn primary"
         @click="exportAskReport"
       >
         导出报告

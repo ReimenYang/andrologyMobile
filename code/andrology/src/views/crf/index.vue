@@ -225,7 +225,7 @@ export default {
         case 'object':
           return value.includes(patientState)
         case 'string':
-          return [label, patientCode].includes(value)
+          return [label, patientCode].join().includes(value)
       }
     },
     async clickTree (object) {

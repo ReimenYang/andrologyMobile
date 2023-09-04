@@ -8,6 +8,7 @@
     <upload-file
       :uploadApi="api.andrology.file.updateFile"
       @finish="finish"
+      @close="$emit('close')"
     />
   </el-dialog>
 </template>
