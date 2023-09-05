@@ -15,13 +15,14 @@ switch (projectName) {
     host.produce = 'https://health10.cn'
     break
   case 'andrology':// 男科大数据
+  case 'andrologyMobile':// 男科大数据手机版
     apiServers = {
       dev: 'http://10.10.20.85:9591',
-      test: 'https://andrologia.cn',
-      produce: 'https://andrologia.cn'
+      test: 'https://sci.andrologia.cn',
+      produce: 'https://sci.andrologia.cn'
     }
     host.dev = 'http://' + webDeveloper
-    host.produce = 'https://andrologia.cn' //todo
+    host.produce = 'https://andrologia.cn' // todo
     break
   default:
     apiServers = {
