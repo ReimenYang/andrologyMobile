@@ -18,7 +18,7 @@
       >
         <upload-file
           :uploadApi="api.andrology.file.updateFile"
-          :config="{listType,autoUpload:true,onRemove:delFile}"
+          :config="{listType,autoUpload: true,onRemove: delFile}"
           :dataList="dataList"
           @finish="finish"
         />
@@ -84,7 +84,7 @@ export default {
       let list = fileList.filter(item => item.response).map(item => item.response.data)
       let res = await this.request(this.api.andrology.patient.addPatientFile, { patientId: this.date.id || this.date.patientId, fileType: this.activeName, list })
       if (res.code !== 200) return
-
+      await this.getList()
       this.$emit('refresh')
     }
   }

@@ -128,10 +128,7 @@ export default {
         { prop: 'groupName', label: '所属组', width: 100 },
         { prop: 'organization', label: '所属机构', width: 100 },
         { prop: 'createDate', label: '创建日期', width: 160 }
-      ],
-      screeningDialog: false,
-      screeningTitle: '',
-      rowData: {}
+      ]
     }
   },
   async created () {

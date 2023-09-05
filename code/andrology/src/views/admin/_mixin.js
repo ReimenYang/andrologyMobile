@@ -50,6 +50,7 @@ export default {
       let res = await this.request(this.api.andrology.user.sendSMSCode, this.form)
       // this.getImgCodeUrl()
       if (res.code !== 200) return
+      this.$message.success('发送成功')
       let _time = 60
       let _obj = this.btnList.find(item => item.name === 'smsCode')
       _time--

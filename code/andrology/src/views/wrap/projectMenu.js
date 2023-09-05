@@ -6,7 +6,8 @@ export default [
     title: '基础信息',
     name: '基础信息',
     path: '/projectCenter/info',
-    icon: 'el-icon-s-home',
+    icon: 'iconfont icon-info-circle',
+    theme: '#2d1e02',
     children: [],
   },
   {
@@ -16,7 +17,8 @@ export default [
     title: '项目文件',
     name: '项目文件',
     path: '/projectCenter/file',
-    icon: ''
+    theme: '#2d1e02',
+    icon: 'iconfont icon-folder'
   },
   {
     id: '03',
@@ -25,7 +27,8 @@ export default [
     title: '组管理',
     name: '组管理',
     path: '/projectCenter/testeeGroup',
-    icon: '',
+    theme: '#2d1e02',
+    icon: 'iconfont icon-team',
     children: []
   },
   {
@@ -35,7 +38,8 @@ export default [
     title: '机构管理',
     name: '机构管理',
     path: '/projectCenter/organization',
-    icon: '',
+    theme: '#2d1e02',
+    icon: 'iconfont icon-cluster',
     children: []
   }, {
     id: '05',
@@ -44,7 +48,8 @@ export default [
     title: '权限管理',
     name: '权限管理',
     path: '/projectCenter/authorize',
-    icon: '',
+    theme: '#2d1e02',
+    icon: 'iconfont icon-Partition',
   }, {
     id: '06',
     menuId: '01',
@@ -52,6 +57,7 @@ export default [
     title: '用户管理',
     name: '用户管理',
     path: '/projectCenter/user',
-    icon: '',
+    theme: '#2d1e02',
+    icon: 'iconfont icon-user',
   },
 ]

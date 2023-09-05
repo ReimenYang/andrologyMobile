@@ -114,15 +114,23 @@
     :date="patientInfo"
     v-if="uploadFileDialog"
   />
+  <screening-info
+    :title="screeningTitle"
+    @close="hideDialog"
+    @refresh="getList"
+    :date="rowData"
+    v-if="screeningDialog"
+  />
 </template>
 
 <script>
 import paper from './_paper.vue'
 import questionMixin from '@/views/crf/questionMixin.js'
 import testeeMixin from '../testee/testeeMixin'
+import screeningInfo from '../testee/_screeningInfo.vue'
 export default {
   mixins: [questionMixin, testeeMixin],
-  components: { paper },
+  components: { paper, screeningInfo },
   provide () {
     return {
       testTarget: () => this

@@ -89,9 +89,11 @@ export default {
       this.$store.commit('changeSystem', path)
 
       // 设置当前系统主题颜色
-      let nowSystem = this.systems.find(item => path.indexOf(item.path) === 0)
-      this.system = nowSystem.path
-      if (nowSystem.theme) document.documentElement.style.setProperty('--theme-color', nowSystem.theme)
+      let nowSystem = this.menuList.find(item => path.indexOf(item.path) === 0)
+      if (nowSystem) {
+        this.system = nowSystem.path
+        if (nowSystem.theme) document.documentElement.style.setProperty('--theme-color', nowSystem.theme)
+      }
 
       // 设置tabList
       this.tabAdd(path)

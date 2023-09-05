@@ -91,7 +91,7 @@ export default {
     }
   },
   async created () {
-    this.screeningInfo = (await this.request(this.api.andrology.patient.getPatientScreeningInfo, { patientId: this.date.id })).data
+    this.screeningInfo = (await this.request(this.api.andrology.patient.getPatientScreeningInfo, { patientId: this.date.id || this.date.patientId })).data
     this.ready = true
   },
   methods: {
@@ -101,7 +101,7 @@ export default {
     },
     async confirm (type) {
       if (type === 'join') return this.joinDialog = true
-      let res = await this.request(this.api.andrology.patient.exclude, { patientId: this.date.id })
+      let res = await this.request(this.api.andrology.patient.exclude, { patientId: this.date.id || this.date.patientId })
       if (res.code !== 200) return this.finish()
     },
     hideDialog () {

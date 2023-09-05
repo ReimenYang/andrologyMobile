@@ -21,7 +21,10 @@ export default {
           { text: '签名', click: row => this.onBtn(row, 'signature'), condition: row => !row.signatureDate && sessionStorage.projectState === '已开始' },
           { text: '删除', click: row => this.onBtn(row, 'deletePatient'), condition: row => !this.patientInfo && sessionStorage.projectState === '已开始' && row.patientState === '未入组' },
         ]
-      }
+      },
+      screeningDialog: false,
+      screeningTitle: '',
+      rowData: {}
     }
   },
   methods: {
