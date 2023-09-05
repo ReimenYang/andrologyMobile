@@ -24,14 +24,18 @@ export default {
     sessionStorage.clear()
     document.documentElement.style.setProperty('--theme-color', '')
     let _userInfo = this.libs.data.getStorage('userInfo')
-    if (!_userInfo) return
-    this.globalData.userInfo = JSON.parse(_userInfo)
-    this.form.phone = this.globalData.userInfo.phone
-    this.btnList[0].smallLabel = true
-    if (!this.$route.query.projectCode) return
-    this.globalData.headers = { projectCode: this.$route.query.projectCode }
-    let getProjectBaseInfo = (await this.request(this.api.andrology.project.getProjectBaseInfo)).data
-    this.projectInfo = { ...getProjectBaseInfo, projectCode: this.$route.query.projectCode }
+    if (_userInfo) {
+      this.globalData.userInfo = JSON.parse(_userInfo)
+      this.form.phone = this.globalData.userInfo.phone
+      this.btnList[0].smallLabel = true
+    }
+    let projectCode = this.$route.query.projectCode
+    if (projectCode) {
+      this.globalData.headers = { projectCode }
+      let res = (await this.request(this.api.andrology.project.getProjectBaseInfo)).data
+      if (res.code !== 200) return
+      this.projectInfo = { ...res.data, projectCode }
+    }
   },
   methods: {
     changeLoginType () {
@@ -47,6 +51,7 @@ export default {
     },
     async getCode () {
       if (this.form.verifyCode.length !== 4) return this.$message.error({ duration: 3000, message: '请输入正确图片验证' })
+      if (this.smsLocker) return
       let res = await this.request(this.api.andrology.user.sendSMSCode, this.form)
       // this.getImgCodeUrl()
       if (res.code !== 200) return

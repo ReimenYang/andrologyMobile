@@ -187,6 +187,7 @@ export default {
     async sandMsg () {
       let userIdList = this.resultList.map(item => item.userId).join()
       await this.request(this.api.andrology.projectMgt.sendProjectSMS, { userIdList })
+      this.$message.success('发送成功')
     }
   }
 }

@@ -80,7 +80,7 @@ export default {
       if (!password && !this.btnList[2].btnStatus) message.push('密码')
       if (smsCode.length !== 6 && this.btnList[2].btnStatus) message.push('短信验证')
       if (message.length) return this.$message.error({ duration: 3000, message: '请输入正确' + message.join('，') })
-      let res = await this.request(this.api.andrology.user.login, this.form)
+      let res = await this.request(this.api.andrology.user.loginForProject, this.form)
       if (res.code !== 200) return
       this.globalData.userInfo = { phone, ...res.data, ...this.projectInfo, beforeunload: new Date() - 0 }
       this.libs.data.setStorage('userInfo', JSON.stringify(this.globalData.userInfo))
