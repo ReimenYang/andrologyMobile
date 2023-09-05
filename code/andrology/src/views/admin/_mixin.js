@@ -32,7 +32,8 @@ export default {
     let projectCode = this.$route.query.projectCode
     if (projectCode) {
       this.globalData.headers = { projectCode }
-      let res = (await this.request(this.api.andrology.project.getProjectBaseInfo)).data
+      let res = await this.request(this.api.andrology.project.getProjectBaseInfo)
+      console.log(res);
       if (res.code !== 200) return
       this.projectInfo = { ...res.data, projectCode }
     }
