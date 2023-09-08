@@ -3,7 +3,7 @@ export default {
     return {
       list: [],
       filterShow: true,
-      fromProp: { labelWidth: '130px' },
+      fromProp: { labelWidth: '100px' },
       resultList: [],
       pagination: { ...this.globalData.pagination },
     }

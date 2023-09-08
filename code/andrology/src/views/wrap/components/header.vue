@@ -42,7 +42,7 @@
         <template #dropdown>
           <el-dropdown-menu>
             <el-dropdown-item @click="showDialog=true">个人信息</el-dropdown-item>
-            <el-dropdown-item>修改密码</el-dropdown-item>
+            <el-dropdown-item @click="showPasswordDialog=true">修改密码</el-dropdown-item>
             <el-dropdown-item @click="logout">退出</el-dropdown-item>
           </el-dropdown-menu>
         </template>
@@ -54,17 +54,24 @@
       title="个人信息"
       @close="hideDialog"
     />
+    <password
+      v-if="showPasswordDialog"
+      title="修改密码"
+      @close="hideDialog"
+    />
   </el-row>
 </template>
 
 <script>
+import password from '@/views/user/_password.vue'
 import userInfo from '@/views/user/_userInfo.vue'
 export default {
-  components: { userInfo },
+  components: { userInfo, password },
   // inject: ['systems', 'system'],
   data () {
     return {
       showDialog: false,
+      showPasswordDialog: false,
       userInfo: {},
       // nowSystem: this.system(),
       studioList: [],
@@ -102,7 +109,7 @@ export default {
       // this.$router.push('/login')
     },
     hideDialog () {
-      this.showDialog = false
+      this.showDialog = this.showPasswordDialog = false
     },
     menuCollapse () {
       this.$store.commit('changeMenuIsCollapse')

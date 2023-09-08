@@ -73,7 +73,18 @@ export default defineComponent({
       this.globalData.userInfo = JSON.parse(_userInfo)
       let { beforeunload, loginToken, projectCode } = this.globalData.userInfo
       console.log(new Date() - beforeunload, (new Date() - beforeunload > 3 * 1000), !loginToken);
-      if ((new Date() - beforeunload > 3 * 1000) || !loginToken) return this.$router.push(`/${projectCode ? 'user' : 'admin'}/login`)
+
+      if ((new Date() - beforeunload > 3 * 1000) || !loginToken) {
+        // 根据用户角色判断跳转路径 todo
+        let url = location.href.split('#')[0] + `#/${projectCode ? ('user/login?projectCode=' + projectCode) : 'admin/login'}`
+        history.pushState(null, null, url);
+        window.addEventListener('popstate', function () {
+          history.pushState(null, null, url);
+        });
+
+        location.replace(url)
+        return
+      }
       this.globalData.headers = { token: loginToken, projectCode: sessionStorage.projectCode || '' }
       if (!sessionStorage.projectCode) return
       this.globalData.orgList = (await this.request(this.api.andrology.projectMgt.getProjectOrgList)).data

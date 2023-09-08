@@ -62,7 +62,7 @@ export default {
         prop: 'enterDate', label: '入组日期', type: 'dateTimePicker', repeat: [{ prop: 'enterDate', type: 'date' }]
       }],
       form: {
-        patientId: this.date.id,
+        patientId: this.date.id || this.date.patientId,
         groupId: '',
         enterDate: ''
       }

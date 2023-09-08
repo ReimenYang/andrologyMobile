@@ -48,6 +48,15 @@
     />
   </div>
 
+  <!-- 密码 -->
+  <div v-if="col.type === 'password'">
+    <el-input
+      type="password"
+      v-model.trim="form[col.prop]"
+      v-bind="col.config"
+    />
+  </div>
+
   <!-- 多行文本 -->
   <div v-else-if="col.type === 'textarea'">
     <el-input

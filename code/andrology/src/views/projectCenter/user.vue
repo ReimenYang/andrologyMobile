@@ -6,13 +6,13 @@
       class="topbar"
     >
       <el-col
-        :span="18"
+        :span="12"
         class="topbarTitle"
       >
         用户管理
       </el-col>
       <el-col
-        :span="6"
+        :span="12"
         class="btnGroup"
       ><button
           class="primary"

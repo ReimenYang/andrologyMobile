@@ -149,6 +149,10 @@ export default {
       }
       .btnGroup {
         flex-direction: row-reverse;
+        flex-wrap: wrap;
+        .el-button + .el-button {
+          margin: 0;
+        }
       }
     }
   }

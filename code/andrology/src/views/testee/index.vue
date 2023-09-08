@@ -6,13 +6,13 @@
       class="topbar"
     >
       <el-col
-        :span="22"
+        :span="20"
         class="topbarTitle"
       >
         受试者管理
       </el-col>
       <el-col
-        :span="2"
+        :span="4"
         class="btnGroup"
       ><button
           class="primary"
@@ -122,12 +122,12 @@ export default {
         { prop: 'patientState', label: '状态', width: 70 },
         { prop: 'patientName', label: '姓名', width: 100 },
         { prop: 'patientPhone', label: '手机号', width: 110 },
-        { prop: 'patientIdentity', label: '身份证', width: 170 },
-        { prop: 'patientAdmission', label: '住院号', width: 100 },
-        { prop: 'patientWeixin', label: '微信号', width: 110 },
+        // { prop: 'patientIdentity', label: '身份证', width: 170 },
+        // { prop: 'patientAdmission', label: '住院号', width: 100 },
+        // { prop: 'patientWeixin', label: '微信号', width: 110 },
         { prop: 'groupName', label: '所属组', width: 100 },
         { prop: 'organization', label: '所属机构', width: 100 },
-        { prop: 'createDate', label: '创建日期', width: 160 }
+        { prop: 'createDate', label: '创建日期', width: 100 }
       ]
     }
   },
@@ -139,7 +139,10 @@ export default {
   methods: {
     async getList () {
       this.list = (await this.request(this.api.andrology.patient.getPatientList)).data
-      this.list.forEach(item => item.patientId = item.id);
+      this.list.forEach(item => {
+        item.patientId = item.id
+        item.createDate = item.createDate.slice(0, 10)
+      });
       this.onPage({})
       this.ready = true
     }
