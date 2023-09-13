@@ -70,6 +70,7 @@
           @click="closeAsk"
         >关闭质疑</button>
         <button
+          v-if="askInfo.askType!=='系统质疑'"
           class="btn primary"
           @click="confirm"
         >回复</button>

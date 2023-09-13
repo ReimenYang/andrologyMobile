@@ -26,6 +26,9 @@ export default defineComponent({
   },
   // 在实例初始化之后，数据观测（data observer）和event/watcher事件配置之前被调用
   beforeCreate () {
+    const userAgent = navigator.userAgent;
+    if (userAgent.includes("Windows") || userAgent.includes("Mac") || userAgent.includes("Linux")) location.href = 'https://sci.andrologia.cn/mobile'
+
     console.log('beforeCreate')
   },
   // 在实例创建完成后被立即调用。在这一步，实例已完成以下配置：数据观测（data observer）

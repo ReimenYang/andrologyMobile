@@ -87,7 +87,7 @@ export default {
       tableHeader: [
         { prop: 'askType', label: '状态', width: 170 },
         { prop: 'askState', label: '类别', width: 100 },
-        { prop: 'askValue', label: '回答', width: 100 },
+        { prop: 'askValue', label: '质疑值', width: 100 },
         { prop: 'createDate', label: '创建日期', width: 160 },
         {
           prop: 'btnList', label: '操作', btnList: [
