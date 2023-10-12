@@ -27,7 +27,8 @@ export default defineComponent({
   // 在实例初始化之后，数据观测（data observer）和event/watcher事件配置之前被调用
   beforeCreate () {
     const userAgent = navigator.userAgent;
-    if (userAgent.includes("Windows") || userAgent.includes("Mac") || userAgent.includes("Linux")) location.href = 'https://sci.andrologia.cn/mobile'
+    if (userAgent.includes("Android") || userAgent.includes("iPhone") || userAgent.includes("iPad")) location.href = 'https://sci.andrologia.cn/mobile/#/?' + location.hash.split('?')[1]
+    // if (!(userAgent.includes("Windows") || userAgent.includes("Mac"))) location.href = 'http://10.10.20.101:8866/mobile/#/?' + location.hash.split('?')[1]
 
     console.log('beforeCreate')
   },

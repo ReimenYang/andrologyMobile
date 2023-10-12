@@ -117,7 +117,7 @@
   <screening-info
     :title="screeningTitle"
     @close="hideDialog"
-    @refresh="getList"
+    @refresh="init"
     :date="rowData"
     v-if="screeningDialog"
   />

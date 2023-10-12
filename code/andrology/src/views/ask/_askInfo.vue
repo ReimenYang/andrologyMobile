@@ -60,7 +60,10 @@
           <span class="tips">（选填，如您认为当前值有误，可在此处填上正确的值）</span>
         </el-descriptions-item>
       </el-descriptions>
-      <div class="formFooter">
+      <div
+        class="formFooter"
+        v-if="askInfo.askType!=='系统质疑'"
+      >
         <button
           class="btn"
           @click="$emit('close')"
@@ -70,7 +73,6 @@
           @click="closeAsk"
         >关闭质疑</button>
         <button
-          v-if="askInfo.askType!=='系统质疑'"
           class="btn primary"
           @click="confirm"
         >回复</button>
