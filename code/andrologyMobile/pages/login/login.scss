@@ -1,0 +1,121 @@
+.bg {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: url("../../static/bg.jpg") center/auto 100%;
+  text-align: center;
+
+  .title {
+    margin-bottom: 20px;
+    font-size: var(--font-h2);
+    color: #fff;
+  }
+
+  .fieldForm {
+    width: 620rpx;
+    padding: 20rpx;
+    margin: 0 auto 60rpx;
+    border-radius: 30rpx;
+    border: var(--border-normal);
+    background: #fff;
+    transition: all 0.125s ease-in;
+
+    .fieldBox {
+      width: 620rpx;
+      height: 110rpx;
+      position: relative;
+
+      &:not(:first-child) {
+        border-top: var(--border-normal);
+      }
+
+      .label {
+        position: absolute;
+        top: 30rpx;
+        left: 20rpx;
+        color: var(--color-tips);
+        font-size: var(--font-h4);
+        transition: all 0.125s ease-in;
+
+        &.smallLabel {
+          top: 10rpx;
+          font-size: var(--font-h6);
+        }
+      }
+
+      .input {
+        width: 520rpx;
+        height: 100rpx;
+        display: inline-block;
+        &.short {
+          width: 420rpx;
+          vertical-align: middle;
+        }
+      }
+
+      .icon-right {
+        width: 60rpx;
+        height: 60rpx;
+        box-sizing: border-box;
+        position: absolute;
+        bottom: 20rpx;
+        right: 0;
+        line-height: 56rpx;
+        text-align: center;
+        border: 4rpx solid;
+        border-radius: 30rpx;
+        font-weight: bold;
+        color: var(--color-tips);
+        transition: all 0.125s ease-in;
+
+        &.smallLabel {
+          bottom: 10rpx;
+        }
+
+        &.active {
+          color: var(--color-light);
+        }
+      }
+    }
+
+    .imgCode {
+      width: 200rpx;
+      height: 80rpx;
+    }
+
+    .getCode {
+      width: 200rpx;
+      display: inline-block;
+      text-align: center;
+      color: var(--theme-color);
+      text-decoration: underline;
+
+      &.disabled {
+        color: var(--color-tips);
+        text-decoration: none;
+      }
+    }
+
+    .submit {
+      width: 620rpx;
+      margin-top: 20rpx;
+      font-size: var(--font-h4);
+    }
+  }
+  .toggleType {
+    margin-bottom: 28vh;
+    text-decoration: underline;
+    color: #fff;
+  }
+  .vision {
+    padding: 1em;
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    font-size: var(--font-h6);
+    color: var(--color-tips);
+  }
+}

@@ -1,0 +1,84 @@
+{
+  "easycom": {
+    "autoscan": true,
+    "custom": {
+      "^uni-(.*)": "@dcloudio/uni-ui/lib/uni-$1/uni-$1.vue",
+      "xnw-loading": "@/libs/components/state/loading/loading.vue",
+      "xnw-dialog": "@/libs/components/uniapp/dialog/dialog.vue",
+      "xnw-address": "@/libs/components/uniapp/address/address.vue",
+      "xnw-number": "@/libs/components/uniapp/number/number.vue",
+      "^xnw-(.*)": "@/libs/components/uniapp/box/$1/$1.vue",
+      "^p-(.*)": "@/pages/components/_$1.vue"
+    }
+  },
+  "pages": [
+    {
+      "path": "pages/login/login",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/testee/index",
+      "style": {
+        "navigationBarTitleText": "受试者管理",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/testee/add",
+      "style": {
+        "navigationBarTitleText": "新增受试者",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/crf/index",
+      "style": {
+        "navigationBarTitleText": "受试者CRF",
+        "navigationStyle": "custom",
+        "navigationBarTextStyle": "white"
+      }
+    },
+    {
+      "path": "pages/crf/uploadFile",
+      "style": {
+        "navigationBarTitleText": "上传文件",
+        "navigationStyle": "custom",
+        "navigationBarTextStyle": "white"
+      }
+    },
+    {
+      "path": "pages/crf/screeningInfo",
+      "style": {
+        "navigationBarTitleText": "筛查详情",
+        "navigationStyle": "custom",
+        "navigationBarTextStyle": "white"
+      }
+    },
+    {
+      "path": "pages/crf/paper",
+      "style": {
+        "navigationBarTitleText": "问卷详情",
+        "navigationStyle": "custom",
+        "navigationBarTextStyle": "white"
+      }
+    }
+  ],
+  "globalStyle": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "男科大数据",
+    "navigationBarBackgroundColor": "#fff",
+    "backgroundColor": "#F8F8F8"
+  },
+  "condition": { // 模式配置，仅开发期间生效
+    "current": 0, // 当前激活的模式(list 的索引项)
+    "list": [
+      {
+        "name": "index", // 模式名称
+        "path": "pages/index/index", // 启动页面，必选
+        "query": "" // 启动参数，在页面的onLoad函数里面得到
+      }
+    ]
+  }
+}
